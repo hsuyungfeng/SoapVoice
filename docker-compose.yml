@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soapvoice-api
+    ports:
+      - "8000:8000"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./:/app
+      - model-cache:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - soapvoice-net
+
+  whisper:
+    image: ghcr.io/guillaumekln/faster-whisper:latest
+    container_name: soapvoice-whisper
+    environment:
+      - CUDA_VISIBLE_DEVICES=1
+    volumes:
+      - model-cache:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: soapvoice-vllm
+    ports:
+      - "8001:8000"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - HF_TOKEN=${HF_TOKEN}
+      - VLLM_ATTENTION_BACKEND=FLASH_ATTN
+    volumes:
+      - model-cache:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+
+volumes:
+  model-cache:
+    driver: local
+
+networks:
+  soapvoice-net:
+    driver: bridge
