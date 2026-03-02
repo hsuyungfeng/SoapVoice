@@ -1,0 +1,164 @@
+# 生產環境 Docker Compose 配置
+
+version: "3.8"
+
+services:
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: soapvoice-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+
+  # FastAPI 應用
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soapvoice-api
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - OLLAMA_HOST=ollama:11434
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - DEFAULT_API_KEY=${DEFAULT_API_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - ollama
+      - redis
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - soapvoice-net
+
+  # Ollama 模型服務
+  ollama:
+    image: ollama/ollama:latest
+    container_name: soapvoice-ollama
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - OLLAMA_MODELS=/models/ollama
+    volumes:
+      - model-cache:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+    command: serve
+
+  # Redis 快取層
+  redis:
+    image: redis:7-alpine
+    container_name: soapvoice-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Whisper ASR 服務 (可選)
+  whisper:
+    image: ghcr.io/guillaumekln/faster-whisper:latest
+    container_name: soapvoice-whisper
+    environment:
+      - CUDA_VISIBLE_DEVICES=1
+    volumes:
+      - model-cache:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+
+  # Prometheus 監控 (可選)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: soapvoice-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+    profiles:
+      - monitoring
+
+  # Grafana 可視化 (可選)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: soapvoice-grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+    profiles:
+      - monitoring
+
+volumes:
+  model-cache:
+    driver: local
+  redis-data:
+    driver: local
+  nginx-cache:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  soapvoice-net:
+    driver: bridge
