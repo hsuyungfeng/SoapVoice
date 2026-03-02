@@ -290,6 +290,49 @@
 
 ---
 
+### 📝 2026-03-09 (星期日) - Week 3, Day 2 - 模型配置更新
+
+**🎯 今日目標**
+- [x] 更新模型配置為 Ollama + Qwen3.5
+- [x] 建立 Ollama 引擎模組
+- [x] 更新 Docker Compose 配置
+- [x] 建立模型設置腳本
+
+**✅ 今日完成**
+
+1. ✅ **模型配置更新**
+   - Qwen3-32B-Instruct → qwen3.5:35b
+   - 新增 qwen3.5:27b (備用)
+   - 新增 glm-4.7-flash:latest (快速推理)
+
+2. ✅ **Ollama 引擎模組**
+   - 建立 `src/llm/ollama_engine.py`
+   - 支援 Ollama API
+   - 向後相容 VLLMEngine
+
+3. ✅ **Docker Compose 更新**
+   - 新增 ollama 服務
+   - 移除 vllm 服務
+   - 配置 GPU 資源
+
+4. ✅ **設置腳本**
+   - `scripts/setup_ollama.sh`: Ollama 模型設置
+
+**⏱️ 時間分配**
+| 項目 | 時間 |
+|------|------|
+| Ollama 引擎實作 | 2h |
+| Docker Compose 更新 | 0.5h |
+| 設置腳本實作 | 0.5h |
+| **總計** | **3h** |
+
+**🔜 明日計畫**
+- [ ] 安裝 Ollama 並下載模型
+- [ ] 執行端到端測試
+- [ ] 執行負載測試
+
+---
+
 ## 🚨 當前問題與阻礙 (Current Issues & Blockers)
 
 ### 🔴 Critical (P0) - 阻擋進度
