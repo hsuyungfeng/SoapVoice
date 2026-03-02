@@ -1,0 +1,64 @@
+# WebSocket Configuration
+# WebSocket 服務配置文件
+
+# 服務器配置
+server:
+  # 監聽地址
+  host: "0.0.0.0"
+  # 監聽端口
+  port: 8001
+  # 最大連接數
+  max_connections: 10
+  # 連接超時秒數
+  connection_timeout: 60
+  # 讀取緩衝區大小
+  buffer_size: 4096
+
+# 音頻處理配置
+audio:
+  # 音頻塊大小 (bytes)
+  chunk_size: 1024
+  # 採樣率
+  sample_rate: 16000
+  # 採樣寬度
+  sample_width: 2
+  # 聲道數
+  channels: 1
+  # 音頻編碼
+  encoding: "pcm_s16le"
+
+# 心跳配置
+ping:
+  # 心跳間隔 (秒)
+  interval: 30
+  # 心跳超時 (秒)
+  timeout: 10
+
+# 轉錄配置
+transcription:
+  # 語言 (null = 自動偵測)
+  language: null
+  # 任務類型: transcribe 或 translate
+  task: "transcribe"
+  # Beam size
+  beam_size: 5
+  # 設備: cuda 或 cpu
+  device: "cuda"
+  # 計算類型: float16, int8, int8_float16
+  compute_type: "float16"
+
+# 日誌配置
+logging:
+  # 日誌級別: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+  # 格式
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# CORS 配置
+cors:
+  # 允許的源
+  allow_origins: ["*"]
+  # 允許的方法
+  allow_methods: ["*"]
+  # 允許的頭
+  allow_headers: ["*"]
