@@ -1,0 +1,48 @@
+# Model Configuration
+# AI 模型配置文件
+
+whisper:
+  # Faster-Whisper 模型配置
+  model_id: "large-v3"
+  device: "cuda"
+  compute_type: "float16"
+  language: "auto"  # 自動偵測語言
+  task: "transcribe"
+  beam_size: 5
+  vad_filter: true
+  
+  # 下載配置
+  download_root: null  # 使用預設路徑 ~/.cache/huggingface/hub
+  
+  # 支援的語言
+  supported_languages:
+    - "en"  # English
+    - "zh"  # Chinese
+    - "ja"  # Japanese
+    - "ko"  # Korean
+    - "es"  # Spanish
+    - "fr"  # French
+    - "de"  # German
+
+llm:
+  # LLM 模型配置 (預設使用 GLM-4.7-Flash)
+  provider: "glm"
+  model: "glm-4.7-flash"
+  api_base: "https://open.bigmodel.cn/api/paas/v4"
+  temperature: 0.7
+  max_tokens: 2048
+  
+  # 備用模型配置
+  fallback_models:
+    - "qwen-turbo"
+    - "qwen3-32b"
+
+# GPU 配置
+gpu:
+  asr_device: "cuda:1"  # Whisper 使用 GPU1
+  llm_device: "cuda:0"  # LLM 使用 GPU0
+  
+# 效能目標
+performance:
+  asr_max_latency_ms: 500  # ASR 延遲目標 < 500ms
+  llm_max_latency_ms: 1000  # LLM 延遲目標 < 1s
