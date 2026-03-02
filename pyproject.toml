@@ -1,6 +1,6 @@
 [project]
 name = "soapvoice"
-version = "0.1.0"
+version = "0.8.0"
 description = "醫療語音轉 SOAP 病歷系統"
 requires-python = ">=3.11"
 dependencies = [
@@ -47,3 +47,35 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+# 測試覆蓋率配置
+[tool.coverage.run]
+branch = true
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+    "*/conftest.py",
+    "*/main.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+fail_under = 80
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
+title = "SoapVoice 測試覆蓋率報告"
+
+[tool.coverage.xml]
+output = "coverage.xml"
