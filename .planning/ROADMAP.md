@@ -8,7 +8,7 @@
 
 ## 階段總覽
 
-- [ ] **Phase 1: 專案基礎設施** - 硬體、軟體、开發環境就緒
+- [x] **Phase 1: 專案基礎設施** - 硬體、軟體、开發環境就緒
 - [ ] **Phase 2: AI 模型部署** - ASR 與 LLM 推理引擎運行
 - [ ] **Phase 3: 醫療 NLP 引擎** - 術語標準化與 SOAP 分類
 - [ ] **Phase 4: API 閘道與輸出** - REST/WebSocket API + SOAP 結構化輸出
@@ -40,7 +40,7 @@
 **Plan list:**
 - [x] 01-01-PLAN.md — 硬體環境驗證腳本 (完成: 2026-03-02)
 - [x] 01-02-PLAN.md — GPU/CUDA 與 Python 環境 (完成: 2026-03-02)
-- [ ] 01-03-PLAN.md — Docker 與 Git 配置
+- [x] 01-03-PLAN.md — Docker 與 Git 配置 (完成: 2026-03-02)
 
 ---
 
@@ -165,7 +165,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. 專案基礎設施 | 2/3 | In Progress | - |
+| 1. 專案基礎設施 | 3/3 | Complete | 2026-03-02 |
 | 2. AI 模型部署 | 0/7 | Not started | - |
 | 3. 醫療 NLP 引擎 | 0/5 | Not started | - |
 | 4. API 閘道與輸出 | 0/9 | Not started | - |
