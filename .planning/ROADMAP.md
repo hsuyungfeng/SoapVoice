@@ -56,11 +56,16 @@
 1. Faster-Whisper large-v3 可進行語音辨識 (WER <5%)
 2. 醫療詞彙可正確辨識 (自定義詞彙注入生效)
 3. WebSocket 串流 pipeline 可即時回傳轉文字結果
-4. Qwen3-32B 可透過 vLLM 進行推理
-5. GLM-4.7-Flash 可作為快速路由模型
-6. 推理延遲目標達成 (<2s @ 95th percentile)
+4. GLM-4.7-Flash 可透過 vLLM 進行推理
+5. 推理延遲目標達成 (<2s @ 95th percentile)
 
-**Plans:** TBD
+**Plans:** 4/4 plans
+
+**Plan list:**
+- [ ] 02-01-PLAN.md — Faster-Whisper large-v3 部署
+- [ ] 02-02-PLAN.md — 醫療詞彙優化
+- [ ] 02-03-PLAN.md — WebSocket 即時串流
+- [ ] 02-04-PLAN.md — GLM-4.7-Flash 推理引擎
 
 ---
 
@@ -166,7 +171,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. 專案基礎設施 | 3/3 | Complete    | 2026-03-02 |
-| 2. AI 模型部署 | 0/7 | Not started | - |
+| 2. AI 模型部署 | 0/4 | Not started | - |
 | 3. 醫療 NLP 引擎 | 0/5 | Not started | - |
 | 4. API 閘道與輸出 | 0/9 | Not started | - |
 | 5. 前端整合 | 0/4 | Not started | - |
