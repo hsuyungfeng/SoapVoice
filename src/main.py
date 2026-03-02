@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from src.api.websocket import router as websocket_router
+from src.api.rest import router as rest_router
 from src.llm.vllm_engine import initialize_engine, ModelConfig
 
 
@@ -86,6 +87,7 @@ app.add_middleware(
 
 # 註冊路由
 app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
+app.include_router(rest_router, prefix="/api/v1", tags=["Clinical NLP"])
 
 
 @app.get("/")
@@ -117,6 +119,12 @@ async def api_v1_root():
             "websocket": "/api/v1/ws/transcribe",
             "health": "/api/v1/health",
             "stats": "/api/v1/stats",
+            "clinical": {
+                "normalize": "/api/v1/clinical/normalize",
+                "icd10": "/api/v1/clinical/icd10",
+                "soap_classify": "/api/v1/clinical/classify/soap",
+                "soap_generate": "/api/v1/clinical/soap/generate",
+            },
         },
     }
 
