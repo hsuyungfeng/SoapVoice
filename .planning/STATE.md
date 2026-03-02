@@ -21,10 +21,10 @@
 ## 當前位置
 
 **階段:** Phase 2: AI 模型部署
-**計劃:** 02-02
+**計劃:** 02-03
 **狀態:** Complete
 
-**進度條:** ██████░░░ 2/4 plans complete
+**進度條:** █████████ 3/4 plans complete
 
 ---
 
@@ -54,6 +54,7 @@
 8. **ASR 引擎:** Faster-Whisper large-v3 (CTranslate2 加速)
 9. **語音辨識:** 支援中英文自動偵測
 10. **詞彙優化:** MedicalVocabulary 類 + 2294 詞彙庫
+11. **即時串流:** WebSocket streaming pipeline + StreamTranscriber
 
 ### 待辦事項
 

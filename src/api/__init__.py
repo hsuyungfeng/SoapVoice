@@ -1,0 +1,7 @@
+"""
+API 路由模組
+"""
+
+from src.api.websocket import router as websocket_router
+
+__all__ = ["websocket_router"]

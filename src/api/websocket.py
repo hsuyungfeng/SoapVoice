@@ -231,8 +231,8 @@ async def websocket_transcribe(websocket: WebSocket):
         # 持續處理訊息
         while True:
             try:
-                # 設置超時
-                await asyncio.wait_for(websocket.receive_text(), timeout=60.0)
+                # 接收文字訊息（使用超時）
+                data = await asyncio.wait_for(websocket.receive_text(), timeout=60.0)
             except asyncio.TimeoutError:
                 await manager.send_message(
                     client_id,
@@ -244,8 +244,6 @@ async def websocket_transcribe(websocket: WebSocket):
                 break
 
             try:
-                # 接收文字訊息
-                data = await websocket.receive_text()
                 message = json.loads(data)
             except json.JSONDecodeError:
                 await manager.send_message(
