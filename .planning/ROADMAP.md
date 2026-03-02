@@ -62,7 +62,7 @@
 **Plans:** 4/4 plans
 
 **Plan list:**
-- [ ] 02-01-PLAN.md — Faster-Whisper large-v3 部署
+- [x] 02-01-PLAN.md — Faster-Whisper large-v3 部署 (完成: 2026-03-02)
 - [ ] 02-02-PLAN.md — 醫療詞彙優化
 - [ ] 02-03-PLAN.md — WebSocket 即時串流
 - [ ] 02-04-PLAN.md — GLM-4.7-Flash 推理引擎
@@ -171,7 +171,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. 專案基礎設施 | 3/3 | Complete    | 2026-03-02 |
-| 2. AI 模型部署 | 0/4 | Not started | - |
+| 2. AI 模型部署 | 1/4 | In Progress | 2026-03-02 |
 | 3. 醫療 NLP 引擎 | 0/5 | Not started | - |
 | 4. API 閘道與輸出 | 0/9 | Not started | - |
 | 5. 前端整合 | 0/4 | Not started | - |

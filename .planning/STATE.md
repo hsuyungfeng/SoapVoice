@@ -14,17 +14,17 @@
 - 標準化醫療術語
 - 本地部署保護患者隱私
 
-**當前焦點:** Phase 0 - 專案準備期
+**當前焦點:** Phase 2: AI 模型部署
 
 ---
 
 ## 當前位置
 
-**階段:** Phase 1: 專案基礎設施
-**計劃:** 01-03
+**階段:** Phase 2: AI 模型部署
+**計劃:** 02-01
 **狀態:** Complete
 
-**進度條:** ████████░░ 3/3 plans complete
+**進度條:** ████░░░░░ 1/3 plans complete
 
 ---
 
@@ -51,10 +51,12 @@
 5. **GPU 分配:** GPU0: Qwen3-32B, GPU1: Whisper large-v3
 6. **GPU 環境:** CUDA 12.2 + NVIDIA Driver 535.288.01
 7. **開發環境:** uv + Python 3.13 虛擬環境
+8. **ASR 引擎:** Faster-Whisper large-v3 (CTranslate2 加速)
+9. **語音辨識:** 支援中英文自動偵測
 
 ### 待辦事項
 
-- [ ] 完成 Phase 1: 專案基礎設施
+- [x] 完成 Phase 1: 專案基礎設施
 - [ ] 完成 Phase 2: AI 模型部署
 - [ ] 完成 Phase 3: 醫療 NLP 引擎
 - [ ] 完成 Phase 4: API 閘道與輸出
