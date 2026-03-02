@@ -19,18 +19,28 @@ SOAP_KEYWORDS = {
     "subjective": [
         "痛", "癢", "暈", "咳", "燒", "燙", "疲倦", "沒胃口", "嘔吐", "噁心",
         "胸悶", "喘", "腹瀉", "便秘", "頭痛", "頭暈", "失眠", "焦慮",
+        "心悸", "腹脹", "抽筋", "麻木", "耳鳴", "視力模糊",
         "pain", "itch", "dizzy", "cough", "fever", "tired", "nausea",
+        "vomiting", "diarrhea", "constipation", "headache", "insomnia",
+        "anxiety", "palpitation", "dyspnea", "fatigue",
     ],
     "objective": [
         "紅腫", "水泡", "血壓", "心跳", "體溫", "呼吸", "觸診", "影像",
-        "化驗", "檢查", "TBSA", "erythema", "swelling", "blister", "bullae",
+        "化驗", "檢查", "TBSA", "聽診", "叩診", "X 光", "超音波", "X 射線",
+        "erythema", "swelling", "blister", "bullae", "blood pressure",
+        "heart rate", "temperature", "respiration", "xray", "x-ray", "ultrasound",
+        "ct", "mri", "ecg", "lab", "test", "examination", "finding",
     ],
     "assessment": [
-        "診斷", "初判", "可能", "疑似", "感染", "ICD", "assessment", "diagnosis",
+        "診斷", "初判", "可能", "疑似", "感染", "ICD", "確定", "臨床",
+        "diagnosis", "assess", "suggest", "suspect", "confirm", "likely",
+        "probable", "consistent with", "indicative of",
     ],
     "plan": [
         "換藥", "上藥", "追蹤", "開藥", "衛教", "回診", "治療", "用藥",
-        "medication", "treatment", "follow-up", "prescription",
+        "手術", "復健", "飲食", "運動", "檢查", "檢驗", "轉診",
+        "medication", "treatment", "follow-up", "prescription", "surgery",
+        "therapy", "diet", "exercise", "referral", "advice", "plan",
     ],
 }
 

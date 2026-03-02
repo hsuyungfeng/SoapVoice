@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class ModelConfig:
     """模型配置"""
 
-    model_id: str
+    model_id: str = "Qwen/Qwen3-32B-Instruct"
     trust_remote_code: bool = True
     tensor_parallel_size: int = 1
     gpu_memory_utilization: float = 0.9

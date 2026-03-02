@@ -38,11 +38,11 @@ class SOAPClassifier:
         "objective": [
             # 檢查測量（中文）
             "紅腫", "水泡", "血壓", "心跳", "體溫", "呼吸", "觸診", "影像",
-            "化驗", "檢查", "TBSA", "聽診", "叩診", "X 光", "超音波",
+            "化驗", "檢查", "TBSA", "聽診", "叩診", "X 光", "超音波", "X 射線",
             # 檢查測量（英文）
             "erythema", "swelling", "blister", "bullae", "blood pressure",
-            "heart rate", "temperature", "respiration", "X-ray", "ultrasound",
-            "CT", "MRI", "ECG", "lab", "test", "examination", "finding",
+            "heart rate", "temperature", "respiration", "xray", "x-ray", "ultrasound",
+            "ct", "mri", "ecg", "lab", "test", "examination", "finding",
         ],
         "assessment": [
             # 診斷（中文）
