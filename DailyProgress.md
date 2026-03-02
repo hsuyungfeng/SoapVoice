@@ -434,6 +434,50 @@ glm-4.7-flash       19 GB (快速推理)
 
 ---
 
+### 📝 2026-03-12 (星期三) - Week 3, Day 5 - Phase 5 測試優化
+
+**🎯 今日目標**
+- [x] 測試覆蓋率配置
+- [x] 醫師 beta 測試回饋表單
+- [x] 效能優化指南
+- [x] 測試腳本建立
+
+**✅ 今日完成**
+
+1. ✅ **測試覆蓋率配置**
+   - 更新 `pyproject.toml` 添加 coverage 配置
+   - 目標覆蓋率：≥80%
+   - 建立 `scripts/test_coverage.sh`
+   - 支援 HTML/XML 報告格式
+
+2. ✅ **醫師 beta 測試準備**
+   - 建立 `docs/BETA_TEST_FEEDBACK.md`
+   - SUS 量表與功能評估問卷
+   - 使用情況調查與問題追蹤
+   - 建立 `scripts/run_beta_test.sh`
+
+3. ✅ **效能優化指南**
+   - 建立 `docs/PERFORMANCE_OPTIMIZATION.md`
+   - 模型、快取、資料庫、API 優化策略
+   - 常見問題排查指南
+   - 效能檢查清單
+
+**⏱️ 時間分配**
+| 項目 | 時間 |
+|------|------|
+| 測試覆蓋率配置 | 1h |
+| beta 測試表單 | 1h |
+| 效能優化指南 | 1.5h |
+| **總計** | **3.5h** |
+
+**🔜 下週計畫 (Week 4)**
+- [ ] 執行測試覆蓋率分析
+- [ ] 醫師 beta 測試執行
+- [ ] 效能優化實作
+- [ ] Phase 6 部署準備
+
+---
+
 ## 🚨 當前問題與阻礙 (Current Issues & Blockers)
 
 ### 🔴 Critical (P0) - 阻擋進度
