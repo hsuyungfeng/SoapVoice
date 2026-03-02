@@ -25,31 +25,29 @@ whisper:
     - "de"  # German
 
 llm:
-  # LLM 模型配置 (本地部署)
-  provider: "vllm"
-  model: "Qwen/Qwen3-32B-Instruct"
-  api_base: "http://localhost:8001/v1"  # 本地 vLLM 服務
+  # LLM 模型配置 (Ollama 本地部署)
+  provider: "ollama"
+  model: "qwen3.5:35b"  # 主模型：Qwen3.5 35B
+  api_base: "http://localhost:11434"  # Ollama 服務
   temperature: 0.3
   max_tokens: 1024
 
-  # 備用模型配置（本地）
+  # 備用模型配置
   fallback_models:
-    - "Qwen/Qwen3-32B-Instruct"
-    - "THUDM/glm-4-9b-chat"
+    - "qwen3.5:27b"  # 較小的 Qwen3.5 版本
+    - "glm-4.7-flash:latest"  # 快速推理模型
 
-  # vLLM 配置
-  vllm:
-    tensor_parallel_size: 1
-    gpu_memory_utilization: 0.9
-    max_model_len: 4096
-    dtype: "float16"
-    enforce_eager: false
+  # Ollama 配置
+  ollama:
+    num_ctx: 4096
+    num_gpu: 1
+    num_thread: 16
 
 # GPU 配置
 gpu:
   asr_device: "cuda:1"  # Whisper 使用 GPU1
   llm_device: "cuda:0"  # LLM 使用 GPU0
-  
+
 # 效能目標
 performance:
   asr_max_latency_ms: 500  # ASR 延遲目標 < 500ms

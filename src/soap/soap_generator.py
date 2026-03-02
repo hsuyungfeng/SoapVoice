@@ -8,7 +8,7 @@ import logging
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 
-from src.llm.vllm_engine import VLLMEngine, ModelConfig
+from src.llm.ollama_engine import OllamaEngine, ModelConfig
 
 
 logger = logging.getLogger(__name__)
@@ -49,11 +49,11 @@ SOAP_KEYWORDS = {
 class SOAPConfig:
     """SOAP 生成配置"""
 
-    model_id: str = "Qwen/Qwen3-32B-Instruct"
+    model_id: str = "qwen3.5:35b"
+    api_base: str = "http://localhost:11434"
     max_tokens: int = 512
     temperature: float = 0.3
-    top_p: float = 0.9
-    gpu_memory_utilization: float = 0.9
+    num_ctx: int = 4096
     max_subjective_length: int = 100  # 字元限制
 
 
@@ -67,22 +67,25 @@ class SOAPGenerator:
             config: SOAP 生成配置
         """
         self.config = config or SOAPConfig()
-        self._engine: Optional[VLLMEngine] = None
+        self._engine: Optional[OllamaEngine] = None
 
-    def initialize(self, engine: Optional[VLLMEngine] = None) -> None:
+    def initialize(self, engine: Optional[OllamaEngine] = None) -> None:
         """初始化 LLM 引擎
 
         Args:
-            engine: 可選的 VLLMEngine 實例
+            engine: 可選的 OllamaEngine 實例
         """
         if engine:
             self._engine = engine
         else:
             model_config = ModelConfig(
                 model_id=self.config.model_id,
-                gpu_memory_utilization=self.config.gpu_memory_utilization,
+                api_base=self.config.api_base,
+                max_tokens=self.config.max_tokens,
+                temperature=self.config.temperature,
+                num_ctx=self.config.num_ctx,
             )
-            from src.llm.vllm_engine import initialize_engine
+            from src.llm.ollama_engine import initialize_engine
             self._engine = initialize_engine(model_config)
         logger.info("SOAPGenerator initialized")
 
@@ -163,7 +166,6 @@ CONVERSATION_SUMMARY:
                 prompt=prompt,
                 max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
-                top_p=self.config.top_p,
             )
             return self._parse_response(response, transcript)
         except Exception as e:

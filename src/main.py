@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 from src.api.websocket import router as websocket_router
 from src.api.rest import router as rest_router
-from src.llm.vllm_engine import initialize_engine, ModelConfig
+from src.llm.ollama_engine import initialize_engine, ModelConfig
 
 
 # 載入環境變數

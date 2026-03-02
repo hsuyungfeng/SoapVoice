@@ -11,16 +11,12 @@ services:
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - PYTHONUNBUFFERED=1
+      - OLLAMA_HOST=ollama:11434
     volumes:
       - ./:/app
       - model-cache:/models
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    depends_on:
+      - ollama
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -49,15 +45,14 @@ services:
     networks:
       - soapvoice-net
 
-  vllm:
-    image: vllm/vllm-openai:latest
-    container_name: soapvoice-vllm
+  ollama:
+    image: ollama/ollama:latest
+    container_name: soapvoice-ollama
     ports:
-      - "8001:8000"
+      - "11434:11434"
     environment:
       - CUDA_VISIBLE_DEVICES=0
-      - HF_TOKEN=${HF_TOKEN}
-      - VLLM_ATTENTION_BACKEND=FLASH_ATTN
+      - OLLAMA_MODELS=/models/ollama
     volumes:
       - model-cache:/models
     deploy:
@@ -70,6 +65,7 @@ services:
     restart: unless-stopped
     networks:
       - soapvoice-net
+    command: serve
 
 volumes:
   model-cache:
