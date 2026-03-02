@@ -5,5 +5,6 @@ ASR (Automatic Speech Recognition) 模組
 """
 
 from src.asr.whisper_model import WhisperModel
+from src.asr.vocabulary import MedicalVocabulary
 
-__all__ = ["WhisperModel"]
+__all__ = ["WhisperModel", "MedicalVocabulary"]
