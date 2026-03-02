@@ -21,10 +21,10 @@
 ## 當前位置
 
 **階段:** Phase 1: 專案基礎設施
-**計劃:** 01-01 (完成)
+**計劃:** 01-02
 **狀態:** In Progress
 
-**進度條:** ████░░░░░░ 1/3 plans complete
+**進度條:** ██████░░░ 2/3 plans complete
 
 ---
 
@@ -49,6 +49,8 @@
 3. **認證方式:** API Key + JWT
 4. **依賴管理:** uv (Python)
 5. **GPU 分配:** GPU0: Qwen3-32B, GPU1: Whisper large-v3
+6. **GPU 環境:** CUDA 12.2 + NVIDIA Driver 535.288.01
+7. **開發環境:** uv + Python 3.13 虛擬環境
 
 ### 待辦事項
 
