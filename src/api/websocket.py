@@ -205,8 +205,9 @@ async def websocket_transcribe(websocket: WebSocket):
         except json.JSONDecodeError:
             client_id = f"client_{id(websocket)}"
 
-        # 添加到管理器
-        manager.connect(websocket, client_id)
+        # 添加到管理器（同步調用）
+        manager.active_connections[client_id] = websocket
+        manager.connection_count += 1
 
         logger.info(f"客戶端 {client_id} 已連接")
 
