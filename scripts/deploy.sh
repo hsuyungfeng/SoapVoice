@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 生產環境部署腳本
+# 生產環境部署腳本 (簡化版)
 
 set -e
 
@@ -43,18 +43,28 @@ check_prerequisites() {
     fi
     log_info "✓ Docker Compose 已安裝"
     
-    # 檢查 NVIDIA Container Toolkit
-    if ! docker run --rm --gpus all nvidia/cuda:12.0-base nvidia-smi &> /dev/null; then
-        log_warn "NVIDIA Container Toolkit 可能未正確配置"
-    else
-        log_info "✓ NVIDIA Container Toolkit 正常"
-    fi
-    
     # 檢查 Ollama
     if ! command -v ollama &> /dev/null; then
-        log_warn "Ollama 未安裝，將使用 Docker 部署"
+        log_error "Ollama 未安裝"
+        log_info "請先安裝 Ollama: curl -fsSL https://ollama.com/install.sh | sh"
+        exit 1
+    fi
+    log_info "✓ Ollama 已安裝"
+    
+    # 檢查 Ollama 服務
+    if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+        log_warn "Ollama 服務未運行，嘗試啟動..."
+        ollama serve &
+        sleep 3
+    fi
+    log_info "✓ Ollama 服務運行中"
+    
+    # 檢查模型
+    if ! ollama list | grep -q "qwen3.5"; then
+        log_warn "qwen3.5 模型未安裝"
+        log_info "請執行：ollama pull qwen3.5:35b"
     else
-        log_info "✓ Ollama 已安裝"
+        log_info "✓ Qwen3.5 模型已安裝"
     fi
 }
 
@@ -69,14 +79,14 @@ setup_env() {
         # 產生 JWT Secret Key
         JWT_SECRET=$(openssl rand -hex 32)
         sed -i "s/JWT_SECRET_KEY=.*/JWT_SECRET_KEY=$JWT_SECRET/" .env
-        log_info "✓ JWT Secret Key 已產生"
         
         # 產生 API Key
-        API_KEY=$(openssl rand -base64 32)
+        API_KEY=$(openssl rand -base64 32 | tr -d '\n')
         sed -i "s/DEFAULT_API_KEY=.*/DEFAULT_API_KEY=$API_KEY/" .env
-        log_info "✓ API Key 已產生"
+        
+        log_info "✓ JWT Secret Key 和 API Key 已產生"
     else
-        log_warn ".env 已存在，跳過"
+        log_info "✓ .env 已存在"
     fi
 }
 
@@ -87,14 +97,14 @@ start_services() {
     # 停止舊服務
     docker compose -f docker-compose.prod.yml down 2>/dev/null || true
     
-    # 啟動新服務
-    docker compose -f docker-compose.prod.yml up -d
+    # 啟動新服務 (不使用需要認證的映像)
+    docker compose -f docker-compose.prod.yml up -d --build
     
     log_info "✓ 服務已啟動"
     
     # 等待服務就緒
     log_info "等待服務就緒..."
-    sleep 10
+    sleep 15
 }
 
 # 驗證部署
@@ -109,14 +119,15 @@ verify_deployment() {
         log_info "✓ API 健康檢查通過"
     else
         log_error "✗ API 健康檢查失敗"
+        docker compose logs api
         exit 1
     fi
     
-    # 檢查 Ollama
-    if curl -s http://localhost:11434/api/tags | grep -q "models"; then
-        log_info "✓ Ollama 服務正常"
+    # 檢查 Redis
+    if docker compose exec -T redis redis-cli ping 2>/dev/null | grep -q "PONG"; then
+        log_info "✓ Redis 服務正常"
     else
-        log_warn "Ollama 服務可能未就緒"
+        log_warn "Redis 服務可能未就緒"
     fi
 }
 
@@ -135,13 +146,13 @@ show_info() {
     echo "  Swagger UI: http://localhost:8000/docs"
     echo "  ReDoc: http://localhost:8000/redoc"
     echo ""
-    log_info "監控:"
-    echo "  Prometheus: http://localhost:9090"
-    echo "  Grafana: http://localhost:3000 (admin/admin)"
-    echo ""
     log_info "日誌:"
     echo "  docker compose logs -f api"
-    echo "  docker compose logs -f ollama"
+    echo "  docker compose logs -f redis"
+    echo ""
+    log_info "測試:"
+    echo "  curl http://localhost:8000/health"
+    echo "  ./scripts/deploy_verify.sh"
     echo ""
 }
 

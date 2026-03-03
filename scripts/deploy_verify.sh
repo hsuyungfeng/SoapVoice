@@ -46,11 +46,9 @@ run_test() {
     fi
 }
 
-# 檢查 Docker 服務
-check_docker_services() {
-    log_info "檢查 Docker 服務..."
-    
-    docker compose ps | grep -q "running" && return 0 || return 1
+# 檢查 Ollama 服務
+check_ollama() {
+    curl -s http://localhost:11434/api/tags | grep -q "models" && return 0 || return 1
 }
 
 # 檢查 API 健康
@@ -58,19 +56,14 @@ check_api_health() {
     curl -s http://localhost:8000/health | grep -q "healthy" && return 0 || return 1
 }
 
-# 檢查 Ollama 服務
-check_ollama() {
-    curl -s http://localhost:11434/api/tags | grep -q "models" && return 0 || return 1
-}
-
-# 檢查模型
-check_models() {
-    ollama list | grep -q "qwen3.5" && return 0 || return 1
+# 檢查 Docker 服務
+check_docker_services() {
+    docker compose -f docker-compose.prod.yml ps 2>&1 | grep -q "Up" && return 0 || return 1
 }
 
 # 檢查 Redis
 check_redis() {
-    docker compose exec -T redis redis-cli ping | grep -q "PONG" && return 0 || return 1
+    docker compose exec -T redis redis-cli ping 2>/dev/null | grep -q "PONG" && return 0 || return 1
 }
 
 # API 功能測試
@@ -96,17 +89,14 @@ main() {
     log_info "開始部署驗證..."
     echo ""
     
-    # Docker 服務檢查
-    run_test "Docker 服務" "check_docker_services" || true
+    # Ollama 服務檢查
+    run_test "Ollama 服務" "check_ollama" || true
     
     # API 健康檢查
     run_test "API 健康檢查" "check_api_health" || true
     
-    # Ollama 服務檢查
-    run_test "Ollama 服務" "check_ollama" || true
-    
-    # 模型檢查
-    run_test "模型檢查" "check_models" || true
+    # Docker 服務檢查
+    run_test "Docker 服務" "check_docker_services" || true
     
     # Redis 檢查
     run_test "Redis 服務" "check_redis" || true
@@ -130,7 +120,6 @@ main() {
         echo "下一步:"
         echo "  1. 訪問測試頁面：http://localhost:8000/docs"
         echo "  2. 執行 beta 測試：./scripts/run_beta_test.sh"
-        echo "  3. 查看監控儀表板：http://localhost:3000"
         exit 0
     else
         log_error "部分驗證失敗，請檢查上述錯誤。"
