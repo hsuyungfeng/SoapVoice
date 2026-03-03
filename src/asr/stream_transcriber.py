@@ -71,6 +71,8 @@ class StreamTranscriber:
         self._model_instance = whisper_model
         self.model = whisper_model.model
         print(f"✓ Whisper 模型已載入：{whisper_model.model_id}")
+        print(f"  model 屬性：{self.model}")
+        print(f"  _model_instance: {self._model_instance}")
 
     def start_stream(self) -> dict:
         """開始新的串流識別會話

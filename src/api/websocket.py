@@ -270,6 +270,8 @@ async def websocket_transcribe(websocket: WebSocket):
 
             if message_type == "start":
                 logger.info(f"收到 start 訊息：{message_data}")
+                logger.info(f"model_loaded 狀態：{model_loaded}")
+                logger.info(f"transcriber.model: {transcriber.model}")
 
                 # 開始新的轉錄會話 - 載入模型
                 if not model_loaded:
@@ -277,11 +279,16 @@ async def websocket_transcribe(websocket: WebSocket):
                     from src.asr.whisper_model import WhisperModel
                     try:
                         whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
+                        logger.info(f"Whisper 模型實例：{whisper_model}")
+                        logger.info(f"Whisper model.model: {whisper_model.model}")
                         transcriber.load_model(whisper_model)
                         model_loaded = True
                         logger.info("✓ Whisper 模型載入完成")
+                        logger.info(f"transcriber.model 載入後：{transcriber.model}")
                     except Exception as e:
                         logger.error(f"Whisper 模型載入失敗：{e}")
+                        import traceback
+                        traceback.print_exc()
                         await manager.send_message(
                             client_id,
                             {"type": "error", "data": {"error": f"Model load error: {str(e)}"}}
@@ -291,6 +298,7 @@ async def websocket_transcribe(websocket: WebSocket):
                 # 開始轉錄會話
                 try:
                     logger.info("開始轉錄會話...")
+                    logger.info(f"呼叫 start_stream() 前 transcriber.model: {transcriber.model}")
                     result = transcriber.start_stream()
                     logger.info(f"轉錄會話開始結果：{result}")
                     await manager.send_message(
@@ -312,6 +320,8 @@ async def websocket_transcribe(websocket: WebSocket):
                     )
                 except Exception as e:
                     logger.error(f"start_stream 未知錯誤：{e}")
+                    import traceback
+                    traceback.print_exc()
                     await manager.send_message(
                         client_id, {"type": "error", "data": {"error": f"Unknown error: {str(e)}"}}
                     )
