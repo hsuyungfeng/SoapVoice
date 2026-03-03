@@ -11,6 +11,22 @@ import json
 import base64
 import pyaudio
 import sys
+import contextlib
+import os
+import time
+
+# 隱藏 ALSA 錯誤訊息
+@contextlib.contextmanager
+def ignore_stderr():
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    old_stderr = os.dup(sys.stderr.fileno())
+    os.dup2(devnull, sys.stderr.fileno())
+    os.close(devnull)
+    try:
+        yield
+    finally:
+        os.dup2(old_stderr, sys.stderr.fileno())
+        os.close(old_stderr)
 
 # 音頻配置
 FORMAT = pyaudio.paInt16
@@ -70,41 +86,47 @@ async def test_audio_streaming():
     # 檢查 PyAudio
     try:
         import pyaudio
-        p = pyaudio.PyAudio()
-        device_count = p.get_device_count()
+        with ignore_stderr():
+            p = pyaudio.PyAudio()
+            device_count = p.get_device_count()
         print(f"✓ 找到 {device_count} 個音頻設備")
 
         # 尋找輸入設備
         input_device = None
         for i in range(device_count):
             try:
-                info = p.get_device_info_by_index(i)
+                with ignore_stderr():
+                    info = p.get_device_info_by_index(i)
                 if info.get('maxInputChannels', 0) > 0:
                     print(f"  輸入設備 {i}: {info['name']} (channels: {info['maxInputChannels']})")
                     if input_device is None:
                         input_device = i  # 使用第一個找到的輸入設備
+                    # 優先選擇 pipewire/default（支援原生 16kHz，品質更好）
+                    name_lower = info.get('name', '').lower()
+                    if 'pipewire' in name_lower or info['name'] == 'default':
+                        input_device = i
             except:
                 pass
 
         if input_device is None:
             print("⚠ 未找到麥克風設備，跳過音頻串流測試")
-            p.terminate()
+            with ignore_stderr():
+                p.terminate()
             return False
 
         print(f"✓ 使用輸入設備：{input_device}")
-        p.terminate()
+        with ignore_stderr():
+            p.terminate()
     except Exception as e:
         print(f"⚠ PyAudio 初始化失敗：{e}")
         print("  跳過音頻串流測試")
         return False
 
-    websocket = None
-    stream = None
-    p = None
-
     try:
-        # 連接 WebSocket
-        websocket = await websockets.connect(WS_URI, ping_timeout=10, close_timeout=10)
+        # 使用 ignore_stderr 隱藏 ALSA 噪音
+        with ignore_stderr():
+            # 連接 WebSocket
+            websocket = await websockets.connect(WS_URI, ping_timeout=10, close_timeout=10)
         print("✓ WebSocket 連接成功")
 
         # 發送客戶端識別資訊（服務器期望）
@@ -158,46 +180,71 @@ async def test_audio_streaming():
             return False
 
         # 初始化 PyAudio
-        p = pyaudio.PyAudio()
+        with ignore_stderr():
+            p = pyaudio.PyAudio()
 
         # Whisper 模型需要 16000Hz
         target_rate = 16000
 
         try:
-            stream = p.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=target_rate,
-                input=True,
-                frames_per_buffer=1024,
-                input_device_index=input_device
-            )
+            with ignore_stderr():
+                stream = p.open(
+                    format=pyaudio.paInt16,
+                    channels=1,
+                    rate=target_rate,
+                    input=True,
+                    frames_per_buffer=1024,
+                    input_device_index=input_device
+                )
+            actual_rate = target_rate
             print(f"✓ PyAudio 串流已初始化（採樣率：{target_rate}Hz）")
         except Exception as e:
             print(f"⚠ {target_rate}Hz 初始化失敗：{e}")
             print("💡 嘗試使用系統預設採樣率並進行轉換...")
 
             # 使用系統預設採樣率
-            stream = p.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=48000,  # 使用更常見的採樣率
-                input=True,
-                frames_per_buffer=1024,
-                input_device_index=input_device
-            )
+            with ignore_stderr():
+                stream = p.open(
+                    format=pyaudio.paInt16,
+                    channels=1,
+                    rate=48000,  # 使用更常見的採樣率
+                    input=True,
+                    frames_per_buffer=1024,
+                    input_device_index=input_device
+                )
+            actual_rate = 48000
             print(f"✓ PyAudio 串流已初始化（採樣率：48000Hz，將轉換為 16000Hz）")
 
-            # 設置採樣率轉換
-            import numpy as np
-            def resample_audio(data, from_rate, to_rate):
-                """簡易採樣率轉換"""
-                num_samples = int(len(data) * to_rate / from_rate)
-                return np.interp(
-                    np.linspace(0, len(data), num_samples, endpoint=False),
-                    np.arange(len(data)),
-                    data.astype(np.float32)
-                ).astype(np.int16).tobytes()
+        # 實際採樣率已在上方設定
+        
+        # 設置採樣率轉換
+        import numpy as np
+        import math
+
+        def resample_audio(data, from_rate, to_rate):
+            """採樣率轉換 (16-bit PCM)，優先使用 scipy 抗混疊重採樣"""
+            if from_rate == to_rate:
+                return data
+            audio_np = np.frombuffer(data, dtype=np.int16).astype(np.float32)
+            try:
+                from scipy.signal import resample_poly
+                g = math.gcd(from_rate, to_rate)
+                up, down = to_rate // g, from_rate // g
+                resampled = resample_poly(audio_np, up, down)
+            except ImportError:
+                # Fallback: 平均抽樣（box filter）提供基本抗混疊
+                ratio = from_rate // to_rate
+                n = len(audio_np) - len(audio_np) % ratio
+                resampled = audio_np[:n].reshape(-1, ratio).mean(axis=1)
+            return resampled.clip(-32768, 32767).astype(np.int16).tobytes()
+        
+        # 根據採樣率調整讀取塊大小，確保每次傳送給伺服器的是 1024 samples (16k)
+        read_chunk_size = 1024
+        if actual_rate == 48000:
+            read_chunk_size = 3072
+        
+        max_chunks = int(10 * actual_rate / read_chunk_size)
+        print(f"📊 設定讀取塊大小：{read_chunk_size}，總塊數：{max_chunks} (採樣率：{actual_rate}Hz)")
 
         print("🎤 開始錄音... (錄音 10 秒，按 Ctrl+C 可提前停止)")
         print("📊 轉錄結果將顯示如下：")
@@ -206,7 +253,6 @@ async def test_audio_streaming():
         print("")
 
         chunk_count = 0
-        max_chunks = 150  # 增加錄音長度（約 10 秒，150 * 1024 / 16000 ≈ 9.6 秒）
         transcripts = []  # 存儲所有轉錄結果
         audio_level_sum = 0  # 音頻電平總和
         speech_detected = False  # 是否檢測到語音
@@ -214,11 +260,26 @@ async def test_audio_streaming():
         try:
             while chunk_count < max_chunks:
                 # 讀取音頻數據
-                data = stream.read(1024, exception_on_overflow=False)
+                raw_data = stream.read(read_chunk_size, exception_on_overflow=False)
+                
+                # 進行採樣率轉換
+                data = resample_audio(raw_data, actual_rate, 16000)
+                
+                # 客戶端音訊正規化 (讓 Whisper 聽清楚)
+                audio_np = np.frombuffer(data, dtype=np.int16).astype(np.float32)
+                current_max = np.abs(audio_np).max()
+                if current_max > 100: # 稍微提高門檻
+                    # 嘗試將音量拉到 70% 的最大量程 (0.7 * 32768 = 22938)
+                    scale = 22938.0 / current_max
+                    # 限制最大增益為 20 倍，支援安靜麥克風場景
+                    scale = min(scale, 20.0)
+                    audio_np = (audio_np * scale).clip(-32768, 32767).astype(np.int16)
+                    data = audio_np.tobytes()
 
-                # 計算音頻電平（用於確認麥克風是否有輸入）
+                # 計算音頻電平
                 import struct
-                audio_level = sum([abs(struct.unpack('<h', data[i:i+2])[0]) for i in range(0, len(data), 2)]) / (len(data) // 2)
+                audio_level = sum([abs(struct.unpack('<h', raw_data[i:i+2])[0]) for i in range(0, len(raw_data), 2)]) / (len(raw_data) // 2)
+                
                 audio_level_sum += audio_level
 
                 # 簡單的語音檢測（電平 > 500 認為有語音）
@@ -235,23 +296,24 @@ async def test_audio_streaming():
 
                 chunk_count += 1
 
-                # 每 10 個塊顯示一次進度
-                if chunk_count % 10 == 0:
-                    avg_level = audio_level_sum / chunk_count
-                    speech_indicator = "🎤 語音" if speech_detected else "🔇 安靜"
-                    print(f"  已發送 {chunk_count}/{max_chunks} 個音頻塊... (音頻電平：{avg_level:.0f}) {speech_indicator}")
+                # 每 5 個塊更新一次 UI
+                if chunk_count % 5 == 0:
+                    peak_amp = np.abs(audio_np).max()
+                    progress = int(chunk_count / max_chunks * 30)
+                    bar = "#" * progress + "-" * (30 - progress)
+                    speech_indicator = "🎤 語音" if peak_amp > 1000 else "🔇 安靜"
+                    print(f"\r  傳送中: {chunk_count:3d}/{max_chunks} [{bar}] 峰值: {peak_amp:5.0f} {speech_indicator}", end="", flush=True)
 
                 # 檢查是否有轉錄結果
                 try:
-                    result = await asyncio.wait_for(
-                        websocket.recv(),
-                        timeout=0.1
-                    )
+                    result = await asyncio.wait_for(websocket.recv(), timeout=0.01)
                     result_data = json.loads(result)
-                    transcript = result_data.get('data', {}).get('text', '')
-                    if transcript:
-                        print(f"  📝 轉錄：{transcript}")
-                        transcripts.append(transcript)
+                    if result_data.get('type') == 'result':
+                        transcript = result_data.get('data', {}).get('text', '')
+                        if transcript:
+                            if not transcripts or transcript != transcripts[-1]:
+                                transcripts.append(transcript)
+                                print(f"\n  📝 轉錄：{transcript}")
                 except asyncio.TimeoutError:
                     pass
 
@@ -292,20 +354,33 @@ async def test_audio_streaming():
 
         # 接收最終結果
         print("等待最終轉錄結果...")
+        print("\n" + "=" * 50)
+        print("📋 最終轉錄結果")
+        print("=" * 50)
+        final_text = ""
         try:
-            result = await asyncio.wait_for(websocket.recv(), timeout=30)
-            print(f"\n{'='*50}")
-            print("📋 最終轉錄結果")
-            print("="*50)
-            print(f"{result}")
-            print("="*50)
-        except asyncio.TimeoutError:
-            print("⚠ 等待最終結果超時")
+            while True:
+                try:
+                    # 取得所有待處理消息，直到收到最終結果
+                    msg = await asyncio.wait_for(websocket.recv(), timeout=2.0)
+                    data = json.loads(msg)
+                    if data.get("type") == "result":
+                        text = data.get("data", {}).get("text", "")
+                        if text:
+                            final_text = text
+                        if data.get("data", {}).get("is_final"):
+                            print(json.dumps(data, indent=2, ensure_ascii=False))
+                            break
+                except asyncio.TimeoutError:
+                    break
         except Exception as e:
-            print(f"⚠ 接收最終結果失敗：{e}")
+            print(f"⚠ 接收結果失敗：{e}")
 
         # 顯示所有轉錄文本
-        if transcripts:
+        if transcripts or final_text:
+            if not transcripts and final_text:
+                transcripts.append(final_text)
+                
             print("\n" + "=" * 50)
             print("📝 所有轉錄文本")
             print("=" * 50)
@@ -313,12 +388,41 @@ async def test_audio_streaming():
                 print(f"{i}. {t}")
             print("=" * 50)
 
-            # 檢查是否都是 "Thank you"
-            thank_you_count = sum(1 for t in transcripts if "thank you" in t.lower())
-            if thank_you_count == len(transcripts) and len(transcripts) > 5:
-                print("\n⚠ 所有轉錄都是 'Thank you'，可能麥克風未正確收音")
-                print("💡 這通常是 Whisper 在寂靜/噪音下的預設輸出")
-                print("💡 請確認麥克風已連接並對著麥克風說話")
+            # 💡 自動呼叫醫療標準化服務 (Medical Translation)
+            if final_text:
+                print("\n🚀 正在執行醫療語意標準化 (Medical Translation)...")
+                import httpx
+                try:
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            "http://localhost:8000/api/v1/clinical/normalize",
+                            json={"text": final_text},
+                            timeout=5.0
+                        )
+                        if response.status_code == 200:
+                            norm_data = response.json()
+                            print("\n" + "=" * 50)
+                            print("🏥 醫療標準化結果 (Standardized Medical Text)")
+                            print("=" * 50)
+                            print(f"原始文字：{final_text}")
+                            print(f"標準英文：{norm_data.get('normalized_text')}")
+                            print("-" * 30)
+                            print("檢測到的醫療術語：")
+                            for term in norm_data.get("terms", []):
+                                print(f"  • {term['original']} -> {term['standard']} ({term['category']})")
+                            
+                            # 儲存結果到檔案
+                            result_file = "latest_result.json"
+                            with open(result_file, "w", encoding="utf-8") as f:
+                                json.dump({
+                                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                                    "raw_text": final_text,
+                                    "normalization": norm_data
+                                }, f, indent=2, ensure_ascii=False)
+                            print(f"\n✅ 結果已儲存至：{os.path.abspath(result_file)}")
+                            print("=" * 50)
+                except Exception as e:
+                    print(f"⚠ 標準化服務呼叫失敗: {e}")
         else:
             print("\n⚠ 未收到轉錄文本（可能是正常的，Whisper 需要足夠的音頻數據）")
 

@@ -12,6 +12,9 @@ from collections import deque
 
 import faster_whisper
 from faster_whisper import WhisperModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class StreamTranscriber:
@@ -98,6 +101,7 @@ class StreamTranscriber:
         self._temp_file = io.BytesIO()
 
         self._is_streaming = True
+        self._chunk_counter = 0
 
         return {
             "status": "stream_started",
@@ -120,10 +124,22 @@ class StreamTranscriber:
         # 將音頻塊寫入緩衝區
         self._audio_buffer.write(audio_chunk)
 
+        # 每 8 個塊（約 512ms）處理一次，避免過度頻繁的計算壓力
+        if not hasattr(self, "_chunk_counter"):
+            self._chunk_counter = 0
+        self._chunk_counter += 1
+
+        if self._chunk_counter % 8 != 0:
+            return {
+                "status": "buffering",
+                "text": self._current_text,
+                "is_final": False,
+            }
+
         # 獲取當前音頻數據
         audio_data = self._audio_buffer.getvalue()
 
-        if len(audio_data) < self.chunk_size * 2:
+        if len(audio_data) < 16000:  # 至少需要 0.5 秒數據
             # 數據量不足，跳過處理
             return {
                 "status": "insufficient_data",
@@ -142,24 +158,57 @@ class StreamTranscriber:
                     "is_final": False,
                 }
 
-            # 執行即時轉錄
+            # 處理語言選擇
+            lang = self.language
+            if not lang or lang == "auto":
+                lang = "zh"
+
+            # 檢查信號強度 (僅記錄，不跳過)
+            max_amp = np.abs(audio_array).max()
+            logger.info(f"Audio max amplitude: {max_amp:.4f}")
+
             segments, info = self.model.transcribe(
                 audio_array,
-                language=self.language,
+                language=lang,
                 task=self.task,
                 beam_size=self.beam_size,
-                vad_filter=False,  # 流式處理時關閉 VAD
+                vad_filter=True,
+                vad_parameters=dict(threshold=0.1, min_silence_duration_ms=500),
+                initial_prompt="醫療診斷對話。",
             )
 
             # 收集分段結果
             text_parts = []
+            
+            # 擴大的幻覺黑名單
+            hallucination_blacklist = [
+                "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", 
+                "Amara.org", "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場",
+                "MING PAO", "CANADA", "TORONTO", "明報", "多倫多"
+            ]
+
             for segment in segments:
-                text_parts.append(segment.text.strip())
+                text = segment.text.strip()
+                if not text:
+                    continue
+                
+                # 檢查是否包含黑名單中的片段
+                is_hallucination = False
+                for black_word in hallucination_blacklist:
+                    if black_word.lower() in text.lower():
+                        is_hallucination = True
+                        break
+                
+                if is_hallucination:
+                    logger.info(f"過濾幻覺文字: {text}")
+                    continue
+                    
+                text_parts.append(text)
                 self._segments_buffer.append(
                     {
                         "start": segment.start,
                         "end": segment.end,
-                        "text": segment.text.strip(),
+                        "text": text,
                     }
                 )
 
@@ -167,6 +216,10 @@ class StreamTranscriber:
             if text_parts:
                 self._current_text = " ".join(text_parts)
                 self._last_result = self._current_text
+            else:
+                # 如果沒有新內容且只有幻覺，保持之前的文字或清空（視需求而定）
+                # 在流式處理中，通常返回最後一次的有效文字
+                pass
 
             # 更新總時長
             if info.duration:
@@ -212,23 +265,50 @@ class StreamTranscriber:
             }
 
         try:
+            # 處理語言選擇
+            lang = self.language
+            if not lang or lang == "auto":
+                lang = "zh"
+
             # 執行最終轉錄
             audio_array = self._bytes_to_audio_array(audio_data)
 
             if audio_array is not None and len(audio_array) > 0:
                 segments, info = self.model.transcribe(
                     audio_array,
-                    language=self.language,
+                    language=lang,
                     task=self.task,
                     beam_size=self.beam_size,
-                    vad_filter=True,  # 最終結果啟用 VAD
+                    vad_filter=True,
+                    vad_parameters=dict(threshold=0.1, min_silence_duration_ms=500),
+                    initial_prompt="醫療診斷對話。",
                 )
 
                 final_text_parts = []
                 final_segments = []
+                
+                # 擴大的幻覺黑名單
+                hallucination_blacklist = [
+                    "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", 
+                    "Amara.org", "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場",
+                    "MING PAO", "CANADA", "TORONTO", "明報", "多倫多"
+                ]
 
                 for segment in segments:
                     text = segment.text.strip()
+                    if not text:
+                        continue
+                        
+                    # 檢查是否包含黑名單中的片段
+                    is_hallucination = False
+                    for black_word in hallucination_blacklist:
+                        if black_word.lower() in text.lower():
+                            is_hallucination = True
+                            break
+                    
+                    if is_hallucination:
+                        continue
+                        
                     final_text_parts.append(text)
                     final_segments.append(
                         {

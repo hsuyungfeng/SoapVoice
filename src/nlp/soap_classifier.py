@@ -61,7 +61,7 @@ class SOAPClassifier:
         ],
     }
 
-    def __init__(self, threshold: float = 0.3):
+    def __init__(self, threshold: float = 0.05):
         """
         初始化 SOAP 分類器
 
@@ -89,9 +89,9 @@ class SOAPClassifier:
             if not matches:
                 continue
 
-            # 計算置信度：匹配關鍵字數 / 總關鍵字數
-            score = len(matches) / len(keywords) * 2  # 放大 2 倍
-            score = min(score, 1.0)  # 限制在 1.0 以內
+            # 修改置信度計算：每個匹配關鍵字給予 0.2 的基本分數，最高 1.0
+            # 這樣短句子只要有一個關鍵字就能達到 0.2，超過 0.05 閾值
+            score = min(len(matches) * 0.25, 1.0)
 
             if score > best_score:
                 best_score = score
