@@ -550,6 +550,33 @@ glm-4.7-flash       19 GB (快速推理)
 
 ---
 
+### 📝 2026-03-15 (星期六) - 部署驗證
+
+**✅ 今日完成**
+
+1. ✅ **部署驗證通過**
+   - Ollama 服務 ✓
+   - API 健康檢查 ✓
+   - 文本標準化 API ✓
+   - ICD-10 分類 API ✓
+   - 核心功能 4/4 通過
+
+2. ✅ **部署方式**
+   - 本地運行：uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
+   - Docker 部署：./scripts/deploy.sh (構建中)
+
+3. ✅ **訪問方式**
+   - API: http://localhost:8000
+   - Swagger UI: http://localhost:8000/docs
+   - ReDoc: http://localhost:8000/redoc
+
+**📊 系統狀態**
+- API 服務：運行中 ✓
+- Ollama 服務：運行中 ✓
+- 模型：qwen3.5:35b ✓
+
+---
+
 ## 🚨 當前問題與阻礙 (Current Issues & Blockers)
 
 ### 🔴 Critical (P0) - 阻擋進度
