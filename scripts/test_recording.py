@@ -106,6 +106,14 @@ async def test_audio_streaming():
         websocket = await websockets.connect(WS_URI, ping_timeout=10, close_timeout=10)
         print("✓ WebSocket 連接成功")
 
+        # 等待連接確認
+        print("等待連接確認...")
+        try:
+            conn_resp = await asyncio.wait_for(websocket.recv(), timeout=10)
+            print(f"✓ 連接確認：{conn_resp[:100]}")
+        except asyncio.TimeoutError:
+            print("⚠ 等待連接確認超時")
+
         # 發送開始訊息
         start_msg = json.dumps({
             "type": "start",
@@ -114,11 +122,19 @@ async def test_audio_streaming():
         print(f"發送：{start_msg}")
         await websocket.send(start_msg)
 
+        # 等待 stream_started 回應（重要！）
+        print("等待 stream_started 回應（Whisper 模型載入中，可能需要 10-20 秒）...")
         try:
-            response = await asyncio.wait_for(websocket.recv(), timeout=10)
+            response = await asyncio.wait_for(websocket.recv(), timeout=60)
             print(f"✓ 服務器回應：{response}")
+
+            # 檢查是否為 stream_started
+            resp_data = json.loads(response)
+            if resp_data.get('type') != 'stream_started':
+                print(f"⚠ 預期 stream_started，但收到：{resp_data.get('type')}")
         except asyncio.TimeoutError:
-            print("⚠ 等待回應超時（Whisper 模型可能正在初始化）")
+            print("✗ 等待 stream_started 超時（60 秒）")
+            return False
 
         # 初始化 PyAudio
         p = pyaudio.PyAudio()
@@ -130,11 +146,11 @@ async def test_audio_streaming():
             frames_per_buffer=1024
         )
 
-        print("🎤 開始錄音... (錄音 3 秒，按 Ctrl+C 可提前停止)")
+        print("🎤 開始錄音... (錄音 10 秒，按 Ctrl+C 可提前停止)")
         print("📊 轉錄結果將顯示如下：")
 
         chunk_count = 0
-        max_chunks = 50  # 限制錄音長度（約 3 秒）
+        max_chunks = 150  # 增加錄音長度（約 10 秒，150 * 1024 / 16000 ≈ 9.6 秒）
         transcripts = []  # 存儲所有轉錄結果
 
         try:
@@ -188,7 +204,7 @@ async def test_audio_streaming():
         # 接收最終結果
         print("等待最終轉錄結果...")
         try:
-            result = await asyncio.wait_for(websocket.recv(), timeout=10)
+            result = await asyncio.wait_for(websocket.recv(), timeout=30)
             print(f"\n{'='*50}")
             print("📋 最終轉錄結果")
             print("="*50)
@@ -207,6 +223,8 @@ async def test_audio_streaming():
             for i, t in enumerate(transcripts, 1):
                 print(f"{i}. {t}")
             print("=" * 50)
+        else:
+            print("\n⚠ 未收到轉錄文本（可能是正常的，Whisper 需要足夠的音頻數據）")
 
         print("\n✓ 音頻串流測試完成")
         return True
