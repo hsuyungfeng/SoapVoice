@@ -134,11 +134,20 @@ async def test_audio_streaming():
             resp_status = resp_data.get('data', {}).get('status')
 
             # 支援兩種格式：{"type":"stream_started"} 或 {"type":"status","data":{"status":"stream_started"}}
+            # 如果收到的是 "connected"，繼續等待 "stream_started"
+            if resp_status == 'connected':
+                print("⚠ 收到 connected，繼續等待 stream_started...")
+                response = await asyncio.wait_for(websocket.recv(), timeout=60)
+                print(f"✓ 服務器回應：{response}")
+                resp_data = json.loads(response)
+                resp_type = resp_data.get('type')
+                resp_status = resp_data.get('data', {}).get('status')
+
             if resp_type == 'stream_started' or resp_status == 'stream_started':
                 print("✓ 串流已開始")
             else:
                 print(f"⚠ 預期 stream_started，但收到：type={resp_type}, status={resp_status}")
-                # 繼續執行，因為可能是連接確認訊息
+                # 繼續執行，因為可能是正常的
         except asyncio.TimeoutError:
             print("✗ 等待 stream_started 超時（60 秒）")
             return False
