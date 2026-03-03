@@ -577,6 +577,44 @@ glm-4.7-flash       19 GB (快速推理)
 
 ---
 
+### 📝 2026-03-16 (星期日) - 錄音測試與 WebSocket 修復
+
+**✅ 今日完成**
+
+1. ✅ **錄音測試功能**
+   - 建立 `docs/RECORDING_TEST.md`
+   - 建立 `scripts/test_recording.py`
+   - 添加 pyaudio 依賴
+
+2. ✅ **WebSocket 修復**
+   - 修復 WebSocket accept() 調用順序
+   - 建立 `scripts/test_websocket_simple.py`
+   - REST API 測試：通過 ✓
+   - WebSocket 連接測試：通過 ✓
+
+3. ✅ **測試結果**
+   ```
+   REST API 測試
+   ✓ 健康檢查：通過
+   ✓ 文本標準化：200
+   ✓ ICD-10 分類：200
+
+   WebSocket 連接測試
+   ✓ WebSocket 連接成功
+   ✓ 訊息發送/接收：正常
+   ```
+
+**使用方式:**
+```bash
+# 錄音測試
+uv run python scripts/test_recording.py
+
+# WebSocket 測試
+uv run python scripts/test_websocket_simple.py
+```
+
+---
+
 ## 🚨 當前問題與阻礙 (Current Issues & Blockers)
 
 ### 🔴 Critical (P0) - 阻擋進度
