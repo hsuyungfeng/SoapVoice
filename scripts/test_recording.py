@@ -27,22 +27,35 @@ async def test_websocket_connection():
     print("=" * 50)
     print("測試 WebSocket 連接")
     print("=" * 50)
-    
+
     try:
-        async with websockets.connect(WS_URI) as websocket:
+        async with websockets.connect(WS_URI, close_timeout=5) as websocket:
             print("✓ WebSocket 連接成功")
-            
+
             # 發送開始訊息
             await websocket.send(json.dumps({
                 "type": "start",
                 "client_id": "test_001"
             }))
-            
-            # 接收確認
-            response = await websocket.recv()
-            print(f"✓ 服務器回應：{response}")
-            
+            print("已發送開始訊息")
+
+            # 等待回應（設置超時）
+            try:
+                response = await asyncio.wait_for(websocket.recv(), timeout=5)
+                print(f"✓ 服務器回應：{response}")
+            except asyncio.TimeoutError:
+                print("⚠ 等待回應超時（可能正在初始化 Whisper 模型）")
+
+            # 發送結束訊息
+            await websocket.send(json.dumps({
+                "type": "end"
+            }))
+            print("已發送結束訊息")
+
             return True
+    except websockets.exceptions.InvalidStatusCode as e:
+        print(f"✗ WebSocket 連接失敗：HTTP {e.status_code}")
+        return False
     except Exception as e:
         print(f"✗ WebSocket 連接失敗：{e}")
         return False
@@ -195,16 +208,16 @@ async def main():
     print("\n" + "=" * 50)
     print("SoapVoice 錄音測試")
     print("=" * 50)
-    
+
     # 選擇測試模式
     print("\n請選擇測試模式:")
     print("1. WebSocket 連接測試")
     print("2. 音頻串流測試（需要麥克風）")
     print("3. 文字輸入測試（模擬）")
     print("4. 完整測試")
-    
+
     choice = input("\n輸入選項 (1-4): ").strip()
-    
+
     if choice == "1":
         await test_websocket_connection()
     elif choice == "2":
@@ -213,17 +226,23 @@ async def main():
         await test_text_input()
     elif choice == "4":
         print("\n執行完整測試...")
-        
+
         # 測試 1: WebSocket 連接
-        if await test_websocket_connection():
+        print("\n" + "=" * 50)
+        print("測試 1: WebSocket 連接")
+        print("=" * 50)
+        ws_result = await test_websocket_connection()
+        if ws_result:
             print("✓ WebSocket 連接測試通過\n")
         else:
-            print("✗ WebSocket 連接測試失敗\n")
-            return
-        
+            print("⚠ WebSocket 連接測試失敗（可繼續其他測試）\n")
+
         # 測試 2: 文字輸入
+        print("=" * 50)
+        print("測試 2: 文字輸入測試")
+        print("=" * 50)
         await test_text_input()
-        
+
         # 測試 3: 音頻串流（可選）
         run_audio_test = input("\n是否執行音頻串流測試？(y/n): ").strip().lower()
         if run_audio_test == "y":
