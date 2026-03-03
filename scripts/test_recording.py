@@ -80,9 +80,9 @@ async def test_audio_streaming():
             try:
                 info = p.get_device_info_by_index(i)
                 if info.get('maxInputChannels', 0) > 0:
-                    input_device = i
-                    print(f"✓ 找到輸入設備：{info['name']}")
-                    break
+                    print(f"  輸入設備 {i}: {info['name']} (channels: {info['maxInputChannels']})")
+                    if input_device is None:
+                        input_device = i  # 使用第一個找到的輸入設備
             except:
                 pass
 
@@ -91,6 +91,7 @@ async def test_audio_streaming():
             p.terminate()
             return False
 
+        print(f"✓ 使用輸入設備：{input_device}")
         p.terminate()
     except Exception as e:
         print(f"⚠ PyAudio 初始化失敗：{e}")
@@ -163,20 +164,28 @@ async def test_audio_streaming():
             channels=1,
             rate=16000,
             input=True,
-            frames_per_buffer=1024
+            frames_per_buffer=1024,
+            input_device_index=input_device  # 指定輸入設備
         )
 
         print("🎤 開始錄音... (錄音 10 秒，按 Ctrl+C 可提前停止)")
         print("📊 轉錄結果將顯示如下：")
+        print("💡 提示：請對著麥克風說話以測試轉錄功能")
 
         chunk_count = 0
         max_chunks = 150  # 增加錄音長度（約 10 秒，150 * 1024 / 16000 ≈ 9.6 秒）
         transcripts = []  # 存儲所有轉錄結果
+        audio_level_sum = 0  # 音頻電平總和
 
         try:
             while chunk_count < max_chunks:
                 # 讀取音頻數據
                 data = stream.read(1024, exception_on_overflow=False)
+
+                # 計算音頻電平（用於確認麥克風是否有輸入）
+                import struct
+                audio_level = sum([abs(struct.unpack('<h', data[i:i+2])[0]) for i in range(0, len(data), 2)]) / (len(data) // 2)
+                audio_level_sum += audio_level
 
                 # 發送音頻塊
                 await websocket.send(json.dumps({
@@ -190,7 +199,8 @@ async def test_audio_streaming():
 
                 # 每 10 個塊顯示一次進度
                 if chunk_count % 10 == 0:
-                    print(f"  已發送 {chunk_count}/{max_chunks} 個音頻塊...")
+                    avg_level = audio_level_sum / chunk_count
+                    print(f"  已發送 {chunk_count}/{max_chunks} 個音頻塊... (音頻電平：{avg_level:.0f})")
 
                 # 檢查是否有轉錄結果
                 try:
@@ -208,6 +218,15 @@ async def test_audio_streaming():
 
         except KeyboardInterrupt:
             print("\n✓ 錄音停止")
+
+        # 計算平均音頻電平
+        avg_audio_level = audio_level_sum / max_chunks if max_chunks > 0 else 0
+        print(f"\n平均音頻電平：{avg_audio_level:.0f}")
+        if avg_audio_level < 100:
+            print("⚠ 音頻電平過低，可能麥克風未正確收音")
+            print("💡 請確認麥克風已連接並正確配置")
+        else:
+            print("✓ 麥克風收音正常")
 
         print("\n" + "=" * 50)
         print("正在結束錄音...")
@@ -243,6 +262,13 @@ async def test_audio_streaming():
             for i, t in enumerate(transcripts, 1):
                 print(f"{i}. {t}")
             print("=" * 50)
+
+            # 檢查是否都是 "Thank you"
+            thank_you_count = sum(1 for t in transcripts if "thank you" in t.lower())
+            if thank_you_count == len(transcripts) and len(transcripts) > 5:
+                print("\n⚠ 所有轉錄都是 'Thank you'，可能麥克風未正確收音")
+                print("💡 這通常是 Whisper 在寂靜/噪音下的預設輸出")
+                print("💡 請確認麥克風已連接並對著麥克風說話")
         else:
             print("\n⚠ 未收到轉錄文本（可能是正常的，Whisper 需要足夠的音頻數據）")
 
