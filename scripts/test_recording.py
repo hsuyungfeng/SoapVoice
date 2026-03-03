@@ -106,6 +106,10 @@ async def test_audio_streaming():
         websocket = await websockets.connect(WS_URI, ping_timeout=10, close_timeout=10)
         print("✓ WebSocket 連接成功")
 
+        # 發送客戶端識別資訊（服務器期望）
+        print("發送客戶端識別資訊...")
+        await websocket.send(json.dumps({"client_id": "test_001"}))
+
         # 等待連接確認
         print("等待連接確認...")
         try:

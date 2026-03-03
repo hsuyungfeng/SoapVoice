@@ -23,26 +23,30 @@ async def debug_test():
     try:
         async with websockets.connect(WS_URI, close_timeout=10) as ws:
             print("\n✓ WebSocket 連接成功")
-            
+
+            # 先發送客戶端識別資訊（服務器期望）
+            print("\n發送客戶端識別資訊...")
+            await ws.send(json.dumps({"client_id": "debug"}))
+
             # 等待連接確認
-            print("\n等待連接確認...")
+            print("等待連接確認...")
             try:
                 msg = await asyncio.wait_for(ws.recv(), timeout=5)
                 print(f"✓ 收到：{msg}")
             except asyncio.TimeoutError:
                 print("⚠ 超時")
-            
+
             # 發送 start
             print("\n發送 start 訊息...")
             await ws.send(json.dumps({"type": "start", "client_id": "debug"}))
-            
+
             # 等待回應
             print("等待回應（最多 30 秒）...")
             for i in range(30):
                 try:
                     msg = await asyncio.wait_for(ws.recv(), timeout=1)
                     print(f"✓ 收到 [{i}s]: {msg}")
-                    
+
                     # 檢查是否為 stream_started
                     data = json.loads(msg)
                     if data.get('type') == 'status' and data.get('data', {}).get('status') == 'stream_started':
@@ -50,11 +54,11 @@ async def debug_test():
                         break
                 except asyncio.TimeoutError:
                     print(f".", end="", flush=True)
-            
+
             # 發送 end
             print("\n\n發送 end 訊息...")
             await ws.send(json.dumps({"type": "end"}))
-            
+
             print("\n✓ 測試完成")
             return True
             
