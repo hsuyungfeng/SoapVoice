@@ -3,9 +3,9 @@
 ## Medical Voice-to-SOAP Conversion System
 
 **版本管理:** uv (Python package & environment manager)
-**最後更新:** 2026-03-14
-**專案狀態:** 🟢 Project Completed - Production Ready
-**文件版本:** v1.0.0
+**最後更新:** 2026-03-03
+**專案狀態:** 🟢 Sprint 7 完成 - 術語標準化整合已上線，92/92 測試通過
+**文件版本:** v1.2.0
 
 ---
 
@@ -411,6 +411,69 @@ ws.onerror = (error) => {
 - ✅ Monitoring dashboards (Prometheus + Grafana)
 - ✅ Deployment runbook (step-by-step guide)
 - ✅ Disaster recovery plan
+
+---
+
+---
+
+### 🏗️ Sprint 7: 術語標準化整合優化 (2026-03-03 起)
+
+**背景:** Code Review 發現 NLP 術語標準化（`MedicalTerminologyMapper`）與 SOAP 生成流程之間存在整合缺口，且有重複代碼問題。
+
+**Code Review 發現問題**
+
+| 嚴重度 | 位置 | 問題 | 修復優先級 |
+|--------|------|------|------------|
+| 🔴 | `soap_generator.py` + `soap_classifier.py` | `SOAP_KEYWORDS` 字典完全重複，維護風險高 | P0 |
+| 🔴 | `rest.py` `/soap/generate` | 未先呼叫術語標準化，LLM 收到口語中文 | P0 |
+| 🟡 | `rest.py` `/classify/soap` | query param 傳參，與其他端點 request body 不一致 | P1 |
+| 🟡 | `rest.py` `generate_soap` | `metadata.model_version` 硬編碼 "qwen3-32b" | P1 |
+
+**Sprint 7 任務清單**
+
+#### 任務 7.1 - 消除重複 SOAP_KEYWORDS (P0)
+- `soap_generator.py` 中刪除 `SOAP_KEYWORDS`，改從 `SOAPClassifier.KEYWORDS` 引入
+- 確保兩個模組共用同一份關鍵字字典
+
+#### 任務 7.2 - 整合術語標準化到 SOAP 生成流程 (P0)
+
+**目標 Pipeline：**
+```
+[ASR 輸出] 口語中文
+  ↓ MedicalTerminologyMapper.map_text()
+[已標準化文字] "chest tightness for 2 days with dyspnea"
+  ↓ ICD-10 候選碼提取 (從映射結果取得)
+[ICD-10 candidates] R07.89, R06.02
+  ↓ SOAPGenerator._build_prompt() (注入標準術語 + ICD-10)
+[LLM Prompt 含增強上下文]
+  ↓ Ollama Qwen3.5:35b
+[完整 SOAP 病歷]
+```
+
+**修改檔案:** `src/soap/soap_generator.py`
+- `generate()` 方法加入 `MedicalTerminologyMapper` 前處理步驟
+- `_build_prompt()` 加入 `normalized_terms` 與 `icd10_candidates` 參數
+- ICD-10 候選碼自動注入 Assessment prompt 段落
+
+**效益預期:**
+- SOAP Assessment 段落準確率提升（ICD-10 已預填）
+- S 段落品質提升（標準英文術語而非口語中文）
+- 減少 LLM 需要自行翻譯的工作量
+
+#### 任務 7.3 - API 介面統一 (P1)
+- `/classify/soap` 改為接收 request body（`NormalizeRequest`）
+- `metadata.model_version` 改從 `SOAPConfig.model_id` 動態取得
+
+**完成標準:**
+- [x] 測試：`POST /clinical/soap/generate` 輸出 Assessment 包含 ICD-10 碼 ✅
+- [x] 測試：SOAP_KEYWORDS 只在 `soap_classifier.py` 定義一處 ✅
+- [x] 所有現有測試 92/92 通過 ✅
+
+**Code Review 額外修復（2026-03-03）:**
+- [x] `MedicalTerminologyMapper` 改為 `self._mapper` 單例，避免每次 `generate()` 重建 ✅
+- [x] mapper 前處理加入 try/except，失敗時 fallback 使用原始 transcript ✅
+- [x] prompt 格式字串各區段明確控制換行 ✅
+- [x] `"icd10"` 統一為 `"icd10_candidates"` 與 `TermMapping` 欄位名稱一致 ✅
 
 ---
 

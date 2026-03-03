@@ -166,7 +166,7 @@ class TestSOAPClassify:
         """測試主觀症狀分類"""
         response = client.post(
             "/api/v1/clinical/classify/soap",
-            params={"text": "病人說他胸悶很痛"},
+            json={"text": "病人說他胸悶很痛"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -177,7 +177,7 @@ class TestSOAPClassify:
         """測試客觀檢查分類"""
         response = client.post(
             "/api/v1/clinical/classify/soap",
-            params={"text": "血壓 140/90，X 光檢查"},
+            json={"text": "血壓 140/90，X 光檢查"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -187,7 +187,7 @@ class TestSOAPClassify:
         """測試診斷分類"""
         response = client.post(
             "/api/v1/clinical/classify/soap",
-            params={"text": "初步診斷為肺炎"},
+            json={"text": "初步診斷為肺炎"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -197,7 +197,7 @@ class TestSOAPClassify:
         """測試治療計畫分類"""
         response = client.post(
             "/api/v1/clinical/classify/soap",
-            params={"text": "開藥三天後回診"},
+            json={"text": "開藥三天後回診"},
         )
         assert response.status_code == 200
         data = response.json()

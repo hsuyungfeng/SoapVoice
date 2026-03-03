@@ -7,7 +7,6 @@ REST API 端點模組
 import logging
 import time
 from typing import Optional, Dict, Any, List
-from dataclasses import dataclass, asdict
 
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
@@ -256,7 +255,7 @@ async def classify_icd10(
 
 @router.post("/classify/soap", response_model=SOAPClassifyResponse)
 async def classify_soap(
-    text: str,
+    request: NormalizeRequest,
     classifier: SOAPClassifier = Depends(get_soap_classifier),
 ):
     """
@@ -266,11 +265,12 @@ async def classify_soap(
 
     **範例:**
     ```
-    POST /api/v1/clinical/classify/soap?text=病人說他頭痛
+    POST /api/v1/clinical/classify/soap
+    {"text": "病人說他頭痛"}
     ```
     """
     try:
-        result = classifier.classify(text)
+        result = classifier.classify(request.text)
 
         return SOAPClassifyResponse(
             text=result.text,
@@ -328,7 +328,8 @@ async def generate_soap(
             ),
             metadata={
                 "confidence": soap_dict.get("classification_confidence", {}),
-                "model_version": "qwen3-32b",
+                "model_version": generator.config.model_id,
+                "normalized_terms": soap_dict.get("normalized_terms", []),
             },
             processing_time_ms=round(processing_time, 2),
         )

@@ -9,40 +9,14 @@ from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 
 from src.llm.ollama_engine import OllamaEngine, ModelConfig
+from src.nlp.soap_classifier import SOAPClassifier
+from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
 
 
 logger = logging.getLogger(__name__)
 
-
-# SOAP 分類關鍵字
-SOAP_KEYWORDS = {
-    "subjective": [
-        "痛", "癢", "暈", "咳", "燒", "燙", "疲倦", "沒胃口", "嘔吐", "噁心",
-        "胸悶", "喘", "腹瀉", "便秘", "頭痛", "頭暈", "失眠", "焦慮",
-        "心悸", "腹脹", "抽筋", "麻木", "耳鳴", "視力模糊",
-        "pain", "itch", "dizzy", "cough", "fever", "tired", "nausea",
-        "vomiting", "diarrhea", "constipation", "headache", "insomnia",
-        "anxiety", "palpitation", "dyspnea", "fatigue",
-    ],
-    "objective": [
-        "紅腫", "水泡", "血壓", "心跳", "體溫", "呼吸", "觸診", "影像",
-        "化驗", "檢查", "TBSA", "聽診", "叩診", "X 光", "超音波", "X 射線",
-        "erythema", "swelling", "blister", "bullae", "blood pressure",
-        "heart rate", "temperature", "respiration", "xray", "x-ray", "ultrasound",
-        "ct", "mri", "ecg", "lab", "test", "examination", "finding",
-    ],
-    "assessment": [
-        "診斷", "初判", "可能", "疑似", "感染", "ICD", "確定", "臨床",
-        "diagnosis", "assess", "suggest", "suspect", "confirm", "likely",
-        "probable", "consistent with", "indicative of",
-    ],
-    "plan": [
-        "換藥", "上藥", "追蹤", "開藥", "衛教", "回診", "治療", "用藥",
-        "手術", "復健", "飲食", "運動", "檢查", "檢驗", "轉診",
-        "medication", "treatment", "follow-up", "prescription", "surgery",
-        "therapy", "diet", "exercise", "referral", "advice", "plan",
-    ],
-}
+# 共用 SOAPClassifier 的關鍵字字典，避免重複定義
+SOAP_KEYWORDS = SOAPClassifier.KEYWORDS
 
 
 @dataclass
@@ -68,6 +42,7 @@ class SOAPGenerator:
         """
         self.config = config or SOAPConfig()
         self._engine: Optional[OllamaEngine] = None
+        self._mapper: MedicalTerminologyMapper = MedicalTerminologyMapper()
 
     def initialize(self, engine: Optional[OllamaEngine] = None) -> None:
         """初始化 LLM 引擎
@@ -89,12 +64,22 @@ class SOAPGenerator:
             self._engine = initialize_engine(model_config)
         logger.info("SOAPGenerator initialized")
 
-    def _build_prompt(self, transcript: str, patient_context: Optional[Dict[str, Any]] = None) -> str:
+    def _build_prompt(
+        self,
+        transcript: str,
+        patient_context: Optional[Dict[str, Any]] = None,
+        normalized_text: str = "",
+        term_mappings: Optional[List[TermMapping]] = None,
+        icd10_candidates: Optional[List[str]] = None,
+    ) -> str:
         """建立 SOAP 生成提示詞
 
         Args:
-            transcript: 醫療對話記錄
+            transcript: 原始醫療對話記錄
             patient_context: 病患背景資訊（年齡、性別等）
+            normalized_text: 術語標準化後的文字
+            term_mappings: 術語映射結果列表
+            icd10_candidates: ICD-10 候選碼列表
 
         Returns:
             完整的提示詞
@@ -109,15 +94,32 @@ class SOAPGenerator:
             if chief_complaint:
                 context_str += f"Chief Complaint: {chief_complaint}\n"
 
+        # 術語標準化提示段落（各區段明確控制換行）
+        sections: list[str] = []
+        if context_str:
+            sections.append(context_str.rstrip("\n"))
+        if term_mappings:
+            term_lines = [
+                f"  - {m.original} → {m.standard} ({m.category})"
+                for m in term_mappings
+            ]
+            sections.append("Pre-identified Medical Terms:\n" + "\n".join(term_lines))
+        if icd10_candidates:
+            sections.append(f"ICD-10 Candidates: {', '.join(icd10_candidates)}")
+
+        header = "\n\n".join(sections) + "\n\n" if sections else ""
+
+        # 若有標準化文字，優先提供給 LLM；否則使用原始文字
+        transcript_for_llm = normalized_text if normalized_text else transcript
+
         prompt = f"""You are an advanced medical documentation assistant. Convert the following clinician-patient conversation into a structured SOAP note.
 
-{context_str}
-Conversation Transcript:
-{transcript}
+{header}Conversation Transcript:
+{transcript_for_llm}
 
 Rules:
 - Correct transcription errors and remove filler words
-- Normalize colloquial expressions into standard medical English
+- Use the pre-identified medical terms and ICD-10 candidates above when applicable
 - Apply keyword-based S/O/A/P classification
 - Subjective section must be ≤{self.config.max_subjective_length} characters
 - Omit Plan section if no plan mentioned
@@ -132,7 +134,7 @@ O:
 [Objective findings - English]
 
 A:
-[Assessment + ICD-10 if possible]
+[Assessment + ICD-10 codes]
 
 P:
 [Plan - omit if empty]
@@ -159,7 +161,33 @@ CONVERSATION_SUMMARY:
         if not self._engine:
             self.initialize()
 
-        prompt = self._build_prompt(transcript, patient_context)
+        # 術語標準化前處理：輔助增強步驟，失敗時 fallback 使用原始 transcript
+        normalized_text = ""
+        term_mappings: List[TermMapping] = []
+        icd10_candidates: List[str] = []
+        try:
+            normalized_text, term_mappings = self._mapper.map_text(transcript)
+            icd10_candidates = [
+                code
+                for m in term_mappings
+                if m.icd10_candidates
+                for code in m.icd10_candidates
+            ]
+            logger.info(
+                "術語標準化完成: %d 個術語, %d 個 ICD-10 候選碼",
+                len(term_mappings),
+                len(icd10_candidates),
+            )
+        except Exception as norm_err:
+            logger.warning("術語標準化失敗，使用原始 transcript: %s", norm_err)
+
+        prompt = self._build_prompt(
+            transcript,
+            patient_context,
+            normalized_text=normalized_text,
+            term_mappings=term_mappings,
+            icd10_candidates=icd10_candidates,
+        )
 
         try:
             response = self._engine.generate(
@@ -167,7 +195,16 @@ CONVERSATION_SUMMARY:
                 max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
             )
-            return self._parse_response(response, transcript)
+            result = self._parse_response(response, transcript)
+            result["normalized_terms"] = [
+                {
+                    "original": m.original,
+                    "standard": m.standard,
+                    "icd10_candidates": m.icd10_candidates,
+                }
+                for m in term_mappings
+            ]
+            return result
         except Exception as e:
             logger.error(f"SOAP generation error: {e}")
             raise
@@ -221,20 +258,18 @@ CONVERSATION_SUMMARY:
             soap[key] = soap[key].strip()
 
         # 計算分類置信度
-        soap["classification_confidence"] = self._calculate_confidence(transcript, soap)
+        soap["classification_confidence"] = self._calculate_confidence(transcript)
 
         return soap
 
     def _calculate_confidence(
         self,
         transcript: str,
-        soap: Dict[str, Any],
     ) -> Dict[str, float]:
         """計算 SOAP 分類置信度
 
         Args:
             transcript: 原始對話記錄
-            soap: SOAP 病歷字典
 
         Returns:
             各分類置信度分數

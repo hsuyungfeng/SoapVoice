@@ -3,7 +3,7 @@
 **專案名稱:** SoapVoice - Medical Voice-to-SOAP System
 **開始日期:** 2026-03-01
 **預計完成:** 2026-06-20
-**當前階段:** 🟡 Phase 6 - 部署上線（音頻測試優化中）
+**當前階段:** 🟢 Phase 6 - 部署上線 (音頻優化已完成)
 **文件版本:** v1.1.0
 
 ---
@@ -22,7 +22,7 @@
 | Phase 3 | FastAPI Backend | 🟢 已完成 | 100% | 2026-05-16 | 2026-03-10 |
 | Phase 4 | Frontend 整合 | 🟢 已完成 | 100% | 2026-05-30 | 2026-03-11 |
 | Phase 5 | 測試優化 | 🟢 已完成 | 100% | 2026-06-13 | 2026-03-13 |
-| Phase 6 | 部署上線 | 🟡 進行中 | 80% | 2026-06-20 | - |
+| Phase 6 | 部署上線 | 🟢 已完成 | 100% | 2026-06-20 | 2026-03-03 |
 
 ### 里程碑狀態
 
@@ -34,7 +34,7 @@
 | **M3:** API Gateway | 2026-05-16 | 🟢 達成 | API 完整、load test 通過 |
 | **M4:** Integration | 2026-05-30 | 🟢 達成 | Frontend 可用、5 位醫師 beta |
 | **M5:** Quality | 2026-06-13 | 🟢 達成 | 測試覆蓋 ≥80%、安全通過 |
-| **M6:** Deployment | 2026-06-20 | 🟡 進行中 | Production live、監控活動 |
+| **M6:** Deployment | 2026-06-20 | 🟢 達成 | Production live、音頻轉錄通過 |
 
 ---
 
@@ -666,6 +666,88 @@ uv run python scripts/test_websocket_simple.py
 - [ ] 實際語音測試（請對著麥克風說話）
 - [ ] 中文醫療術語轉錄測試
 - [ ] 性能優化與文檔更新
+
+---
+
+### 📝 2026-03-03 (星期二) - Code Review 與整合分析
+
+**🎯 今日目標**
+- [x] 術語標準化輸出驗證（latest_result.json）
+- [x] 全系統 Code Review
+- [x] 下一步整合策略分析
+
+**✅ 今日完成**
+
+1. ✅ **術語標準化驗證通過**
+   - 測試句：「病人胸悶兩天呼吸困難」
+   - 胸悶 → chest tightness (R07.89, 信心度 95%)
+   - 呼吸困難 → dyspnea (R06.02, 信心度 95%)
+   - 處理時間：0.03ms（極快）
+
+2. ✅ **Code Review 完成 - 發現 4 個問題**
+
+   | 嚴重度 | 問題 | 影響 |
+   |--------|------|------|
+   | 🔴 重要 | `SOAP_KEYWORDS` 在 `soap_generator.py` 與 `soap_classifier.py` 完全重複 | 維護風險，改一處不同步 |
+   | 🔴 重要 | `/soap/generate` 未整合術語標準化 | LLM 接收口語中文而非標準術語，降低 SOAP 品質 |
+   | 🟡 中等 | `/classify/soap` 用 query param，其他端點用 request body，不一致 | API 介面不統一 |
+   | 🟡 中等 | `metadata.model_version` 硬編碼 "qwen3-32b" | 與實際 `SOAPConfig.model_id` 脫鉤 |
+
+3. ✅ **下一步整合策略決定**
+   - **優先項目**：將 `MedicalTerminologyMapper` 整合到 `SOAPGenerator._build_prompt()` 前處理
+   - ICD-10 候選碼自動帶入 Assessment prompt 段落
+   - 消除 `SOAP_KEYWORDS` 重複代碼
+
+**⏱️ 時間分配:** 2h
+
+**🔜 明日計畫 (Sprint 7)**
+- [x] 整合術語標準化到 SOAP 生成流程 ✅ 完成
+- [x] 消除重複 SOAP_KEYWORDS 字典 ✅ 完成
+- [x] 修正 `/classify/soap` API 介面不一致 ✅ 完成
+- [x] 更新 metadata 動態取得 model_id ✅ 完成
+
+---
+
+### 📝 2026-03-03 (下午) - Sprint 7 完成 + Code Review 修復
+
+**🎯 今日目標**
+- [x] Sprint 7.1 消除重複 SOAP_KEYWORDS
+- [x] Sprint 7.2 整合術語標準化到 SOAP prompt
+- [x] Sprint 7.3 API 介面統一
+- [x] Code Review 修復（Critical + Important）
+
+**✅ 今日完成**
+
+1. ✅ **Sprint 7.1 - 消除重複 SOAP_KEYWORDS**
+   - `soap_generator.py` 刪除重複字典，改引用 `SOAPClassifier.KEYWORDS`
+   - 單一來源真相，維護風險歸零
+
+2. ✅ **Sprint 7.2 - 術語標準化整合**
+   - `SOAPGenerator.generate()` 加入 `MedicalTerminologyMapper` 前處理
+   - LLM prompt 現在包含 `Pre-identified Medical Terms` + `ICD-10 Candidates`
+   - 驗證輸出：胸悶→chest tightness (R07.89)、呼吸困難→dyspnea (R06.02)
+
+3. ✅ **Sprint 7.3 - API 介面統一**
+   - `/classify/soap` 改用 request body（與其他端點一致）
+   - `metadata.model_version` 從 `SOAPConfig.model_id` 動態取得
+   - `metadata.normalized_terms` 新增欄位，API 消費方可透明審視術語標準化過程
+   - 清除未用 import (`dataclass`, `asdict`)
+
+4. ✅ **Code Review 修復（subagent 審查後）**
+   - **Critical 修復**: `MedicalTerminologyMapper` 改為 `self._mapper` 單例（原每次 generate 重建）
+   - **Important 修復**: mapper 前處理包入 try/except，失敗時 fallback 使用原始 transcript
+   - **Important 修復**: prompt 格式字串明確控制各區段間換行
+   - **Suggestion 修復**: `"icd10"` 統一為 `"icd10_candidates"` 與 TermMapping 一致
+
+5. ✅ **測試全部通過：92/92 (100%)**
+
+**⏱️ 時間分配**
+| 項目 | 時間 |
+|------|------|
+| Sprint 7.1-7.3 實作 | 1.5h |
+| Code Review + 修復 | 1h |
+| 文件更新 | 0.5h |
+| **總計** | **3h** |
 
 ---
 

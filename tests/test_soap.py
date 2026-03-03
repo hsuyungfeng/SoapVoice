@@ -18,7 +18,7 @@ class TestSOAPConfig:
     def test_default_config(self):
         """測試預設配置"""
         config = SOAPConfig()
-        assert config.model_id == "Qwen/Qwen3-32B-Instruct"
+        assert config.model_id == "qwen3.5:35b"
         assert config.max_tokens == 512
         assert config.temperature == 0.3
         assert config.max_subjective_length == 100
@@ -96,15 +96,8 @@ class TestSOAPGenerator:
 
     def test_calculate_confidence(self, generator):
         """測試置信度計算"""
-        soap = {
-            "subjective": "chest pain",
-            "objective": "BP 140/90",
-            "assessment": "pneumonia",
-            "plan": "medication",
-        }
         confidence = generator._calculate_confidence(
             "病人胸悶，血壓 140，診斷肺炎，開藥",
-            soap,
         )
         assert isinstance(confidence, dict)
         assert "subjective" in confidence
