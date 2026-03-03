@@ -195,6 +195,8 @@ async def websocket_transcribe(websocket: WebSocket):
         # 接受 WebSocket 連接
         await websocket.accept()
 
+        logger.info(f"WebSocket 連接已接受：{id(websocket)}")
+
         # 接收客戶端識別資訊
         initial_data = await websocket.receive_text()
         try:
@@ -205,6 +207,8 @@ async def websocket_transcribe(websocket: WebSocket):
 
         # 添加到管理器
         manager.connect(websocket, client_id)
+
+        logger.info(f"客戶端 {client_id} 已連接")
 
         # 發送連接成功訊息
         await manager.send_message(
@@ -219,8 +223,12 @@ async def websocket_transcribe(websocket: WebSocket):
             },
         )
 
+        logger.info(f"已發送連接確認訊息到 {client_id}")
+
         # 初始化 Whisper 模型 (lazy load)
+        logger.info("正在初始化 Whisper 模型...")
         whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
+        logger.info("✓ Whisper 模型初始化完成")
 
         # 創建轉錄器
         transcriber = create_transcriber(
@@ -230,6 +238,8 @@ async def websocket_transcribe(websocket: WebSocket):
             task="transcribe",
             beam_size=5,
         )
+
+        logger.info(f"✓ 轉錄器已創建：{client_id}")
 
         # 持續處理訊息
         while True:
@@ -290,7 +300,9 @@ async def websocket_transcribe(websocket: WebSocket):
 
                     try:
                         audio_bytes = base64.b64decode(audio_data)
+                        logger.debug(f"收到音頻塊：{len(audio_bytes)} bytes")
                     except Exception as e:
+                        logger.error(f"音頻解碼失敗：{e}")
                         await manager.send_message(
                             client_id,
                             {
@@ -303,29 +315,36 @@ async def websocket_transcribe(websocket: WebSocket):
                     # 處理音頻塊
                     try:
                         result = transcriber.process_chunk(audio_bytes)
+                        logger.debug(f"轉錄結果：{result}")
                         await manager.send_message(client_id, {"type": "result", "data": result})
                     except Exception as e:
+                        logger.error(f"音頻處理失敗：{e}")
                         await manager.send_message(
                             client_id,
                             {"type": "error", "data": {"error": f"Processing error: {str(e)}"}},
                         )
                 else:
+                    logger.warning("收到 chunk 但沒有音頻數據")
                     await manager.send_message(
                         client_id, {"type": "error", "data": {"error": "No audio data provided"}}
                     )
 
             elif message_type == "end":
                 # 結束轉錄會話
+                logger.info(f"收到結束訊息：{client_id}")
                 try:
                     result = transcriber.end_stream()
+                    logger.info(f"轉錄會話結束：{result}")
                     await manager.send_message(client_id, {"type": "result", "data": result})
                 except Exception as e:
+                    logger.error(f"結束串流失敗：{e}")
                     await manager.send_message(
                         client_id,
                         {"type": "error", "data": {"error": f"End stream error: {str(e)}"}},
                     )
                 finally:
                     # 清理轉錄器
+                    logger.info(f"清理轉錄器：{client_id}")
                     remove_transcriber(client_id)
 
             else:
