@@ -107,16 +107,18 @@ async def test_audio_streaming():
         print("✓ WebSocket 連接成功")
 
         # 發送開始訊息
-        await websocket.send(json.dumps({
+        start_msg = json.dumps({
             "type": "start",
             "client_id": "test_001"
-        }))
+        })
+        print(f"發送：{start_msg}")
+        await websocket.send(start_msg)
 
         try:
             response = await asyncio.wait_for(websocket.recv(), timeout=10)
-            print(f"✓ 開始錄音：{response}")
+            print(f"✓ 服務器回應：{response}")
         except asyncio.TimeoutError:
-            print("⚠ 等待回應超時")
+            print("⚠ 等待回應超時（Whisper 模型可能正在初始化）")
 
         # 初始化 PyAudio
         p = pyaudio.PyAudio()
@@ -129,9 +131,11 @@ async def test_audio_streaming():
         )
 
         print("🎤 開始錄音... (錄音 3 秒，按 Ctrl+C 可提前停止)")
+        print("📊 轉錄結果將顯示如下：")
 
         chunk_count = 0
         max_chunks = 50  # 限制錄音長度（約 3 秒）
+        transcripts = []  # 存儲所有轉錄結果
 
         try:
             while chunk_count < max_chunks:
@@ -158,14 +162,19 @@ async def test_audio_streaming():
                         websocket.recv(),
                         timeout=0.1
                     )
-                    print(f"  轉錄結果：{result}")
+                    result_data = json.loads(result)
+                    transcript = result_data.get('data', {}).get('text', '')
+                    if transcript:
+                        print(f"  📝 轉錄：{transcript}")
+                        transcripts.append(transcript)
                 except asyncio.TimeoutError:
                     pass
 
         except KeyboardInterrupt:
             print("\n✓ 錄音停止")
 
-        print("\n正在結束錄音...")
+        print("\n" + "=" * 50)
+        print("正在結束錄音...")
 
         # 發送結束訊息
         try:
@@ -177,13 +186,27 @@ async def test_audio_streaming():
             print(f"⚠ 發送結束訊息失敗：{e}")
 
         # 接收最終結果
+        print("等待最終轉錄結果...")
         try:
             result = await asyncio.wait_for(websocket.recv(), timeout=10)
-            print(f"✓ 最終轉錄結果：{result}")
+            print(f"\n{'='*50}")
+            print("📋 最終轉錄結果")
+            print("="*50)
+            print(f"{result}")
+            print("="*50)
         except asyncio.TimeoutError:
             print("⚠ 等待最終結果超時")
         except Exception as e:
             print(f"⚠ 接收最終結果失敗：{e}")
+
+        # 顯示所有轉錄文本
+        if transcripts:
+            print("\n" + "=" * 50)
+            print("📝 所有轉錄文本")
+            print("=" * 50)
+            for i, t in enumerate(transcripts, 1):
+                print(f"{i}. {t}")
+            print("=" * 50)
 
         print("\n✓ 音頻串流測試完成")
         return True
@@ -193,6 +216,8 @@ async def test_audio_streaming():
         return False
     except Exception as e:
         print(f"✗ 音頻串流測試失敗：{e}")
+        import traceback
+        traceback.print_exc()
         return False
     finally:
         # 清理資源
