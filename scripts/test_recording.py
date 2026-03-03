@@ -159,14 +159,56 @@ async def test_audio_streaming():
 
         # 初始化 PyAudio
         p = pyaudio.PyAudio()
-        stream = p.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=16000,
-            input=True,
-            frames_per_buffer=1024,
-            input_device_index=input_device  # 指定輸入設備
-        )
+
+        # 獲取設備支援的採樣率
+        try:
+            device_info = p.get_device_info_by_index(input_device)
+            supported_rates = []
+            for rate in [8000, 16000, 22050, 44100, 48000]:
+                try:
+                    if p.is_format_supported(
+                        rate,
+                        input_device=input_device,
+                        input_channels=1,
+                        input_format=pyaudio.paInt16,
+                    ):
+                        supported_rates.append(rate)
+                except:
+                    pass
+
+            # 使用 16000 如果支援，否則使用第一個支援的採樣率
+            if 16000 in supported_rates:
+                sample_rate = 16000
+            elif supported_rates:
+                sample_rate = supported_rates[0]
+                print(f"⚠ 設備不支援 16000Hz，使用 {sample_rate}Hz")
+            else:
+                sample_rate = 16000  # 預設
+                print(f"⚠ 無法檢測支援的採樣率，使用預設 {sample_rate}Hz")
+        except Exception as e:
+            print(f"⚠ 檢測設備採樣率失敗：{e}")
+            sample_rate = 16000
+
+        try:
+            stream = p.open(
+                format=pyaudio.paInt16,
+                channels=1,
+                rate=sample_rate,
+                input=True,
+                frames_per_buffer=1024,
+                input_device_index=input_device
+            )
+            print(f"✓ PyAudio 串流已初始化（採樣率：{sample_rate}Hz）")
+        except Exception as e:
+            print(f"✗ PyAudio 初始化失敗：{e}")
+            print("💡 嘗試使用預設參數...")
+            stream = p.open(
+                format=pyaudio.paInt16,
+                channels=1,
+                rate=16000,
+                input=True,
+                frames_per_buffer=1024
+            )
 
         print("🎤 開始錄音... (錄音 10 秒，按 Ctrl+C 可提前停止)")
         print("📊 轉錄結果將顯示如下：")
