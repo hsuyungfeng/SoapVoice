@@ -78,6 +78,10 @@ class StreamTranscriber:
         Returns:
             包含會話資訊的字典
         """
+        # 檢查模型是否已載入
+        if self.model is None:
+            raise RuntimeError("Whisper 模型未載入，請先呼叫 load_model()")
+
         if self._is_streaming:
             raise RuntimeError("串流會話已在進行中，請先結束當前會話")
 
