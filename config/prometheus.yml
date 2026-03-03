@@ -1,0 +1,27 @@
+# Prometheus 監控配置
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # SoapVoice API
+  - job_name: 'soapvoice-api'
+    static_configs:
+      - targets: ['api:8000']
+    metrics_path: '/metrics'
+    
+  # Node Exporter (系統監控)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+      
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+      
+  # Ollama 監控
+  - job_name: 'ollama'
+    static_configs:
+      - targets: ['ollama:11434']
