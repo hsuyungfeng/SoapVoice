@@ -160,64 +160,56 @@ async def test_audio_streaming():
         # 初始化 PyAudio
         p = pyaudio.PyAudio()
 
-        # 獲取設備支援的採樣率
-        try:
-            device_info = p.get_device_info_by_index(input_device)
-            supported_rates = []
-            for rate in [8000, 16000, 22050, 44100, 48000]:
-                try:
-                    if p.is_format_supported(
-                        rate,
-                        input_device=input_device,
-                        input_channels=1,
-                        input_format=pyaudio.paInt16,
-                    ):
-                        supported_rates.append(rate)
-                except:
-                    pass
-
-            # 使用 16000 如果支援，否則使用第一個支援的採樣率
-            if 16000 in supported_rates:
-                sample_rate = 16000
-            elif supported_rates:
-                sample_rate = supported_rates[0]
-                print(f"⚠ 設備不支援 16000Hz，使用 {sample_rate}Hz")
-            else:
-                sample_rate = 16000  # 預設
-                print(f"⚠ 無法檢測支援的採樣率，使用預設 {sample_rate}Hz")
-        except Exception as e:
-            print(f"⚠ 檢測設備採樣率失敗：{e}")
-            sample_rate = 16000
+        # Whisper 模型需要 16000Hz
+        target_rate = 16000
 
         try:
             stream = p.open(
                 format=pyaudio.paInt16,
                 channels=1,
-                rate=sample_rate,
+                rate=target_rate,
                 input=True,
                 frames_per_buffer=1024,
                 input_device_index=input_device
             )
-            print(f"✓ PyAudio 串流已初始化（採樣率：{sample_rate}Hz）")
+            print(f"✓ PyAudio 串流已初始化（採樣率：{target_rate}Hz）")
         except Exception as e:
-            print(f"✗ PyAudio 初始化失敗：{e}")
-            print("💡 嘗試使用預設參數...")
+            print(f"⚠ {target_rate}Hz 初始化失敗：{e}")
+            print("💡 嘗試使用系統預設採樣率並進行轉換...")
+
+            # 使用系統預設採樣率
             stream = p.open(
                 format=pyaudio.paInt16,
                 channels=1,
-                rate=16000,
+                rate=48000,  # 使用更常見的採樣率
                 input=True,
-                frames_per_buffer=1024
+                frames_per_buffer=1024,
+                input_device_index=input_device
             )
+            print(f"✓ PyAudio 串流已初始化（採樣率：48000Hz，將轉換為 16000Hz）")
+
+            # 設置採樣率轉換
+            import numpy as np
+            def resample_audio(data, from_rate, to_rate):
+                """簡易採樣率轉換"""
+                num_samples = int(len(data) * to_rate / from_rate)
+                return np.interp(
+                    np.linspace(0, len(data), num_samples, endpoint=False),
+                    np.arange(len(data)),
+                    data.astype(np.float32)
+                ).astype(np.int16).tobytes()
 
         print("🎤 開始錄音... (錄音 10 秒，按 Ctrl+C 可提前停止)")
         print("📊 轉錄結果將顯示如下：")
-        print("💡 提示：請對著麥克風說話以測試轉錄功能")
+        print("💡 提示：請對著麥克風**清楚說話**以測試轉錄功能")
+        print("💡 例如：'病人胸悶兩天，呼吸困難'")
+        print("")
 
         chunk_count = 0
         max_chunks = 150  # 增加錄音長度（約 10 秒，150 * 1024 / 16000 ≈ 9.6 秒）
         transcripts = []  # 存儲所有轉錄結果
         audio_level_sum = 0  # 音頻電平總和
+        speech_detected = False  # 是否檢測到語音
 
         try:
             while chunk_count < max_chunks:
@@ -228,6 +220,10 @@ async def test_audio_streaming():
                 import struct
                 audio_level = sum([abs(struct.unpack('<h', data[i:i+2])[0]) for i in range(0, len(data), 2)]) / (len(data) // 2)
                 audio_level_sum += audio_level
+
+                # 簡單的語音檢測（電平 > 500 認為有語音）
+                if audio_level > 500:
+                    speech_detected = True
 
                 # 發送音頻塊
                 await websocket.send(json.dumps({
@@ -242,7 +238,8 @@ async def test_audio_streaming():
                 # 每 10 個塊顯示一次進度
                 if chunk_count % 10 == 0:
                     avg_level = audio_level_sum / chunk_count
-                    print(f"  已發送 {chunk_count}/{max_chunks} 個音頻塊... (音頻電平：{avg_level:.0f})")
+                    speech_indicator = "🎤 語音" if speech_detected else "🔇 安靜"
+                    print(f"  已發送 {chunk_count}/{max_chunks} 個音頻塊... (音頻電平：{avg_level:.0f}) {speech_indicator}")
 
                 # 檢查是否有轉錄結果
                 try:
@@ -264,9 +261,20 @@ async def test_audio_streaming():
         # 計算平均音頻電平
         avg_audio_level = audio_level_sum / max_chunks if max_chunks > 0 else 0
         print(f"\n平均音頻電平：{avg_audio_level:.0f}")
+
+        # 語音檢測報告
+        if speech_detected:
+            print("✓ 檢測到語音活動")
+        else:
+            print("⚠ 未檢測到語音活動（電平 < 500）")
+            print("💡 請確認麥克風已連接並**對著麥克風清楚說話**")
+
         if avg_audio_level < 100:
             print("⚠ 音頻電平過低，可能麥克風未正確收音")
             print("💡 請確認麥克風已連接並正確配置")
+        elif not speech_detected:
+            print("⚠ 有音頻輸入但未檢測到語音")
+            print("💡 可能是背景噪音，請對著麥克風清楚說話")
         else:
             print("✓ 麥克風收音正常")
 
