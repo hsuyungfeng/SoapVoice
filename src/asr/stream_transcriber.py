@@ -29,7 +29,7 @@ class StreamTranscriber:
 
     def __init__(
         self,
-        whisper_model: WhisperModel,
+        whisper_model: Optional[WhisperModel] = None,
         language: Optional[str] = None,
         task: str = "transcribe",
         beam_size: int = 5,
@@ -38,13 +38,14 @@ class StreamTranscriber:
         """初始化串流辨識器
 
         Args:
-            whisper_model: WhisperModel 實例
+            whisper_model: WhisperModel 實例（可為 None，延遲載入）
             language: 語言代碼，None 為自動偵測
             task: 任務類型
             beam_size: Beam search 大小
             chunk_size: 音頻塊大小
         """
-        self.model = whisper_model.model
+        self._model_instance = whisper_model
+        self.model = whisper_model.model if whisper_model else None
         self.language = language
         self.task = task
         self.beam_size = beam_size
@@ -60,6 +61,16 @@ class StreamTranscriber:
         # 用於即時處理的變數
         self._temp_file = None
         self._last_result = ""
+
+    def load_model(self, whisper_model: WhisperModel) -> None:
+        """載入 Whisper 模型
+
+        Args:
+            whisper_model: WhisperModel 實例
+        """
+        self._model_instance = whisper_model
+        self.model = whisper_model.model
+        print(f"✓ Whisper 模型已載入：{whisper_model.model_id}")
 
     def start_stream(self) -> dict:
         """開始新的串流識別會話

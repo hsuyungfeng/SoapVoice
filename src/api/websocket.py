@@ -225,23 +225,20 @@ async def websocket_transcribe(websocket: WebSocket):
 
         logger.info(f"已發送連接確認訊息到 {client_id}")
 
-        # 初始化 Whisper 模型 (lazy load)
-        logger.info("正在初始化 Whisper 模型...")
-        whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
-        logger.info("✓ Whisper 模型初始化完成")
-
-        # 創建轉錄器
+        # 創建轉錄器（延遲初始化 Whisper 模型）
         transcriber = create_transcriber(
             client_id=client_id,
-            whisper_model=whisper_model,
-            language=None,  # 自動偵測
+            whisper_model=None,  # 延遲載入
+            language=None,
             task="transcribe",
             beam_size=5,
         )
 
-        logger.info(f"✓ 轉錄器已創建：{client_id}")
+        logger.info(f"轉錄器已創建（模型未載入）：{client_id}")
 
         # 持續處理訊息
+        model_loaded = False
+
         while True:
             try:
                 # 接收文字訊息（使用超時）
@@ -271,7 +268,16 @@ async def websocket_transcribe(websocket: WebSocket):
             message_data = message.get("data", {})
 
             if message_type == "start":
-                # 開始新的轉錄會話
+                # 開始新的轉錄會話 - 載入模型
+                if not model_loaded:
+                    logger.info("收到 start 訊息，正在載入 Whisper 模型...")
+                    from src.asr.whisper_model import WhisperModel
+                    whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
+                    transcriber.load_model(whisper_model)
+                    model_loaded = True
+                    logger.info("✓ Whisper 模型載入完成")
+
+                # 開始轉錄會話
                 try:
                     result = transcriber.start_stream()
                     await manager.send_message(
@@ -285,6 +291,7 @@ async def websocket_transcribe(websocket: WebSocket):
                             },
                         },
                     )
+                    logger.info(f"已發送 stream_started 到 {client_id}")
                 except RuntimeError as e:
                     await manager.send_message(
                         client_id, {"type": "error", "data": {"error": str(e)}}
