@@ -97,85 +97,130 @@ async def test_audio_streaming():
         print("  跳過音頻串流測試")
         return False
 
+    websocket = None
+    stream = None
+    p = None
+
     try:
-        async with websockets.connect(WS_URI) as websocket:
-            # 發送開始訊息
-            await websocket.send(json.dumps({
-                "type": "start",
-                "client_id": "test_001"
-            }))
+        # 連接 WebSocket
+        websocket = await websockets.connect(WS_URI, ping_timeout=10, close_timeout=10)
+        print("✓ WebSocket 連接成功")
 
-            response = await websocket.recv()
+        # 發送開始訊息
+        await websocket.send(json.dumps({
+            "type": "start",
+            "client_id": "test_001"
+        }))
+
+        try:
+            response = await asyncio.wait_for(websocket.recv(), timeout=10)
             print(f"✓ 開始錄音：{response}")
+        except asyncio.TimeoutError:
+            print("⚠ 等待回應超時")
 
-            # 初始化 PyAudio
-            p = pyaudio.PyAudio()
-            stream = p.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=16000,
-                input=True,
-                frames_per_buffer=1024
-            )
+        # 初始化 PyAudio
+        p = pyaudio.PyAudio()
+        stream = p.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=16000,
+            input=True,
+            frames_per_buffer=1024
+        )
 
-            print("🎤 開始錄音... (按 Ctrl+C 停止)")
+        print("🎤 開始錄音... (錄音 3 秒，按 Ctrl+C 可提前停止)")
 
-            chunk_count = 0
-            max_chunks = 50  # 限制錄音長度
-            try:
-                while chunk_count < max_chunks:
-                    # 讀取音頻數據
-                    data = stream.read(1024, exception_on_overflow=False)
+        chunk_count = 0
+        max_chunks = 50  # 限制錄音長度（約 3 秒）
 
-                    # 發送音頻塊
-                    await websocket.send(json.dumps({
-                        "type": "chunk",
-                        "data": {
-                            "audio": base64.b64encode(data).decode('utf-8')
-                        }
-                    }))
+        try:
+            while chunk_count < max_chunks:
+                # 讀取音頻數據
+                data = stream.read(1024, exception_on_overflow=False)
 
-                    chunk_count += 1
+                # 發送音頻塊
+                await websocket.send(json.dumps({
+                    "type": "chunk",
+                    "data": {
+                        "audio": base64.b64encode(data).decode('utf-8')
+                    }
+                }))
 
-                    # 每 10 個塊顯示一次進度
-                    if chunk_count % 10 == 0:
-                        print(f"  已發送 {chunk_count} 個音頻塊...")
+                chunk_count += 1
 
-                    # 檢查是否有轉錄結果
-                    try:
-                        result = await asyncio.wait_for(
-                            websocket.recv(),
-                            timeout=0.1
-                        )
-                        print(f"  轉錄結果：{result}")
-                    except asyncio.TimeoutError:
-                        pass
+                # 每 10 個塊顯示一次進度
+                if chunk_count % 10 == 0:
+                    print(f"  已發送 {chunk_count}/{max_chunks} 個音頻塊...")
 
-            except KeyboardInterrupt:
-                print("\n✓ 錄音停止")
+                # 檢查是否有轉錄結果
+                try:
+                    result = await asyncio.wait_for(
+                        websocket.recv(),
+                        timeout=0.1
+                    )
+                    print(f"  轉錄結果：{result}")
+                except asyncio.TimeoutError:
+                    pass
 
-            # 發送結束訊息
+        except KeyboardInterrupt:
+            print("\n✓ 錄音停止")
+
+        print("\n正在結束錄音...")
+
+        # 發送結束訊息
+        try:
             await websocket.send(json.dumps({
                 "type": "end"
             }))
+            print("✓ 已發送結束訊息")
+        except Exception as e:
+            print(f"⚠ 發送結束訊息失敗：{e}")
 
-            # 接收最終結果
-            try:
-                result = await asyncio.wait_for(websocket.recv(), timeout=5)
-                print(f"✓ 最終轉錄結果：{result}")
-            except asyncio.TimeoutError:
-                print("⚠ 等待最終結果超時")
+        # 接收最終結果
+        try:
+            result = await asyncio.wait_for(websocket.recv(), timeout=10)
+            print(f"✓ 最終轉錄結果：{result}")
+        except asyncio.TimeoutError:
+            print("⚠ 等待最終結果超時")
+        except Exception as e:
+            print(f"⚠ 接收最終結果失敗：{e}")
 
-            # 清理
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
+        print("\n✓ 音頻串流測試完成")
+        return True
 
-            return True
-
+    except websockets.exceptions.ConnectionClosed as e:
+        print(f"⚠ WebSocket 連接已關閉：{e}")
+        return False
     except Exception as e:
         print(f"✗ 音頻串流測試失敗：{e}")
         return False
+    finally:
+        # 清理資源
+        print("\n正在清理資源...")
+
+        if stream:
+            try:
+                stream.stop_stream()
+                stream.close()
+                print("✓ 音頻流已關閉")
+            except:
+                pass
+
+        if p:
+            try:
+                p.terminate()
+                print("✓ PyAudio 已終止")
+            except:
+                pass
+
+        if websocket:
+            try:
+                await websocket.close()
+                print("✓ WebSocket 已關閉")
+            except:
+                pass
+
+        print("✓ 資源清理完成")
 
 
 async def test_text_input():
