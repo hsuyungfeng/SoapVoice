@@ -192,6 +192,9 @@ async def websocket_transcribe(websocket: WebSocket):
     client_id = None
 
     try:
+        # 接受 WebSocket 連接
+        await websocket.accept()
+
         # 接收客戶端識別資訊
         initial_data = await websocket.receive_text()
         try:
@@ -200,8 +203,8 @@ async def websocket_transcribe(websocket: WebSocket):
         except json.JSONDecodeError:
             client_id = f"client_{id(websocket)}"
 
-        # 接受連接
-        await manager.connect(websocket, client_id)
+        # 添加到管理器
+        manager.connect(websocket, client_id)
 
         # 發送連接成功訊息
         await manager.send_message(
