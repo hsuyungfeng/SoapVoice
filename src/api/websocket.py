@@ -269,18 +269,30 @@ async def websocket_transcribe(websocket: WebSocket):
             message_data = message.get("data", {})
 
             if message_type == "start":
+                logger.info(f"收到 start 訊息：{message_data}")
+
                 # 開始新的轉錄會話 - 載入模型
                 if not model_loaded:
                     logger.info("收到 start 訊息，正在載入 Whisper 模型...")
                     from src.asr.whisper_model import WhisperModel
-                    whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
-                    transcriber.load_model(whisper_model)
-                    model_loaded = True
-                    logger.info("✓ Whisper 模型載入完成")
+                    try:
+                        whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
+                        transcriber.load_model(whisper_model)
+                        model_loaded = True
+                        logger.info("✓ Whisper 模型載入完成")
+                    except Exception as e:
+                        logger.error(f"Whisper 模型載入失敗：{e}")
+                        await manager.send_message(
+                            client_id,
+                            {"type": "error", "data": {"error": f"Model load error: {str(e)}"}}
+                        )
+                        continue
 
                 # 開始轉錄會話
                 try:
+                    logger.info("開始轉錄會話...")
                     result = transcriber.start_stream()
+                    logger.info(f"轉錄會話開始結果：{result}")
                     await manager.send_message(
                         client_id,
                         {
@@ -294,8 +306,14 @@ async def websocket_transcribe(websocket: WebSocket):
                     )
                     logger.info(f"已發送 stream_started 到 {client_id}")
                 except RuntimeError as e:
+                    logger.error(f"start_stream 失敗：{e}")
                     await manager.send_message(
-                        client_id, {"type": "error", "data": {"error": str(e)}}
+                        client_id, {"type": "error", "data": {"error": f"Start stream error: {str(e)}"}}
+                    )
+                except Exception as e:
+                    logger.error(f"start_stream 未知錯誤：{e}")
+                    await manager.send_message(
+                        client_id, {"type": "error", "data": {"error": f"Unknown error: {str(e)}"}}
                     )
 
             elif message_type == "chunk":
