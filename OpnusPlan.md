@@ -477,6 +477,59 @@ ws.onerror = (error) => {
 
 ---
 
+### 🏗️ Sprint 8: ASR 多引擎整合 (2026-03-04)
+
+**背景:** 根據 MoonshinePlan.md 評估結果，整合多 ASR 引擎以支援不同場景需求。
+
+**Sprint 8 任務清單**
+
+#### 任務 8.1 - Qwen3ASRModel 包裝類 ✅
+- 建立 `src/asr/qwen3asr_model.py`
+- 匹配 WhisperModel 介面
+- 支援 load() / transcribe() 方法
+
+#### 任務 8.2 - ASR 工廠類與簡繁轉換 ✅
+- 建立 `src/asr/asr_factory.py`
+- ASRBackendFactory: 引擎切換
+- ChineseConverter: opencc 簡轉繁
+
+#### 任務 8.3 - WebSocket 整合 ✅
+- 支援 `asr_backend` 參數
+- 支援 `convert_to_traditional` 參數
+- StreamTranscriber 內建轉換邏輯
+
+#### 任務 8.4 - 基準測試 ✅
+- 執行 4 引擎測試（whisper, moonshine, qwen3asr, funasr）
+- 測試 8 個醫療場景
+- 評估延遲與準確率
+
+**測試結果：**
+
+| 引擎 | 平均延遲 | 語系 | 評估 |
+|------|---------|------|------|
+| Moonshine | ~2,600ms | ❌ 亂碼 | 不建議（非商業授權）|
+| Faster-Whisper | ~4,500ms | 繁體 | ✅ 首選 |
+| Qwen3-ASR | ~6,500ms | 簡體→繁體 | ✅ 備選（最準確）|
+| FunASR | ~29,000ms | 簡體 | ❌ 延遲過高 |
+
+**使用方式：**
+```json
+// WebSocket start 訊息
+{
+  "type": "start",
+  "asr_backend": "whisper",    // 或 "qwen3asr"
+  "convert_to_traditional": true
+}
+```
+
+**完成標準:**
+- [x] Qwen3ASRModel 可獨立運作 ✅
+- [x] 引擎可透過參數切換 ✅
+- [x] Qwen3-ASR 輸出自動轉繁體 ✅
+- [x] 基準測試完成 ✅
+
+---
+
 ## 3️⃣ 功能分解與優先級 (Feature Breakdown)
 
 ### 🎯 功能分類 (MoSCoW Method)

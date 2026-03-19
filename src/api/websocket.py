@@ -16,6 +16,8 @@ from fastapi.responses import JSONResponse
 
 from src.asr.whisper_model import WhisperModel
 from src.asr.stream_transcriber import StreamTranscriber
+from src.asr.asr_factory import create_asr_model, ChineseConverter, ASRBackendFactory
+from src.asr.recording_session import get_recording_manager, RecordingSessionManager
 
 
 # 配置日誌
@@ -273,25 +275,38 @@ async def websocket_transcribe(websocket: WebSocket):
                 logger.info(f"model_loaded 狀態：{model_loaded}")
                 logger.info(f"transcriber.model: {transcriber.model}")
 
+                # 解析 ASR 後端參數
+                asr_backend = message_data.get("asr_backend", "whisper")
+                convert_to_traditional = message_data.get("convert_to_traditional", True)
+
+                logger.info(f"ASR 後端：{asr_backend}，轉繁體：{convert_to_traditional}")
+
                 # 開始新的轉錄會話 - 載入模型
                 if not model_loaded:
-                    logger.info("收到 start 訊息，正在載入 Whisper 模型...")
-                    from src.asr.whisper_model import WhisperModel
+                    logger.info(
+                        f"收到 start 訊息，正在載入 {ASRBackendFactory.get_backend_name(asr_backend)} 模型..."
+                    )
                     try:
-                        whisper_model = WhisperModel(model_id="large-v3", device="cuda", compute_type="float16")
-                        logger.info(f"Whisper 模型實例：{whisper_model}")
-                        logger.info(f"Whisper model.model: {whisper_model.model}")
-                        transcriber.load_model(whisper_model)
+                        model, needs_conversion = create_asr_model(
+                            backend=asr_backend,
+                            convert_to_traditional=convert_to_traditional,
+                        )
+                        transcriber._asr_needs_conversion = needs_conversion
+                        transcriber.load_model(model)
                         model_loaded = True
-                        logger.info("✓ Whisper 模型載入完成")
+                        logger.info(
+                            f"✓ {ASRBackendFactory.get_backend_name(asr_backend)} 模型載入完成"
+                        )
+                        logger.info(f"轉換為繁體：{needs_conversion}")
                         logger.info(f"transcriber.model 載入後：{transcriber.model}")
                     except Exception as e:
                         logger.error(f"Whisper 模型載入失敗：{e}")
                         import traceback
+
                         traceback.print_exc()
                         await manager.send_message(
                             client_id,
-                            {"type": "error", "data": {"error": f"Model load error: {str(e)}"}}
+                            {"type": "error", "data": {"error": f"Model load error: {str(e)}"}},
                         )
                         continue
 
@@ -301,6 +316,10 @@ async def websocket_transcribe(websocket: WebSocket):
                     logger.info(f"呼叫 start_stream() 前 transcriber.model: {transcriber.model}")
                     result = transcriber.start_stream()
                     logger.info(f"轉錄會話開始結果：{result}")
+                    # 開始錄音 session
+                    recording_mgr = get_recording_manager()
+                    recording_mgr.start_session(client_id)
+                    logger.info(f"錄音會話已建立：{client_id}")
                     await manager.send_message(
                         client_id,
                         {
@@ -316,41 +335,29 @@ async def websocket_transcribe(websocket: WebSocket):
                 except RuntimeError as e:
                     logger.error(f"start_stream 失敗：{e}")
                     await manager.send_message(
-                        client_id, {"type": "error", "data": {"error": f"Start stream error: {str(e)}"}}
-                    )
-                except Exception as e:
-                    logger.error(f"start_stream 未知錯誤：{e}")
-                    import traceback
-                    traceback.print_exc()
-                    await manager.send_message(
-                        client_id, {"type": "error", "data": {"error": f"Unknown error: {str(e)}"}}
+                        client_id,
+                        {"type": "error", "data": {"error": f"Start stream error: {str(e)}"}},
                     )
 
             elif message_type == "chunk":
                 # 處理音頻塊
-                audio_data = message_data.get("audio")
-
-                if audio_data:
-                    # 解碼 base64 音頻
-                    import base64
-
-                    try:
-                        audio_bytes = base64.b64decode(audio_data)
-                        logger.debug(f"收到音頻塊：{len(audio_bytes)} bytes")
-                    except Exception as e:
-                        logger.error(f"音頻解碼失敗：{e}")
-                        await manager.send_message(
-                            client_id,
-                            {
-                                "type": "error",
-                                "data": {"error": f"Failed to decode audio: {str(e)}"},
-                            },
-                        )
-                        continue
-
-                    # 處理音頻塊
+                audio_bytes = message_data.get("audio")
+                if audio_bytes:
+                    # 寫入錄音 session
+                    rec_mgr = get_recording_manager()
+                    session = rec_mgr.get_session(client_id)
+                    if session:
+                        session.write_audio_chunk(audio_bytes)
+                    # 處理轉錄
                     try:
                         result = transcriber.process_chunk(audio_bytes)
+                        # 即時保存轉錄片段（可選，減輕記憶體壓力）
+                        if result.get("text") and result.get("status") == "interim":
+                            rec_mgr2 = get_recording_manager()
+                            sess = rec_mgr2.get_session(client_id)
+                            if sess and result.get("segments"):
+                                for seg in result.get("segments", []):
+                                    sess.add_transcript_segment(seg)
                         logger.debug(f"轉錄結果：{result}")
                         await manager.send_message(client_id, {"type": "result", "data": result})
                     except Exception as e:
@@ -370,8 +377,30 @@ async def websocket_transcribe(websocket: WebSocket):
                 logger.info(f"收到結束訊息：{client_id}")
                 try:
                     result = transcriber.end_stream()
+                    final_text = result.get("text", "")
+                    final_segments = result.get("segments", [])
+                    # 即時保存最終片段
+                    rec_mgr = get_recording_manager()
+                    session = rec_mgr.get_session(client_id)
+                    if session:
+                        for seg in final_segments:
+                            session.add_transcript_segment(seg)
                     logger.info(f"轉錄會話結束：{result}")
                     await manager.send_message(client_id, {"type": "result", "data": result})
+                    # 儲存錄音檔案（音檔 + 逐字稿）
+                    save_result = rec_mgr.end_session(client_id, final_text=final_text)
+                    if save_result:
+                        logger.info(f"錄音已儲存：{save_result}")
+                        await manager.send_message(
+                            client_id,
+                            {
+                                "type": "status",
+                                "data": {
+                                    "status": "recording_saved",
+                                    "recording": save_result,
+                                },
+                            },
+                        )
                 except Exception as e:
                     logger.error(f"結束串流失敗：{e}")
                     await manager.send_message(

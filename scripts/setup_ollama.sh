@@ -81,7 +81,7 @@ main() {
     
     # 模型清單
     MODELS=(
-        "qwen3.5:35b"
+        "qwen3.5:9b"
         "qwen3.5:27b"
         "glm-4.7-flash:latest"
     )
@@ -111,7 +111,7 @@ main() {
     
     echo ""
     log_info "使用方式:"
-    echo "  ollama run qwen3.5:35b"
+    echo "  ollama run qwen3.5:9b"
     echo "  ollama run qwen3.5:27b"
     echo "  ollama run glm-4.7-flash:latest"
 }

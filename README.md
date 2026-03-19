@@ -14,11 +14,14 @@ SoapVoice 是一套基於本地 LLM 的醫療語音轉 SOAP 病歷系統：
 - 📋 結構化 SOAP 病歷自動產出（含 ICD-10 候選碼預填）
 - 📊 ICD-10 診斷代碼映射與專科分類
 - 🔐 內網專用安全部署（192.168.x.x）
+- 🔄 **支援多 ASR 引擎切換**（Faster-Whisper / Qwen3-ASR）
 
 **Pipeline 說明：**
 ```
-語音輸入 → Faster-Whisper ASR → 術語標準化 → ICD-10 對應 → Qwen3.5 LLM → SOAP 病歷
-```
+語音輸入 → [可選 ASR 引擎] → 術語標準化 → ICD-10 對應 → Qwen3.5 LLM → SOAP 病歷
+                ↓
+        Faster-Whisper (繁體) 或 Qwen3-ASR (簡體→繁體)
+```Goal: add Cli-anything and skill use smaller model for SOAP record
 
 ---
 
@@ -49,7 +52,7 @@ uv sync
 
 # 3. 安裝並啟動 Ollama
 curl -fsSL https://ollama.ai/install.sh | sh
-ollama pull qwen3.5:35b
+ollama pull qwen3.5:9b
 
 # 4. 啟動 API 服務
 uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
@@ -92,7 +95,7 @@ vim .env
 python3 -c "import secrets; print(secrets.token_hex(32))"
 
 # Step 4: 下載模型（約需 60GB 磁碟空間）
-ollama pull qwen3.5:35b      # 主模型 23GB
+ollama pull qwen3.5:9b       # 主模型 6GB
 ollama pull qwen3.5:27b      # 備用模型 17GB（可選）
 ollama pull glm-4.7-flash    # 快速推理 19GB（可選）
 
@@ -164,11 +167,10 @@ server {
 
 ```
 GPU0 (RTX 2080 Ti, 22GB VRAM):
-  └── Ollama: qwen3.5:35b (23GB → 需兩張 GPU 共享)
+  └── Ollama: qwen3.5:9b (6GB) + qwen3.5:27b (17GB，備用)
 
 GPU1 (RTX 2080 Ti, 22GB VRAM):
   └── Faster-Whisper large-v3 (6GB)
-  └── qwen3.5:35b (共享)
 
 CPU (Ryzen 9 5950X, 16C/32T):
   └── FastAPI (uvicorn workers × 4)
@@ -220,7 +222,7 @@ curl -X POST http://localhost:8000/api/v1/clinical/soap/generate \
     "conversation_summary": "病患主訴胸悶兩天伴隨呼吸困難，建議進一步心肺評估。"
   },
   "metadata": {
-    "model_version": "qwen3.5:35b",
+    "model_version": "qwen3.5:9b",
     "normalized_terms": [
       {"original": "胸悶", "standard": "chest tightness", "icd10_candidates": ["R07.89"]},
       {"original": "呼吸困難", "standard": "dyspnea", "icd10_candidates": ["R06.02"]}
@@ -233,7 +235,50 @@ curl -X POST http://localhost:8000/api/v1/clinical/soap/generate \
 
 ---
 
-## 🔐 安全認證
+## 🎛️ ASR 引擎選擇
+
+SoapVoice 支援多種 ASR 引擎，可在 WebSocket 連線時選擇：
+
+### 支援的引擎
+
+| 引擎 | 輸出語系 | 延遲 | 特色 |
+|------|---------|------|------|
+| `whisper` | 繁體中文 | ~4.5s | 預設首選，穩定輸出繁體 |
+| `qwen3asr` | 簡體→繁體 | ~6.5s | 語義最準確，需 opencc 轉換 |
+
+### 使用方式
+
+```javascript
+// WebSocket 連線時選擇引擎
+const ws = new WebSocket('ws://localhost:8000/api/v1/voice/stream');
+
+// 開始轉錄，指定 ASR 引擎
+ws.send(JSON.stringify({
+  type: 'start',
+  asr_backend: 'qwen3asr',        // 或 'whisper'
+  convert_to_traditional: true     // Qwen3-ASR 輸出轉繁體
+}));
+
+// 傳送音頻塊...
+ws.send(JSON.stringify({
+  type: 'chunk',
+  audio: 'base64-encoded-audio'
+}));
+
+// 結束轉錄
+ws.send(JSON.stringify({ type: 'end' }));
+```
+
+### 基準測試結果（8 個醫療場景）
+
+| 引擎 | 平均延遲 | 準確率 | 備註 |
+|------|---------|--------|------|
+| 🥇 Faster-Whisper | ~4,500ms | 良好 | 繁體輸出，生產首選 |
+| 🥈 Qwen3-ASR | ~6,500ms | 最佳 | 簡體輸出，需轉繁體 |
+
+ 安全認證---
+
+## 🔐
 
 ### API Key 認證
 
@@ -280,6 +325,12 @@ uv run python scripts/test_recording.py
 
 # 負載測試（需 Locust）
 uv run locust -f scripts/load_test.py --host=http://localhost:8000
+
+# ASR 基準測試（4 引擎比較）
+uv run python scripts/asr_bench.py list           # 列出所有場景
+uv run python scripts/asr_bench.py record        # 錄製測試音頻
+uv run python scripts/asr_bench.py batch         # 批次測試所有引擎
+uv run python scripts/asr_bench.py report        # 顯示最新報告
 ```
 
 ---
@@ -302,9 +353,10 @@ uv run locust -f scripts/load_test.py --host=http://localhost:8000
 | 層次 | 技術 |
 |------|------|
 | API 框架 | FastAPI + uvicorn |
-| 語音辨識 | Faster-Whisper large-v3 |
-| LLM | Ollama (qwen3.5:35b, GLM-4.7-Flash) |
+| **語音辨識** | **Faster-Whisper large-v3 + Qwen3-ASR-0.6B** |
+| LLM | Ollama (qwen3.5:9b, qwen3.5:27b, GLM-4.7-Flash) |
 | NLP | 自建術語映射器 + ICD-10 分類器 |
+| 簡繁轉換 | opencc |
 | 快取 | Redis |
 | 代理 | Nginx |
 | 容器 | Docker Compose |
@@ -325,6 +377,7 @@ uv run locust -f scripts/load_test.py --host=http://localhost:8000
 | Phase 5 | 測試優化 | ✅ 完成 | 2026-03-13 |
 | Phase 6 | 部署上線 | ✅ 完成 | 2026-03-15 |
 | Sprint 7 | 術語標準化整合 | ✅ 完成 | 2026-03-03 |
+| **Sprint 8** | **ASR 多引擎整合** | ✅ 完成 | **2026-03-04** |
 
 ---
 

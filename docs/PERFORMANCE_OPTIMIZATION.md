@@ -28,7 +28,7 @@ ollama pull glm-4.7-flash:latest  # 快速推理
 ```yaml
 # config/models.yaml
 llm:
-  model: "qwen3.5:35b"  # 主模型
+  model: "qwen3.5:9b"  # 主模型
   fallback_models:
     - "qwen3.5:27b"  # 較小模型
     - "glm-4.7-flash"  # 快速模型

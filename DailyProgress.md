@@ -751,6 +751,63 @@ uv run python scripts/test_websocket_simple.py
 
 ---
 
+### 📝 2026-03-04 (星期三) - ASR 多引擎整合
+
+**🎯 今日目標**
+- [x] 建立 Qwen3ASRModel 包裝類
+- [x] 建立 ASRBackendFactory 工廠類
+- [x] 加入 opencc 簡轉繁轉換
+- [x] 更新 WebSocket 支援 asr_backend 參數
+- [x] 執行 4 引擎基準測試（batch）
+- [x] 更新文件
+
+**✅ 今日完成**
+
+1. ✅ **ASR 多引擎架構**
+   - 建立 `src/asr/qwen3asr_model.py` - Qwen3-ASR 包裝類
+   - 建立 `src/asr/asr_factory.py` - 工廠類 + 簡繁轉換器
+   - 更新 `src/asr/__init__.py` 匯出模組
+
+2. ✅ **WebSocket 整合**
+   - 新增 `asr_backend` 參數支援選擇引擎
+   - 新增 `convert_to_traditional` 參數
+   - StreamTranscriber 支援簡轉繁
+
+3. ✅ **4 引擎基準測試（batch）**
+   - 測試 8 個醫療場景
+   - Moonshine: ❌ 延遲低但中文辨識失敗
+   - Faster-Whisper: ✅ 繁體輸出，延遲 ~4.5s
+   - Qwen3-ASR: ✅✅ 語義最準確，延遲 ~6.5s（需轉繁體）
+   - FunASR: ⚠️ 延遲過高 ~29s
+
+4. ✅ **依賴更新**
+   - 添加 opencc>=0.2.0 到 pyproject.toml
+
+**使用方式：**
+```json
+// WebSocket start 訊息
+{
+  "type": "start",
+  "asr_backend": "whisper",  // 或 "qwen3asr"
+  "convert_to_traditional": true
+}
+```
+
+**⏱️ 時間分配**
+| 項目 | 時間 |
+|------|------|
+| Qwen3ASRModel 實作 | 1h |
+| 工廠類 + 轉換器 | 1h |
+| WebSocket 整合 | 1h |
+| 基準測試 | 1h |
+| **總計** | **4h** |
+
+**🔜 明日計畫**
+- [ ] 準備發布
+- [ ] 更新 README.md
+
+---
+
 ## 🚨 當前問題與阻礙 (Current Issues & Blockers)
 
 ### 🔴 Critical (P0) - 阻擋進度

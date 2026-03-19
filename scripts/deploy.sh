@@ -62,7 +62,7 @@ check_prerequisites() {
     # 檢查模型
     if ! ollama list | grep -q "qwen3.5"; then
         log_warn "qwen3.5 模型未安裝"
-        log_info "請執行：ollama pull qwen3.5:35b"
+        log_info "請執行：ollama pull qwen3.5:9b"
     else
         log_info "✓ Qwen3.5 模型已安裝"
     fi

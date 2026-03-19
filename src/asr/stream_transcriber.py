@@ -61,6 +61,9 @@ class StreamTranscriber:
         self._current_text = ""
         self._total_duration = 0.0
 
+        # 簡轉繁轉換標記
+        self._asr_needs_conversion = False
+
         # 用於即時處理的變數
         self._temp_file = None
         self._last_result = ""
@@ -76,6 +79,15 @@ class StreamTranscriber:
         print(f"✓ Whisper 模型已載入：{whisper_model.model_id}")
         print(f"  model 屬性：{self.model}")
         print(f"  _model_instance: {self._model_instance}")
+        print(f"  簡轉繁：{self._asr_needs_conversion}")
+
+    def set_conversion(self, needs_conversion: bool) -> None:
+        """設置是否需要將輸出轉換為繁體中文
+
+        Args:
+            needs_conversion: 是否需要轉換
+        """
+        self._asr_needs_conversion = needs_conversion
 
     def start_stream(self) -> dict:
         """開始新的串流識別會話
@@ -179,30 +191,47 @@ class StreamTranscriber:
 
             # 收集分段結果
             text_parts = []
-            
+
             # 擴大的幻覺黑名單
             hallucination_blacklist = [
-                "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", 
-                "Amara.org", "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場",
-                "MING PAO", "CANADA", "TORONTO", "明報", "多倫多"
+                "谢谢",
+                "謝謝",
+                "字幕",
+                "志愿者",
+                "感謝",
+                "感谢",
+                "Watching",
+                "Amara.org",
+                "李宗盛",
+                "杨茜茜",
+                "楊茜茜",
+                "訂閱",
+                "订阅",
+                "剧场",
+                "劇場",
+                "MING PAO",
+                "CANADA",
+                "TORONTO",
+                "明報",
+                "多倫多",
             ]
 
             for segment in segments:
                 text = segment.text.strip()
                 if not text:
                     continue
-                
+
                 # 檢查是否包含黑名單中的片段
                 is_hallucination = False
                 for black_word in hallucination_blacklist:
                     if black_word.lower() in text.lower():
                         is_hallucination = True
                         break
-                
+
                 if is_hallucination:
                     logger.info(f"過濾幻覺文字: {text}")
                     continue
-                    
+
                 text_parts.append(text)
                 self._segments_buffer.append(
                     {
@@ -286,29 +315,46 @@ class StreamTranscriber:
 
                 final_text_parts = []
                 final_segments = []
-                
+
                 # 擴大的幻覺黑名單
                 hallucination_blacklist = [
-                    "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", 
-                    "Amara.org", "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場",
-                    "MING PAO", "CANADA", "TORONTO", "明報", "多倫多"
+                    "谢谢",
+                    "謝謝",
+                    "字幕",
+                    "志愿者",
+                    "感謝",
+                    "感谢",
+                    "Watching",
+                    "Amara.org",
+                    "李宗盛",
+                    "杨茜茜",
+                    "楊茜茜",
+                    "訂閱",
+                    "订阅",
+                    "剧场",
+                    "劇場",
+                    "MING PAO",
+                    "CANADA",
+                    "TORONTO",
+                    "明報",
+                    "多倫多",
                 ]
 
                 for segment in segments:
                     text = segment.text.strip()
                     if not text:
                         continue
-                        
+
                     # 檢查是否包含黑名單中的片段
                     is_hallucination = False
                     for black_word in hallucination_blacklist:
                         if black_word.lower() in text.lower():
                             is_hallucination = True
                             break
-                    
+
                     if is_hallucination:
                         continue
-                        
+
                     final_text_parts.append(text)
                     final_segments.append(
                         {
@@ -319,6 +365,15 @@ class StreamTranscriber:
                     )
 
                 final_text = " ".join(final_text_parts)
+
+                # 簡體轉繁體（如需要）
+                if self._asr_needs_conversion:
+                    from src.asr.asr_factory import ChineseConverter
+
+                    final_text = ChineseConverter.convert(final_text)
+                    final_segments = [
+                        {**s, "text": ChineseConverter.convert(s["text"])} for s in final_segments
+                    ]
 
                 # 更新總時長
                 if info.duration:

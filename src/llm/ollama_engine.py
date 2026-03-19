@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class ModelConfig:
     """模型配置"""
 
-    model_id: str = "qwen3.5:35b"
+    model_id: str = "qwen3.5:9b"
     api_base: str = "http://localhost:11434"
     temperature: float = 0.3
     max_tokens: int = 1024
@@ -34,7 +34,7 @@ class OllamaEngine:
         """初始化 Ollama Engine
 
         Args:
-            config: 模型配置，預設使用 qwen3.5:35b
+            config: 模型配置，預設使用 qwen3.5:9b
         """
         self.config = config or ModelConfig()
         self._initialized = False
@@ -97,7 +97,7 @@ class OllamaEngine:
                 "num_ctx": self.config.num_ctx,
                 "num_predict": max_tokens or self.config.max_tokens,
                 "temperature": temperature or self.config.temperature,
-            }
+            },
         }
 
         try:
@@ -113,8 +113,9 @@ class OllamaEngine:
                 result = ""
                 for line in response.iter_lines():
                     if line:
-                        data = line.decode('utf-8')
+                        data = line.decode("utf-8")
                         import json
+
                         chunk = json.loads(data)
                         if "response" in chunk:
                             result += chunk["response"]
@@ -190,7 +191,7 @@ class OllamaEngine:
         """下載模型
 
         Args:
-            model_name: 模型名稱 (e.g., "qwen3.5:35b")
+            model_name: 模型名稱 (e.g., "qwen3.5:9b")
 
         Returns:
             是否成功

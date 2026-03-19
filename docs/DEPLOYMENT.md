@@ -29,7 +29,7 @@
 
 ### 模型需求
 
-- [ ] qwen3.5:35b (23GB)
+- [ ] qwen3.5:9b (6GB)
 - [ ] qwen3.5:27b (17GB)
 - [ ] glm-4.7-flash:latest (19GB)
 - [ ] faster-whisper large-v3 (6GB)
@@ -71,7 +71,7 @@ sudo systemctl start ollama
 sudo systemctl enable ollama
 
 # 2.3 下載模型
-ollama pull qwen3.5:35b
+ollama pull qwen3.5:9b
 ollama pull qwen3.5:27b
 ollama pull glm-4.7-flash:latest
 
@@ -293,7 +293,7 @@ docker compose restart api
 ollama list
 
 # 重新下載模型
-ollama pull qwen3.5:35b
+ollama pull qwen3.5:9b
 
 # 檢查 VRAM
 nvidia-smi --query-gpu=memory.used,memory.total --format=csv

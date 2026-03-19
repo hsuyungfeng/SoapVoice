@@ -23,7 +23,7 @@ SOAP_KEYWORDS = SOAPClassifier.KEYWORDS
 class SOAPConfig:
     """SOAP 生成配置"""
 
-    model_id: str = "qwen3.5:35b"
+    model_id: str = "qwen3.5:9b"
     api_base: str = "http://localhost:11434"
     max_tokens: int = 512
     temperature: float = 0.3
@@ -61,6 +61,7 @@ class SOAPGenerator:
                 num_ctx=self.config.num_ctx,
             )
             from src.llm.ollama_engine import initialize_engine
+
             self._engine = initialize_engine(model_config)
         logger.info("SOAPGenerator initialized")
 
@@ -99,10 +100,7 @@ class SOAPGenerator:
         if context_str:
             sections.append(context_str.rstrip("\n"))
         if term_mappings:
-            term_lines = [
-                f"  - {m.original} → {m.standard} ({m.category})"
-                for m in term_mappings
-            ]
+            term_lines = [f"  - {m.original} → {m.standard} ({m.category})" for m in term_mappings]
             sections.append("Pre-identified Medical Terms:\n" + "\n".join(term_lines))
         if icd10_candidates:
             sections.append(f"ICD-10 Candidates: {', '.join(icd10_candidates)}")
@@ -168,10 +166,7 @@ CONVERSATION_SUMMARY:
         try:
             normalized_text, term_mappings = self._mapper.map_text(transcript)
             icd10_candidates = [
-                code
-                for m in term_mappings
-                if m.icd10_candidates
-                for code in m.icd10_candidates
+                code for m in term_mappings if m.icd10_candidates for code in m.icd10_candidates
             ]
             logger.info(
                 "術語標準化完成: %d 個術語, %d 個 ICD-10 候選碼",
@@ -305,11 +300,13 @@ CONVERSATION_SUMMARY:
         for category, keywords in SOAP_KEYWORDS.items():
             matches = [kw for kw in keywords if kw.lower() in text_lower]
             if matches:
-                results.append({
-                    "category": category,
-                    "matched_keywords": matches,
-                    "confidence": len(matches) / len(keywords),
-                })
+                results.append(
+                    {
+                        "category": category,
+                        "matched_keywords": matches,
+                        "confidence": len(matches) / len(keywords),
+                    }
+                )
 
         # 依置信度排序
         results.sort(key=lambda x: x["confidence"], reverse=True)

@@ -20,6 +20,11 @@ dependencies = [
     "pyjwt>=2.8.0",
     "pyaudio>=0.2.13",
     "scipy>=1.17.1",
+    "moonshine-voice>=0.0.49",
+    "funasr",
+    "modelscope",
+    "qwen-asr>=0.0.6",
+    "opencc>=0.2.0",
 ]
 
 [project.optional-dependencies]

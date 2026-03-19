@@ -18,7 +18,7 @@ class TestSOAPConfig:
     def test_default_config(self):
         """測試預設配置"""
         config = SOAPConfig()
-        assert config.model_id == "qwen3.5:35b"
+        assert config.model_id == "qwen3.5:9b"
         assert config.max_tokens == 512
         assert config.temperature == 0.3
         assert config.max_subjective_length == 100
@@ -187,6 +187,7 @@ class TestSingletonGenerator:
         # 清除全域快取以測試新配置
         from src.soap.soap_generator import _generator
         import src.soap.soap_generator as soap_mod
+
         soap_mod._generator = None
 
         config = SOAPConfig(max_tokens=256)
@@ -201,6 +202,7 @@ class TestSingletonGenerator:
         # 僅測試函數可呼叫，不實際初始化 LLM
         from src.soap.soap_generator import _generator
         import src.soap.soap_generator as soap_mod
+
         soap_mod._generator = None
 
         gen = get_generator()
