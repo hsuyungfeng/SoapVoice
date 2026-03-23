@@ -7,7 +7,7 @@ VLLM Engine 模組
 
 import os
 import logging
-from typing import Optional, Dict, Any, List
+from typing import Optional, List
 from dataclasses import dataclass
 
 from vllm import LLM, SamplingParams

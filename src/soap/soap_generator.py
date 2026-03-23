@@ -185,6 +185,8 @@ CONVERSATION_SUMMARY:
         )
 
         try:
+            if not self._engine:
+                raise RuntimeError("LLM engine not initialized")
             response = self._engine.generate(
                 prompt=prompt,
                 max_tokens=self.config.max_tokens,
@@ -218,7 +220,7 @@ CONVERSATION_SUMMARY:
         Returns:
             SOAP 病歷字典
         """
-        soap = {
+        soap: Dict[str, Any] = {
             "subjective": "",
             "objective": "",
             "assessment": "",

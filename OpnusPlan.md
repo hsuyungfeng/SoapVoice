@@ -96,8 +96,12 @@
 
 | 模型 | 用途 | 精度 | VRAM | 延遲目標 | 狀態 |
 |------|------|------|------|----------|------|
-| **Qwen3-32B-Instruct** | 主推理引擎 | FP16 | 36-40GB | <2s | 主力 |
-| **GLM-4.7-Flash** | Fast routing (簡單案例) | FP16 | <10GB | <400ms | 備用 |
+| **Qwen2.5:14b** | 主推理引擎 | Q4/Q8 | 9GB | <2s | ✅ 主力 |
+| **Qwen2.5:7b** | 備用/輕量 | Q4 | 4.7GB | <1s | ✅ 備用 |
+| **Qwen2.5:3b** | 快速測試 | Q4 | 1.9GB | <0.5s | ✅ 測試用 |
+| ~~qwen3.5:9b~~ | ~~主推理引擎~~ | ~~-~~ | ~~6.6GB~~ | ~~-~~ | ❌ CUDA 不相容 |
+
+> ⚠️ **重要提醒:** RTX 2080 Ti 雙 GPU 環境與 qwen3.5:9b 的 MTP 架構不相容，請使用 qwen2.5 系列。
 
 **技術實作:**
 
@@ -530,6 +534,65 @@ ws.onerror = (error) => {
 
 ---
 
+### 🏗️ Sprint 9: CLI 介面與擴展模式 (2026-03-23)
+
+**背景:** 根據用戶需求，新增 CLI 命令列介面，支援本地 LLM 進行 ICD-10、醫囑、藥物推薦。
+
+**硬體限制:** RTX 2080 Ti 雙 GPU 環境下 qwen3.5:9b 有 CUDA 相容性問題（MTP 架構），改用 qwen2.5 系列。
+
+**Sprint 9 任務清單**
+
+#### 任務 9.1 - CLI 介面實作 ✅
+- [x] 建立 `src/cli.py` - 完整 CLI 介面
+- [x] 支援互動式模式、文字輸入、檔案輸入
+- [x] 支援病患資訊（age, gender, chief_complaint）
+- [x] 支援自訂模型（`--model` 參數）
+- [x] 預設模型：qwen2.5:14b
+
+#### 任務 9.2 - 擴展模式實作 ✅
+- [x] 建立 `scripts/extended_soapvoice.py` - 擴展引擎
+- [x] 症狀提取（73 術語映射 + 45+ ICD-10 分類）
+- [x] ICD-10 自動映射
+- [x] 醫囑建議（根據 ICD-10 代碼）
+- [x] 藥物推薦（根據症狀）
+- [x] 完整 SOAP 生成（含擴展資訊）
+
+#### 任务 9.3 - 擴展 API 端點 ✅
+- [x] 建立 `src/api/extended_api.py`
+- [x] `/api/v1/extended/process` - 擴展 SOAP 端點
+
+#### 任務 9.4 - 錯誤修復 ✅
+- [x] 修復 `src/__init__.py` vllm import 問題
+- [x] 修復 `extended_soapvoice.py` _init_models 未呼叫問題
+
+**使用方式：**
+```bash
+# 基本模式
+uv run python src/cli.py --text "病人咳嗽兩天"
+
+# 擴展模式
+uv run python src/cli.py --extended --text "病人咳嗽兩天"
+
+# 音訊輸入
+uv run python src/cli.py --audio recording.wav --extended
+```
+
+**驗證結果：**
+```
+🔍 症狀: ['cough', '咳嗽']
+🏥 ICD-10: [('R05', 'Cough')]
+📋 醫囑: ['祛痰劑', '止咳藥物', '多喝水']
+💊 藥物: [('咳特靈', '1# 3次/日')]
+```
+
+**完成標準:**
+- [x] CLI 基本模式運作正常 ✅
+- [x] CLI 擴展模式運作正常 ✅
+- [x] 測試通過（92/92） ✅
+- [x] ruff lint check 通過 ✅
+
+---
+
 ## 3️⃣ 功能分解與優先級 (Feature Breakdown)
 
 ### 🎯 功能分類 (MoSCoW Method)
@@ -656,6 +719,11 @@ ws.onerror = (error) => {
 
 **決策:** 選擇 FP16 全精度
 **理由:** 硬體資源充足，醫療準確性優先於速度，確保診斷可靠性
+
+> **⚠️ 2026-03-23 更新:** 
+> 由於 RTX 2080 Ti 雙 GPU 環境與 qwen3.5:9b 的 MTP (Multi-Token Prediction) 架構不相容，導致 CUDA 錯誤。
+> **更新決策：** 改用 qwen2.5:14b 作為主要模型（9GB，運作正常）。
+> 其他驗證通過的模型：qwen2.5:7b（4.7GB）、qwen2.5:3b（1.9GB）、phi4:latest（9.1GB）。
 
 ---
 

@@ -1,0 +1,267 @@
+{
+  "timestamp": "20260304_152337",
+  "engines": [
+    "whisper",
+    "moonshine",
+    "qwen3asr",
+    "funasr"
+  ],
+  "results": {
+    "chest_pain": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2916.4,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 6330.5,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 12649.0,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 30099.6,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "respiratory": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2299.8,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難。 高血壓偏高建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針。皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 4335.6,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6643.5,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 31447.1,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "hypertension": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2748.8,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 4201.9,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6475.2,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 28514.3,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "wound_care": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2343.3,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 4219.8,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6408.7,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 29480.6,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "diabetes": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2260.2,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 4182.7,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6669.4,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 28836.9,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "doctor_patient": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2707.3,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 4069.7,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6503.1,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 28601.5,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "drug_order": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2741.6,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人 主宿胸悶兩天,伴隨呼吸�難,高血壓偏高,建議心電圖母胸部S光�",
+        "latency_ms": 3394.7,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6485.4,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 28351.3,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "surgery_record": [
+      {
+        "engine": "Moonshine base-zh (CPU)",
+        "text": "信 人 叔 叔 兄 ?? 山 水 呼 吸 ? 嗯 嗯 嗯 嗯 嗯 ?? 胸部s光检查。 真 体 缝 合 使 用 大 弧 度 群一群 真 真 真 皮 肤 表 层 缝 合 使 用 小 弧 度 ? 吃 蒸 汽 不 要",
+        "latency_ms": 2769.5,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 4233.8,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6394.0,
+        "error": null,
+        "extra": {}
+      },
+      {
+        "engine": "FunASR Paraformer-zh (CUDA)",
+        "text": "病人卤肃胸闷凉泛水，呼吸困，高血压偏高，建立心电图时光。真皮缝合使用大户，对无表层使用小持针汽，不要夹住针。",
+        "latency_ms": 27946.9,
+        "error": null,
+        "extra": {}
+      }
+    ]
+  }
+}

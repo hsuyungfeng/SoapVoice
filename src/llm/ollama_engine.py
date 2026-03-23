@@ -5,10 +5,9 @@ Ollama Engine 模組
 使用 Ollama 進行高效推理
 """
 
-import os
 import logging
 import requests
-from typing import Optional, Dict, Any, List
+from typing import Optional, List
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)

@@ -1,0 +1,153 @@
+{
+  "timestamp": "20260304_130800",
+  "engines": [
+    "whisper",
+    "qwen3asr"
+  ],
+  "results": {
+    "chest_pain": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主述胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 5082.9,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 11655.0,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "respiratory": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶",
+        "latency_ms": 4895.8,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6184.0,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "hypertension": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 3790.5,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6160.0,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "wound_care": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人,,,,,,,,,,,,,,,,,,.",
+        "latency_ms": 2859.9,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6246.1,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "diabetes": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓",
+        "latency_ms": 2937.5,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6202.7,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "doctor_patient": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高 食針器不要夾住針頭",
+        "latency_ms": 3673.2,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6166.1,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "drug_order": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難,血壓偏高,建議心電圖母胸部S光檢測。 針皮縫合使用大弧度取形針,皮膚表層縫合使用小弧度取形針。 持針器不要夾住針頭。",
+        "latency_ms": 3887.6,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6318.6,
+        "error": null,
+        "extra": {}
+      }
+    ],
+    "surgery_record": [
+      {
+        "engine": "Faster-Whisper large-v3 (CUDA)",
+        "text": "病人主宿胸悶兩天,伴隨呼吸困難。 高血壓偏高,建議心電圖母胸部S光檢查。 針皮縫合使用大弧度取形針。皮膚表層縫合使用小弧度取形針。 持針器不要夾住針皮。",
+        "latency_ms": 4020.5,
+        "error": null,
+        "extra": {
+          "lang_prob": 1
+        }
+      },
+      {
+        "engine": "Qwen3-ASR-0.6B (CUDA)",
+        "text": "病人主诉胸闷两天，伴随呼吸困难，高血压偏高。建议心电图、胸部 X 光检查。真皮缝合，使用大弧度曲形针；皮肤表层缝合，使用小弧度曲形针。持针器不要夹住针。",
+        "latency_ms": 6231.4,
+        "error": null,
+        "extra": {}
+      }
+    ]
+  }
+}

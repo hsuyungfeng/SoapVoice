@@ -7,7 +7,6 @@ SoapVoice FastAPI 主入口
 import os
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +14,8 @@ from dotenv import load_dotenv
 
 from src.api.websocket import router as websocket_router
 from src.api.rest import router as rest_router
+from src.api.consultation_api import router as consultation_router
+from src.api.extended_api import router as extended_router
 from src.llm.ollama_engine import initialize_engine, ModelConfig
 
 
@@ -35,8 +36,7 @@ APP_CONFIG = {
     "description": "醫療語音轉 SOAP 病歷系統",
     "version": "0.1.0",
     "cors_origins": os.getenv(
-        "CORS_ORIGINS",
-        "http://localhost:3000,http://127.0.0.1:3000,http://192.168.1.100:3000"
+        "CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://192.168.1.100:3000"
     ).split(","),
     "llm_model": os.getenv("LLM_MODEL", "Qwen/Qwen3-32B-Instruct"),
     "llm_gpu_memory": float(os.getenv("LLM_GPU_MEMORY", "0.9")),
@@ -88,6 +88,8 @@ app.add_middleware(
 # 註冊路由
 app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
 app.include_router(rest_router, prefix="/api/v1", tags=["Clinical NLP"])
+app.include_router(consultation_router, prefix="/api/v1", tags=["Consultation Flow"])
+app.include_router(extended_router, prefix="/api/v1", tags=["Extended Pipeline"])
 
 
 @app.get("/")
@@ -124,6 +126,15 @@ async def api_v1_root():
                 "icd10": "/api/v1/clinical/icd10",
                 "soap_classify": "/api/v1/clinical/classify/soap",
                 "soap_generate": "/api/v1/clinical/soap/generate",
+            },
+            "consultation": {
+                "start": "/api/v1/consultation/start",
+                "end": "/api/v1/consultation/end",
+                "soap_generate": "/api/v1/consultation/soap/generate",
+                "search": "/api/v1/consultation/search",
+                "stats": "/api/v1/consultation/stats",
+                "sessions": "/api/v1/consultation/sessions",
+                "websocket": "/api/v1/consultation/ws",
             },
         },
     }

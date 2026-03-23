@@ -1,10 +1,15 @@
+# SoapVoice Docker Compose - Development Environment
+# Includes API, Ollama, Whisper, and Redis
+
 version: "3.8"
 
 services:
+  # FastAPI 應用
   api:
     build:
       context: .
       dockerfile: Dockerfile
+      target: development
     container_name: soapvoice-api
     ports:
       - "8000:8000"
@@ -12,11 +17,22 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - PYTHONUNBUFFERED=1
       - OLLAMA_HOST=ollama:11434
+      # Llama.cpp settings
+      - LLAMA_MODEL_PATH=/models/llama
+      - LLAMA_N_GPU_LAYERS=35
+      - LLAMA_N_CTX=4096
+      # DoctorConsultation API
+      - DOCTOR_CONSULTATION_API_KEY=${DOCTOR_CONSULTATION_API_KEY:-}
+      - DOCTOR_CONSULTATION_BASE_URL=${DOCTOR_CONSULTATION_BASE_URL:-https://doctor-toolbox.com/DoctorConsultation}
+      # LLM Priority: local_first, cloud_first, local_only, cloud_only
+      - LLM_PRIORITY=local_first
     volumes:
       - ./:/app
       - model-cache:/models
+      - ./data:/app/data
     depends_on:
       - ollama
+      - redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -27,6 +43,7 @@ services:
     networks:
       - soapvoice-net
 
+  # Faster-Whisper ASR
   whisper:
     image: ghcr.io/guillaumekln/faster-whisper:latest
     container_name: soapvoice-whisper
@@ -45,6 +62,7 @@ services:
     networks:
       - soapvoice-net
 
+  # Ollama LLM Service
   ollama:
     image: ollama/ollama:latest
     container_name: soapvoice-ollama
@@ -67,8 +85,26 @@ services:
       - soapvoice-net
     command: serve
 
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: soapvoice-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - soapvoice-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   model-cache:
+    driver: local
+  redis-data:
     driver: local
 
 networks:

@@ -59,13 +59,20 @@ def get_soap_generator() -> SOAPGenerator:
     """取得 SOAP 生成器（單例）"""
     global _soap_generator
     if _soap_generator is None:
-        _soap_generator = SOAPGenerator()
+        from src.soap.soap_generator import SOAPConfig
+        import os
+
+        config = SOAPConfig(
+            model_id=os.getenv("LLM_MODEL", "qwen2.5:3b"),
+        )
+        _soap_generator = SOAPGenerator(config)
     return _soap_generator
 
 
 # Request/Response Models
 class NormalizeRequest(BaseModel):
     """標準化請求"""
+
     text: str = Field(..., description="醫療文本（中文或英文）")
     context: Optional[Dict[str, Any]] = Field(
         default=None,
@@ -75,6 +82,7 @@ class NormalizeRequest(BaseModel):
 
 class NormalizedTerm(BaseModel):
     """標準化術語"""
+
     original: str
     standard: str
     category: str
@@ -84,6 +92,7 @@ class NormalizedTerm(BaseModel):
 
 class NormalizeResponse(BaseModel):
     """標準化回應"""
+
     normalized_text: str
     terms: List[NormalizedTerm]
     processing_time_ms: float
@@ -91,6 +100,7 @@ class NormalizeResponse(BaseModel):
 
 class ICD10MatchResponse(BaseModel):
     """ICD-10 匹配回應"""
+
     code: str
     description: str
     description_zh: str
@@ -101,6 +111,7 @@ class ICD10MatchResponse(BaseModel):
 
 class ICD10Response(BaseModel):
     """ICD-10 分類回應"""
+
     matches: List[ICD10MatchResponse]
     primary_code: Optional[str] = None
     processing_time_ms: float
@@ -108,6 +119,7 @@ class ICD10Response(BaseModel):
 
 class SOAPClassifyResponse(BaseModel):
     """SOAP 分類回應"""
+
     text: str
     category: str
     confidence: float
@@ -116,6 +128,7 @@ class SOAPClassifyResponse(BaseModel):
 
 class SOAPGenerateRequest(BaseModel):
     """SOAP 生成請求"""
+
     transcript: str = Field(..., description="醫療對話記錄")
     patient_context: Optional[Dict[str, Any]] = Field(
         default=None,
@@ -125,6 +138,7 @@ class SOAPGenerateRequest(BaseModel):
 
 class SOAPSection(BaseModel):
     """SOAP 段落"""
+
     subjective: str = ""
     objective: str = ""
     assessment: str = ""
@@ -134,6 +148,7 @@ class SOAPSection(BaseModel):
 
 class SOAPGenerateResponse(BaseModel):
     """SOAP 生成回應"""
+
     soap: SOAPSection
     metadata: Dict[str, Any]
     processing_time_ms: float

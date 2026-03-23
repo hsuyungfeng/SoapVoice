@@ -1,12 +1,15 @@
-# 生產環境 Docker Compose 配置 (簡化版)
-# 使用本地 Ollama 服務，僅部署必要的 API 和 Redis
+# SoapVoice Docker Compose - Production Environment
+# Optimized for deployment with GPU support
+
+version: "3.8"
 
 services:
-  # FastAPI 應用
+  # FastAPI 應用 (GPU)
   api:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production-gpu
     container_name: soapvoice-api
     ports:
       - "8000:8000"
@@ -15,27 +18,49 @@ services:
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - PYTHONUNBUFFERED=1
+      - PYTHONOPTIMIZE=2
+      # Ollama settings (optional)
       - OLLAMA_HOST=${OLLAMA_HOST:-host.docker.internal:11434}
+      # Llama.cpp settings (GPU)
+      - LLAMA_MODEL_PATH=${LLAMA_MODEL_PATH:-/models/qwen2.5-7b-q4_k_m.gguf}
+      - LLAMA_N_GPU_LAYERS=${LLAMA_N_GPU_LAYERS:-35}
+      - LLAMA_N_CTX=${LLAMA_N_CTX:-4096}
+      - LLAMA_N_THREADS=${LLAMA_N_THREADS:-8}
+      # DoctorConsultation API (cloud LLM)
+      - DOCTOR_CONSULTATION_API_KEY=${DOCTOR_CONSULTATION_API_KEY:-}
+      - DOCTOR_CONSULTATION_BASE_URL=${DOCTOR_CONSULTATION_BASE_URL:-https://doctor-toolbox.com/DoctorConsultation}
+      # LLM Priority: local_first, cloud_first, local_only, cloud_only
+      - LLM_PRIORITY=${LLM_PRIORITY:-local_first}
+      # Database
+      - DATABASE_PATH=/app/data/local_db/medical.db
     volumes:
-      - ./:/app
+      - ./data:/app/data
       - model-cache:/models
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     networks:
       - soapvoice-net
 
-  # Redis 快取層
+  # Redis Cache
   redis:
-    image: docker.io/library/redis:7-alpine
+    image: redis:7-alpine
     container_name: soapvoice-redis
     command: redis-server --appendonly yes
     volumes:
@@ -49,14 +74,16 @@ services:
       timeout: 5s
       retries: 5
 
-  # Nginx 反向代理 (可選)
+  # Nginx Reverse Proxy (optional)
   nginx:
-    image: docker.io/library/nginx:alpine
+    image: nginx:alpine
     container_name: soapvoice-nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/ssl:/etc/nginx/ssl:ro
     depends_on:
       - api
     restart: unless-stopped
