@@ -71,6 +71,5 @@ htmlcov/
 # Large database files (exceeds GitHub 100MB limit)
 # data/local_db/medical.db  # 暫時註解，使用 Git LFS 管理
 
-# Large PDF files
-CurrentData/各种病例规范模板/
-CurrentData/各種病例規範模板/
+# Large PDF files and data directories
+CurrentData/
