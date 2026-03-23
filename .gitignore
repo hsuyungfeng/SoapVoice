@@ -67,3 +67,10 @@ htmlcov/
 
 # Ruff/Black
 .ruff_cache/
+
+# Large database files (exceeds GitHub 100MB limit)
+data/local_db/medical.db
+
+# Large PDF files
+CurrentData/各种病例规范模板/
+CurrentData/各種病例規範模板/
