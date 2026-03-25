@@ -1,0 +1,54 @@
+{
+  "system_info": {
+    "cpu_cores": 16,
+    "cpu_threads": 32,
+    "memory_total_gb": 47.0,
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 2080 Ti",
+        "memory_total_mb": 22528,
+        "memory_free_mb": 15703,
+        "utilization": "16"
+      },
+      {
+        "name": "NVIDIA GeForce RTX 2080 Ti",
+        "memory_total_mb": 22528,
+        "memory_free_mb": 16418,
+        "utilization": "0"
+      }
+    ]
+  },
+  "timestamp": "2026-03-25 10:45:53",
+  "results": [
+    {
+      "name": "GPU (qwen2.5:7b)",
+      "model": "qwen2.5:7b",
+      "runs": 3,
+      "prompts_count": 9,
+      "avg_inference_time_sec": 2.338,
+      "avg_tokens_per_second": 7.24,
+      "min_time_sec": 1.837,
+      "max_time_sec": 3.002
+    },
+    {
+      "name": "GPU (qwen2.5:3b)",
+      "model": "qwen2.5:3b",
+      "runs": 3,
+      "prompts_count": 9,
+      "avg_inference_time_sec": 1.257,
+      "avg_tokens_per_second": 7.98,
+      "min_time_sec": 0.846,
+      "max_time_sec": 1.826
+    },
+    {
+      "name": "GPU (qwen2.5:14b)",
+      "model": "qwen2.5:14b",
+      "runs": 3,
+      "prompts_count": 9,
+      "avg_inference_time_sec": 5.28,
+      "avg_tokens_per_second": 2.87,
+      "min_time_sec": 2.809,
+      "max_time_sec": 13.557
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+# SoapVoice Docker Compose - CPU Only Version (Windows)
+# 不需要 GPU，適用於無 GPU 的 Windows 環境
+
+version: "3.8"
+
+services:
+  # FastAPI 應用（CPU 模式）
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soapvoice-api-cpu
+    ports:
+      - "8000:8000"
+    environment:
+      # CPU 模式：使用較小的模型
+      - LLM_MODEL=qwen2.5:3b
+      - LLM_PRIORITY=cloud_first
+      # 如果有本地 Ollama，使用 local_only
+      # - LLM_PRIORITY=local_only
+      # - OLLAMA_HOST=http://host.docker.internal:11434
+      - PYTHONUNBUFFERED=1
+      # CPU 配置
+      - OLLAMA_NUM_THREADS=8
+    volumes:
+      - ./:/app
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - soapvoice-net
+
+  # 可選：本地 Ollama（需要較強 CPU）
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: soapvoice-ollama-cpu
+  #   ports:
+  #     - "11434:11434"
+  #   environment:
+  #     # CPU 模式：不使用 GPU
+  #     - CUDA_VISIBLE_DEVICES=
+  #   volumes:
+  #     - ollama-data:/root/.ollama
+  #   restart: unless-stopped
+  #   networks:
+  #     - soapvoice-net
+  #   command: serve
+
+  # 使用雲端 LLM 作為備用（DoctorConsultation）
+  # 需要設置 API Key
+  # doctor-cloud:
+  #   image: curlimages/curl:latest
+  #   container_name: soapvoice-doctor-cloud
+  #   command: ["sleep", "infinity"]
+
+networks:
+  soapvoice-net:
+    driver: bridge
+
+# volumes:
+#   ollama-data:
+#     driver: local
