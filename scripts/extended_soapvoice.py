@@ -153,6 +153,7 @@ class ExtendedSoapVoiceEngine:
         icd10_codes: List[Dict],
         medical_orders: List[str],
         drug_recommendations: List[Dict],
+        output_lang: str = "en",
     ) -> Dict[str, str]:
         """生成擴展 SOAP"""
 
@@ -164,18 +165,18 @@ class ExtendedSoapVoiceEngine:
             else "無"
         )
 
-        prompt_en = f"""Create a medical SOAP note in English with the following information:
+        prompt_en = f"""Create a medical SOAP note in ENGLISH ONLY. Do not write in Chinese or any other language.
 
-Transcript: {transcript}
+Transcript (Chinese): {transcript}
 ICD-10 Codes: {icd_list}
 Recommended Medical Orders: {orders}
 Drug Recommendations: {drugs}
 
-Format:
+Write the SOAP note entirely in English with this format:
 S - Subjective:
 O - Objective: 
 A - Assessment:
-P - Plan: (include medical orders and drug recommendations)
+P - Plan:
 """
 
         response = requests.post(

@@ -2,7 +2,7 @@
 
 [![測試狀態](https://img.shields.io/badge/tests-92%20passed-green)]()
 [![測試覆蓋率](https://img.shields.io/badge/coverage-85%25-green)]()
-[![版本](https://img.shields.io/badge/version-1.3.0-blue)]()
+[![版本](https://img.shields.io/badge/version-1.5.0-blue)]()
 [![授權](https://img.shields.io/badge/license-MIT-blue)]()
 
 ## 📖 專案說明
@@ -20,10 +20,62 @@ SoapVoice 是一套基於本地 LLM 的醫療語音轉 SOAP 病歷系統：
 
 **Pipeline 說明：**
 ```
-語音輸入 → [可選 ASR 引擎] → 術語標準化 → ICD-10 對應 → LLM → SOAP 病歷
-                ↓                                ↓
-        Faster-Whisper (繁體)             症狀提取 + 醫囑 + 藥物推薦
+語音輸入 → [可選 ASR 引擎] → 術語標準化 → ICD-10 對應 → RAG病例範本檢索 → LLM → SOAP 病歷
+                ↓                                ↓                                ↓
+        Faster-Whisper (繁體)             症狀提取 + 醫囑 + 藥物推薦      相關病例範本參考
 ```
+
+---
+
+## 📚 RAG 病例範本檢索系統
+
+SoapVoice 整合向量資料庫，提供語義相似病例範本檢索，增強 SOAP 生成品質。
+
+### 功能特點
+
+- 🔍 **語義搜尋**：使用多語言嵌入模型（paraphrase-multilingual-MiniLM-L12-v2）
+- 📊 **向量資料庫**：Chroma 向量資料庫 + SQLite 備份
+- 📁 **病例範本**：1,665 個專科病例範本（冠心病、糖尿病、肺炎等）
+- ⚡ **即時檢索**：LLM 生成 SOAP 時自動檢索相關病例作為參考
+
+### 使用方式
+
+```bash
+# 初始化 RAG 系統
+uv run python -m src.rag.case_template_rag init --template-dir "CurrentData/各种病例规范模板/"
+
+# 搜尋病例範本
+uv run python -m src.rag.case_template_rag search --query "冠心病 胸悶" --top-k 3
+
+# 查看統計
+uv run python -m src.rag.case_template_rag stats
+```
+
+### 程式碼使用
+
+```python
+from src.soap.soap_generator import SOAPGenerator, SOAPConfig
+
+# 啟用 RAG 檢索
+config = SOAPConfig(
+    enable_rag=True,    # 啟用 RAG
+    rag_top_k=3,         # 檢索前 3 個相關病例
+)
+generator = SOAPGenerator(config)
+
+# 生成 SOAP（會自動檢索相關病例範本）
+result = generator.generate("病人胸悶兩天...")
+print(result['case_templates'])  # 包含檢索到的病例範本
+```
+
+### 資料庫結構
+
+| 資料表 | 記錄數 | 用途 |
+|--------|---------|------|
+| icd10_codes | 96,802 | ICD-10 疾病分類 |
+| drugs | 12,042 | 藥品資料 |
+| medical_orders | 2,102 | 醫療服務 |
+| case_templates | 1,665 | 病例範本（RAG） |
 
 ---
 
@@ -313,9 +365,27 @@ curl -X POST http://localhost:8000/api/v1/clinical/soap/generate \
     ],
     "confidence": {"subjective": 0.97, "objective": 0.0, "assessment": 0.05, "plan": 0.0}
   },
+  "case_templates": [
+    {
+      "specialty": "冠心病病例",
+      "rank": 1,
+      "content": "患者主訴胸悶兩天，伴隨氣短..."
+    },
+    {
+      "specialty": "高血壓病例", 
+      "rank": 2,
+      "content": "患者有高血壓病史..."
+    }
+  ],
   "processing_time_ms": 1823.5
 }
 ```
+
+**說明：**
+- `case_templates`: RAG 檢索到的相關病例範本（最多 3 個）
+- `rank`: 相似度排名
+- `specialty`: 病例專科分類
+- `content`: 病例內容預覽（前 500 字元）
 
 ---
 

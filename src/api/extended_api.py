@@ -94,7 +94,12 @@ async def extended_process(request: ExtendedProcessRequest):
 
         # 生成 SOAP
         soap_result = engine.generate_extended_soap(
-            request.transcript, symptoms, icd10_codes, medical_orders, drug_recommendations
+            request.transcript,
+            symptoms,
+            icd10_codes,
+            medical_orders,
+            drug_recommendations,
+            output_lang=request.output_lang,
         )
 
         processing_time = time.time() - start
@@ -132,7 +137,11 @@ async def transcribe_audio(audio: UploadFile = File(...)):
 
     try:
         transcript = engine.transcribe(tmp_path)
-        return {"transcript": transcript, "language": "zh"}
+        return {
+            "transcript": transcript,
+            "language": "zh",
+            "model": engine.whisper_model or "whisper-medium",
+        }
     finally:
         os.unlink(tmp_path)
 

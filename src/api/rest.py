@@ -63,7 +63,7 @@ def get_soap_generator() -> SOAPGenerator:
         import os
 
         config = SOAPConfig(
-            model_id=os.getenv("LLM_MODEL", "qwen2.5:3b"),
+            model_id=os.getenv("LLM_MODEL", "qwen2.5:14b"),
         )
         _soap_generator = SOAPGenerator(config)
     return _soap_generator

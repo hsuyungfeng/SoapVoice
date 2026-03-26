@@ -10,6 +10,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 
 from src.api.websocket import router as websocket_router
@@ -85,6 +87,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 靜態檔案服務
+import pathlib
+
+static_dir = pathlib.Path(__file__).parent.parent / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
 # 註冊路由
 app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
 app.include_router(rest_router, prefix="/api/v1", tags=["Clinical NLP"])
@@ -94,7 +103,10 @@ app.include_router(extended_router, prefix="/api/v1", tags=["Extended Pipeline"]
 
 @app.get("/")
 async def root():
-    """根路徑"""
+    """根路徑 - 服務首頁"""
+    index_file = static_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
     return {
         "service": "SoapVoice API",
         "version": APP_CONFIG["version"],

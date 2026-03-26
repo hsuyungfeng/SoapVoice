@@ -1,0 +1,410 @@
+[
+  {
+    "name": "胸痛",
+    "file": "chest_pain.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 13.94,
+    "asr_model": "whisper",
+    "llm_time": 73.06,
+    "total_time": 87.0,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The symptoms have been progressively worsening over the past 24 hours.\n\n**O - Objective:**\n- Blood Pressure: Elevated (specific readings not provided)\n- Respiratory Rate: Increased\n- Heart Rate: Tachycardic (not quantified)\n- Patient appears anxious and uncomfortable.\n- No visible signs of trauma or injury on physical examination, but patient is in distress due to chest tightness.\n\n**A - Assessment:**  \nThe patient presents with symptoms suggestive of angina pectoris or possible myocardial ischemia. The combination of chest tightness, shortness of breath, and elevated blood pressure necessitates further diagnostic evaluation to rule out acute coronary syndrome (ACS). \n\nICD-10 Codes:\n- R07.89: Chest tightness\n- R06.02: Shortness of breath\n\n**P - Plan:**  \n1. Order an ECG to assess for cardiac ischemia or infarction.\n2. Obtain a chest X-ray to evaluate the lungs and heart size.\n3. Initiate oxygen therapy as needed based on respiratory status.\n4. Monitor blood pressure closely, aiming to maintain it within normal limits.\n5. Perform cardiac enzyme tests (troponin) to rule out myocardial injury.\n6. Administer nitroglycerin sublingually for symptomatic relief of chest pain if indicated.\n\nFollow-up:\n- Schedule a follow-up visit in 24 hours or sooner if symptoms worsen or new symptoms arise.\n- Refer the patient to cardiology for further evaluation and management as necessary.",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀：**\n病人報告過去兩天內感到胸部緊繃，伴隨著呼吸困難和血壓升高。症狀在過去24小時內逐漸加重。\n\n**O - 客觀：**\n- 血壓：高（具體讀數未提供）\n- 呼吸頻率：增加\n- 心跳速率：心動過速（未量化）\n- 病人看起來焦慮不安。\n- 在身體檢查中沒有可見的外傷或創傷跡象，但病人因胸部緊繃而感到痛苦。\n\n**A - 評估：**\n病人的症狀提示可能是心絞痛或可能的心肌缺血。由於胸部緊繃、呼吸困難和高血壓的組合，需要進一步診斷評估以排除急性冠脈綜合徵（ACS）。\n\nICD-10代碼：\n- R07.89：胸部緊繃\n- R06.02：呼吸困難\n\n**P - 計劃：**\n1. 下達心電圖檢查，以評估是否有心肌缺血或梗塞。\n2. 獲取胸片檢查肺部和心臟大小。\n3. 根據呼吸狀況需要時開始氧氣治療。\n4. 密切監測血壓，目標是保持在正常範圍內。\n5. 進行心肌酶檢測（肌鈣蛋白）以排除心肌損傷。\n6. 如有指徵，舌下給藥硝酸甘油以緩解胸痛症狀。\n\n追蹤：\n- 安排24小時後或更早的回診，如果症狀加劇或出現新的症狀。\n- 將病人轉介至心臟科進行進一步評估和管理。"
+    }
+  },
+  {
+    "name": "高血壓",
+    "file": "hypertension.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.15,
+    "asr_model": "whisper",
+    "llm_time": 65.42,
+    "total_time": 76.57,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient has not experienced any recent significant stressors or changes in activity level that might explain the symptoms.\n\n**O - Objective:**\n- Blood Pressure: Elevated\n- Respiratory Rate: Increased (24 breaths per minute)\n- Oxygen Saturation: 93% on room air, requiring supplemental oxygen\n- Heart Rate: Tachycardic (105 bpm)\n\n**A - Assessment:**  \nThe patient presents with chest tightness and shortness of breath, which are concerning for possible cardiac or respiratory issues. The elevated blood pressure and tachycardia support the need for further diagnostic evaluation to rule out conditions such as acute coronary syndrome or pulmonary embolism.\n\nICD-10 Codes:\n- R07.89: Chest tightness\n- R06.02: Shortness of breath\n\n**P - Plan:**  \n1. Order an ECG and chest X-ray to evaluate for cardiac and respiratory causes.\n2. Initiate supplemental oxygen therapy as needed based on oxygen saturation levels.\n3. Monitor blood pressure closely, especially if symptoms persist or worsen.\n4. Perform cardiac enzyme tests to rule out myocardial infarction.\n5. Prescribe sublingual nitroglycerin (as directed) for chest pain relief.\n\nFollow-up:\n- Schedule a follow-up appointment in 2 days to review test results and adjust treatment as necessary.\n- Advise the patient to return immediately if symptoms worsen or new symptoms develop.",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n病人報告過去兩天內感到胸部悶痛，伴有呼吸困難和血壓升高。病人近期沒有經歷任何顯著的精神壓力或活動水平的變化，這些可能解釋其症狀。\n\n**O - 客觀:**\n- 血壓：高\n- 呼吸頻率：增加（每分鐘24次）\n- 氧氣飽和度：在室內空氣中為93%，需要額外給氧\n- 心跳速率：心跳過速（每分鐘105次）\n\n**A - 評估:**  \n病人表現出胸部悶痛和呼吸困難，這可能表明心臟或呼吸道問題。高血壓和心跳加速支持進一步診斷評估以排除急性冠狀動脈綜合徵或肺栓塞等情況。\n\nICD-10代碼：\n- R07.89：胸部悶痛\n- R06.02：呼吸困難\n\n**P - 計劃:**  \n1. 下達心電圖和胸部X光檢查，以評估心臟和呼吸道問題。\n2. 根據氧氣飽和度水平需要時開始額外給氧治療。\n3. 密切監測血壓，特別是在症狀持續或加劇的情況下。\n4. 進行心肌酶檢測以排除心肌梗塞。\n5. 開處舌下含服硝酸甘油（按指示）以緩解胸痛。\n\n追蹤：\n- 安排兩天後的回診，以審閱檢查結果並根據需要調整治療方案。\n- 建議病人如果症狀加劇或出現新症狀時立即返回就醫。"
+    }
+  },
+  {
+    "name": "糖尿病",
+    "file": "diabetes.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.38,
+    "asr_model": "whisper",
+    "llm_time": 63.54,
+    "total_time": 74.92,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient has not experienced any recent trauma or injury but notes a gradual onset of symptoms over the past 48 hours.\n\n**O - Objective:**\n- Blood Pressure: Elevated\n- Respiratory Rate: Increased\n- Heart Rate: Tachycardic (102 bpm)\n- Oxygen Saturation: 93% on room air\n\n**A - Assessment:**  \nThe patient presents with symptoms suggestive of possible cardiac issues, including chest tightness and shortness of breath. The elevated blood pressure and tachycardia further support the need for immediate evaluation to rule out acute coronary syndrome or other cardiovascular conditions.\n\nICD-10 Codes:\n- R07.89: Chest tightness\n- R06.02: Shortness of breath\n\n**P - Plan:**  \n1. Order an ECG (Electrocardiogram) and chest X-ray to evaluate for cardiac and pulmonary causes.\n2. Initiate oxygen therapy as needed based on oxygen saturation levels.\n3. Monitor blood pressure closely and manage with appropriate medications if necessary.\n4. Perform a cardiac enzyme panel to assess for myocardial injury.\n5. Administer sublingual nitroglycerin (0.4 mg) as prescribed for angina relief.\n\nFollow-up:\n- Schedule the patient for follow-up in 24 hours or sooner if symptoms worsen.\n- Refer to cardiology for further evaluation and management based on test results.",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n病人報告過去兩天內感到胸部緊繃，並伴有呼吸困難和血壓升高。病人沒有經歷任何近期外傷或損傷，但注意到症狀在過去48小時內逐漸出現。\n\n**O - 客觀:**\n- 血壓：偏高\n- 呼吸頻率：增加\n- 心跳速率：心動過速（每分鐘102次）\n- 氧飽和度：室內空氣下為93%\n\n**A - 評估:**  \n病人出現可能與心血管問題相關的症狀，包括胸部緊繃和呼吸困難。血壓升高和心動過速進一步支持需要立即評估以排除急性冠脈綜合徵或其他心血管疾病。\n\nICD-10代碼：\n- R07.89：胸部緊繃\n- R06.02：呼吸困難\n\n**P - 計劃:**  \n1. 下達心電圖（ECG）和胸部X光檢查，以評估心臟和肺部的病因。\n2. 根據氧飽和度水平按需要開始氧療。\n3. 密切監測血壓並根據需要使用適當藥物進行管理。\n4. 進行心肌酶檢測以評估心肌損傷。\n5. 按處方給病人舌下含服硝酸甘油（0.4毫克）以緩解心絞痛。\n\n追蹤：\n- 安排病人在24小時內或症狀惡化時更早進行回診。\n- 根據檢查結果將病人轉介至心臟科進一步評估和治療。"
+    }
+  },
+  {
+    "name": "傷口護理",
+    "file": "wound_care.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.31,
+    "asr_model": "whisper",
+    "llm_time": 58.82,
+    "total_time": 70.13,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient has not experienced any recent trauma or injury but notes a history of hypertension.\n\n**O - Objective:**\n- Blood Pressure: Elevated (specific values not provided)\n- Respiratory Rate: Increased\n- Heart Rate: Tachycardia noted upon examination\n\n**A - Assessment:**  \nThe patient presents with symptoms suggestive of possible cardiac issues, including chest tightness and shortness of breath. The elevated blood pressure further supports the need for a thorough evaluation to rule out conditions such as myocardial ischemia or other cardiovascular disorders.\n\nICD-10 Codes: R07.89 (Chest tightness), R06.02 (Shortness of breath)\n\n**P - Plan:**  \n1. Order an ECG and chest X-ray to evaluate for cardiac and pulmonary causes.\n2. Initiate oxygen therapy as needed based on respiratory status.\n3. Monitor blood pressure closely and adjust antihypertensive medications if necessary.\n4. Perform cardiac enzyme tests to assess for myocardial injury or ischemia.\n5. Prescribe nitroglycerin sublingual tablets (as needed) for chest pain relief.\n\nFollow-up:  \n- Schedule a follow-up appointment in 1 week for further evaluation and management of symptoms.\n- Advise patient on the importance of monitoring blood pressure at home and reporting any significant changes or worsening of symptoms to their healthcare provider.",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n病人報告過去兩天有胸悶症狀，伴隨呼吸困難和高血壓。病人沒有經歷任何近期的外傷或損傷，但注意到其有高血壓病史。\n\n**O - 客觀:**\n- 血壓：升高（具體值未提供）\n- 呼吸頻率：增加\n- 心跳速率：檢查時發現心跳加速\n\n**A - 評估:**  \n病人出現可能與心臟問題相關的症狀，包括胸悶和呼吸困難。高血壓進一步支持需要進行全面評估以排除如心肌缺血或其他心血管疾病等情況。\n\nICD-10代碼：R07.89（胸悶），R06.02（呼吸困難）\n\n**P - 計劃:**  \n1. 下達心電圖和胸部X光檢查，評估心臟和肺部原因。\n2. 根據呼吸狀況需要時開始氧療。\n3. 密切監測血壓並根據需要調整降血壓藥物。\n4. 進行心肌酶檢測以評估心肌損傷或缺血情況。\n5. 開具舌下含服硝酸甘油片（按需使用）以緩解胸痛。\n\n追蹤：\n- 安排一週後的回診，進一步評估和管理症狀。\n- 告知病人在家監測血壓的重要性，並建議其向醫療提供者報告任何顯著變化或症狀惡化。"
+    }
+  },
+  {
+    "name": "呼吸道",
+    "file": "respiratory.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.36,
+    "asr_model": "whisper",
+    "llm_time": 80.62,
+    "total_time": 91.99,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient mentions discomfort in the chest area that feels like a heavy weight on the chest and difficulty breathing, especially with physical activity.\n\n**O - Objective:**  \n- Blood Pressure: 150/98 mmHg (elevated)\n- Heart Rate: 92 bpm (tachycardic)\n- Respiratory Rate: 24 breaths per minute\n- Oxygen Saturation: 93% on room air (decreased, indicating hypoxemia)\n- Patient appears anxious and in mild distress.\n- No visible signs of trauma or external injury to the chest area.\n\n**A - Assessment:**  \nThe patient presents with symptoms consistent with possible cardiac ischemia or angina, given the presence of chest tightness, shortness of breath, elevated blood pressure, tachycardia, and hypoxemia. The risk factors include hypertension and potential myocardial infarction due to the clinical presentation.\n\n**P - Plan:**  \n1. Order an ECG (Electrocardiogram) to evaluate cardiac function.\n2. Request a chest X-ray to rule out pulmonary causes of shortness of breath or other thoracic abnormalities.\n3. Initiate oxygen therapy at 4 L/min via nasal cannula to maintain adequate oxygen saturation levels.\n4. Monitor blood pressure closely and adjust antihypertensive medications as needed.\n5. Order cardiac enzyme tests (troponin, CK-MB) to assess for myocardial damage or infarction.\n6. Administer sublingual nitroglycerin 0.4 mg SL q5min prn for chest pain relief.\n7. Advise the patient on the importance of rest and avoiding strenuous activities until further evaluation is completed.\n\nICD-10 Codes:  \nR07.89 - Chest tightness  \nR06.02 - Shortness of breath",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n患者報告過去兩天內經歷胸悶，伴隨呼吸困難和血壓升高。患者提到胸部有不適感，感覺像是胸口有一個沉重的負擔，特別是在進行體力活動時會感到呼吸困難。\n\n**O - 客觀:**  \n- 血壓：150/98 mmHg（高）\n- 心率：92 次/分鐘（心動過速）\n- 呼吸頻率：每分鐘 24 次\n- 血氧飽和度：在室內空氣中為 93%（降低，表示低血氧症）\n- 患者表現出焦慮和輕微的不適。\n- 胸部區域無可見外傷或創傷跡象。\n\n**A - 評估:**  \n患者出現與可能的心肌缺血或心絞痛一致的症狀，包括胸悶、呼吸困難、高血壓、心動過速和低血氧症。風險因素包括高血壓以及由於臨床表現而潛在的心肌梗塞。\n\n**P - 計劃:**  \n1. 下達心電圖（ECG）檢查以評估心臟功能。\n2. 請求胸部 X 光檢查，排除短暫呼吸困難的肺部原因或其他胸腔異常。\n3. 通過鼻導管開始吸氧治療，每分鐘 4 升，以維持足夠的血氧飽和度水平。\n4. 密切監測血壓並根據需要調整抗高血壓藥物。\n5. 下達心肌酶檢測（TnI、CK-MB）以評估心肌損傷或梗塞。\n6. 根據需要每 5 分鐘舌下給藥硝酸甘油 0.4 mg，用於緩解胸痛。\n7. 告知患者休息的重要性並避免進行強烈的體力活動，直到進一步檢查完成。\n\nICD-10 碼：  \nR07.89 - 胸悶  \nR06.02 - 呼吸困難"
+    }
+  },
+  {
+    "name": "醫囑",
+    "file": "drug_order.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.75,
+    "asr_model": "whisper",
+    "llm_time": 64.88,
+    "total_time": 76.63,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient has been advised to undergo an electrocardiogram (ECG) and a chest X-ray. Additionally, the patient mentions that skin suturing was performed using curved needles with large arcs for superficial layers and small arcs for deeper layers without clamping the needle.\n\n**O - Objective:**  \n- Blood Pressure: Elevated\n- Respiratory Rate: Increased due to shortness of breath\n- Chest Pain: Tightness described by the patient\n\n**A - Assessment:**  \nThe patient presents with symptoms suggestive of possible cardiac issues, including chest tightness and shortness of breath. The elevated blood pressure further supports the need for immediate evaluation through diagnostic tests such as an ECG and a chest X-ray to rule out conditions like myocardial infarction or other cardiovascular disorders.\n\n**P - Plan:**  \n1. **Diagnostic Testing:**\n   - Order Electrocardiogram (ECG)\n   - Order Chest X-Ray\n2. **Treatment:**\n   - Administer sublingual nitroglycerin as needed for chest pain.\n   - Initiate oxygen therapy if shortness of breath is severe.\n3. **Monitoring:**\n   - Continuous blood pressure monitoring.\n4. **Follow-Up:**\n   - Schedule a follow-up appointment in one week to review test results and adjust treatment plan as necessary.\n\n**ICD-10 Codes:**  \nR07.89 Chest tightness, R06.02 Shortness of breath",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀：**  \n病人報告過去兩天出現胸悶，伴隨呼吸困難和血壓升高。病人已被告知需要進行心電圖（ECG）和胸部X光檢查。此外，病人提到皮膚縫合手術使用了帶有大弧度的曲針處理表層組織，小弧度的曲針處理深層組織，並未夾緊針頭。\n\n**O - 客觀：**  \n- 血壓：升高\n- 呼吸速率：由於呼吸困難而增加\n- 胸痛：病人描述為胸悶\n\n**A - 評估：**  \n病人出現可能與心臟問題相關的症狀，包括胸悶和呼吸困難。血壓升高的情況進一步支持了通過診斷測試如心電圖（ECG）和胸部X光檢查來排除心肌梗塞或其他心血管疾病的需求。\n\n**P - 計劃：**  \n1. **診斷測試：**\n   - 開具心電圖（ECG）\n   - 開具胸部X光檢查\n2. **治療：**\n   - 根據胸痛需要舌下含服硝酸甘油。\n   - 如果呼吸困難嚴重，則開始氧療。\n3. **監測：**\n   - 持續血壓監測。\n4. **追蹤：**\n   - 預約一周後的回診以審閱檢查結果並根據需要調整治療計劃。\n\n**ICD-10代碼：**  \nR07.89 胸悶，R06.02 呼吸困難"
+    }
+  },
+  {
+    "name": "手術記錄",
+    "file": "surgery_record.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.75,
+    "asr_model": "whisper",
+    "llm_time": 65.36,
+    "total_time": 77.11,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient has not experienced any recent trauma or exertion that might explain these symptoms.\n\n**O - Objective:**\n- Blood Pressure: Elevated (specific values not provided)\n- Respiratory Rate: Increased\n- Heart Rate: Tachycardic (specific value not provided)\n- Oxygen Saturation: Within normal limits on room air\n\n**A - Assessment:**  \nThe patient presents with chest tightness and shortness of breath, which are concerning for possible cardiac issues such as angina or myocardial infarction. The elevated blood pressure adds another layer of complexity to the differential diagnosis, suggesting potential cardiovascular involvement.\n\n**P - Plan:**\n1. Order an ECG (Electrocardiogram) to evaluate cardiac function.\n2. Obtain a chest X-ray to rule out pulmonary causes for shortness of breath and chest tightness.\n3. Initiate oxygen therapy if hypoxemia is present or as needed based on symptoms.\n4. Monitor blood pressure closely, especially in relation to symptom exacerbation.\n5. Order cardiac enzyme tests (troponin) to assess for myocardial injury.\n6. Prescribe sublingual nitroglycerin for symptomatic relief of chest pain and tightness if angina is suspected.\n\nFollow-up:  \n- Schedule a follow-up visit within 24-48 hours or sooner if symptoms worsen.\n- Advise the patient to report any changes in their condition, such as increased severity of chest pain or shortness of breath.",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n患者報告過去兩天內感到胸部緊繃，伴有呼吸困難和血壓升高。患者近期沒有遭受任何外傷或過度勞累，這些症狀無法用上述原因解釋。\n\n**O - 客觀:**\n- 血壓：升高（具體值未提供）\n- 呼吸頻率：增加\n- 心跳速率：心跳加速（具體值未提供）\n- 氧氣飽和度：在室內空氣中處於正常範圍\n\n**A - 評估:**  \n患者出現胸部緊繃及呼吸困難，這可能提示可能存在心臟問題如心絞痛或心肌梗塞。血壓升高為診斷帶來更多複雜性，暗示潛在的心血管系統參與。\n\n**P - 計劃:**\n1. 下達心電圖（ECG）檢查以評估心臟功能。\n2. 獲取胸部X光片以排除呼吸困難和胸部緊繃的肺部原因。\n3. 如有低氧血症或根據症狀需要時，開始吸氧治療。\n4. 密切監測血壓，特別是在症狀加劇的情況下。\n5. 下達心肌酶檢測（肌鈣蛋白）以評估心肌損傷。\n6. 若懷疑心絞痛，開具舌下含服硝酸甘油以緩解胸痛和緊繃。\n\n追蹤：\n- 安排患者在24至48小時內或症狀惡化時更早進行回診。\n- 告知患者如有任何病情變化（如胸痛或呼吸困難加重），需立即報告。"
+    }
+  },
+  {
+    "name": "醫病對話",
+    "file": "doctor_patient.wav",
+    "model": "qwen2.5:3b",
+    "audio_duration": 30.0,
+    "audio_size": 937.5,
+    "transcript": "病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查針皮縫合 使用大弧度取型針皮膚表層縫合 使用小弧度取型針指針器不要夾住針",
+    "transcribe_time": 11.38,
+    "asr_model": "whisper",
+    "llm_time": 72.06,
+    "total_time": 83.44,
+    "symptoms": [
+      "dyspnea",
+      "ECG",
+      "chest tightness",
+      "chest",
+      "suturing",
+      "胸悶",
+      "呼吸困難"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R07.89",
+        "description": "Chest tightness",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "硝酸甘油",
+        "dosage": "舌下含服",
+        "category": "心臟"
+      }
+    ],
+    "medical_orders": [
+      "心電圖檢查",
+      "胸部X光",
+      "氧气治疗",
+      "血壓監測",
+      "心臟酶檢查"
+    ],
+    "soap": {
+      "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports experiencing chest tightness for two days, accompanied by shortness of breath and elevated blood pressure. The patient has not experienced any recent trauma or injury but is concerned about the possibility of cardiac issues.\n\n**O - Objective:**\n- Blood Pressure: Elevated\n- Respiratory Rate: Increased\n- Heart Rate: Tachycardic (102 bpm)\n- Oxygen Saturation: 94% on room air\n\n**A - Assessment:**  \nThe patient presents with symptoms indicative of potential cardiovascular compromise, including chest tightness and shortness of breath. The elevated blood pressure further supports the need for diagnostic evaluation to rule out conditions such as acute coronary syndrome or other cardiac pathologies.\n\nICD-10 Codes:\n- R07.89: Chest tightness\n- R06.02: Shortness of breath\n\n**P - Plan:**  \n1. Order an ECG (Electrocardiogram) to assess for any abnormalities indicative of myocardial ischemia or infarction.\n2. Request a chest X-ray to evaluate lung fields and rule out pulmonary causes of shortness of breath.\n3. Initiate oxygen therapy if necessary, aiming for an oxygen saturation level above 94% on room air.\n4. Monitor blood pressure closely and manage with appropriate medications as needed.\n5. Order cardiac enzyme tests (troponin) to assess myocardial damage.\n6. Recommend sublingual nitroglycerin for acute chest pain relief if symptoms persist or worsen.\n\nFollow-up:\n- Schedule a follow-up appointment in 24 hours for further evaluation based on test results and clinical progress.\n- Advise the patient to seek immediate medical attention if symptoms worsen, particularly if experiencing severe chest pain, shortness of breath, or signs of heart failure.",
+      "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n病人報告過去兩天感到胸部緊繃，並伴有呼吸困難和血壓升高。病人最近沒有受過外傷或創傷，但擔心可能存在心臟問題。\n\n**O - 客觀:**\n- 血壓：偏高\n- 呼吸頻率：增加\n- 心跳速率：快速（每分鐘102次）\n- 氧氣飽和度：在室內空氣中為94%\n\n**A - 評估:**  \n病人出現可能表明心血管功能受損的症狀，包括胸部緊繃和呼吸困難。血壓升高進一步支持需要進行診斷評估以排除急性冠脈綜合徵或其他心臟疾病的可能性。\n\nICD-10代碼：\n- R07.89：胸部緊繃\n- R06.02：呼吸困難\n\n**P - 計劃:**  \n1. 下達心電圖（ECG）檢查，以評估是否有任何異常跡象表明心肌缺血或梗塞。\n2. 請求進行胸部X光攝影，以評估肺部情況並排除導致呼吸困難的肺部原因。\n3. 如有必要開始氧氣治療，目標是在室內空氣中將氧氣飽和度維持在94%以上。\n4. 密切監測血壓，根據需要使用適當的藥物進行管理。\n5. 下達心肌酶檢測（肌鈣蛋白）以評估心肌損傷情況。\n6. 如症狀持續或加劇，建議舌下含服硝酸甘油以緩解急性胸痛。\n\n追蹤：\n- 根據檢查結果和臨床進展安排24小時後的隨訪。\n- 告知病人如果症狀惡化，尤其是出現嚴重胸痛、呼吸困難或心力衰竭跡象時，應立即尋求醫療幫助。"
+    }
+  }
+]

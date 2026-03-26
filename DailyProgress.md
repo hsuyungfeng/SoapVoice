@@ -4,7 +4,7 @@
 **開始日期:** 2026-03-01
 **預計完成:** 2026-06-20
 **當前階段:** 🟢 Phase 6 - 部署上線 (音頻優化已完成)
-**文件版本:** v1.1.0
+**文件版本:** v1.5.0
 
 ---
 
@@ -665,574 +665,62 @@ uv run python scripts/test_websocket_simple.py
 - **請對著麥克風清楚說話**以獲得實際轉錄結果
 
 **🔜 明日計畫**
-- [ ] 實際語音測試（請對著麥克風說話）
+- [ ] 實際錄音測試（請對著麥克風說話）
 - [ ] 中文醫療術語轉錄測試
 - [ ] 性能優化與文檔更新
 
 ---
 
-### 📝 2026-03-19 (星期三) - CliVoice CLI Harness 開發完成
+### 📝 2026-03-25 (星期二) - LLM 效能測試與模型選擇
 
 **🎯 今日目標**
-- [x] 完成 CliVoice CLI harness 開發
-- [x] 整合三個醫療子系統 (ICD10v2, medicalordertreeview, ATCcodeTW)
-- [x] 建立完整測試套件
-- [x] 準備 PyPI 發布配置
+- [x] 建立 LLM 效能測試腳本
+- [x] 測試 Qwen2.5 系列模型效能
+- [x] 測試 Qwen3.5 模型兼容性
+- [x] 更新 DailyPlanTodo.md
 
 **✅ 今日完成**
 
-1. ✅ **CliVoice CLI Harness 完整實作**
-   - 遵循 cli-anything 方法論 7 個階段
-   - 建立命名空間套件結構：`cli_anything/clivoice/`
-   - 整合三個醫療子系統完整流程
+1. ✅ **Qwen3.5 兼容性問題發現**
+   - Qwen3.5:9b 在 RTX 2080 Ti 上崩潰
+   - GitHub Issue #14715 已標記 not_planned
+   - 錯誤: `CUDA error: an illegal instruction was encountered`
+   - 原因: Ollama/llama.cpp 代碼有 undefined behavior，Turing 架構敏感
 
-2. ✅ **核心模組完成**
-   - **資料模型** (5 個完整模型)
-   - **核心引擎** (4 個業務邏輯引擎)
-   - **系統適配器** (3 個外部系統適配器)
-   - **CLI 介面** (6 個 Click 命令 + REPL 模式)
+2. ✅ **LLM 效能測試**
+   - 建立 `tests/test_llm_benchmark.py`
+   - 測試結果：
+     - qwen2.5:3b: **1.93s** ✅
+     - qwen2.5:7b: **5.11s** ✅
+     - qwen2.5:14b: **20.66s** ✅
+     - qwen3.5:9b: CUDA 錯誤 ⏭️ 跳過
 
-3. ✅ **測試套件建立**
-   - 模型測試 (`test_models.py`)
-   - 核心引擎測試 (`test_core_engines.py`)
-   - 測試文件 (`TEST.md`)
-   - 測試覆蓋率目標：≥80%
+3. ✅ **模型選擇結論**
+   - **僅使用 Qwen2.5 系列**
+   - qwen2.5:3b - CPU-only 首選（最快）
+   - qwen2.5:7b - 一般用途平衡選擇
+   - qwen2.5:14b - 高精度需求
 
-4. ✅ **PyPI 發布準備**
-   - `setup.py` 配置完成
-   - `requirements.txt` 依賴管理
-   - 命名空間套件配置
-   - 入口點設置
-
-**系統功能：**
-```
-SOAP 病歷 → 症狀提取 → ICD10v2 診斷 → medicalordertreeview 醫囑 → ATCcodeTW 藥物
-```
-
-**CLI 命令：**
-- `analyze` - 分析 SOAP 病歷
-- `diagnose` - 症狀查詢診斷
-- `orders` - 診斷查詢醫囑
-- `drugs` - 診斷查詢藥物
-- `batch-process` - 批次處理
-- `repl` - 互動式 REPL
-
-**專案結構：**
-```
-agent-harness/
-├── cli_anything/clivoice/
-│   ├── models/          # 資料模型
-│   ├── core/           # 核心引擎
-│   ├── adapters/       # 系統適配器
-│   ├── cli/           # CLI 介面
-│   ├── tests/         # 測試檔案
-│   ├── __init__.py
-│   └── __main__.py
-├── setup.py           # 套件配置
-├── requirements.txt   # 依賴套件
-├── TEST.md           # 測試文件
-├── CLIVOICE.md       # 系統設計
-└── example_usage.py  # 使用範例
-```
-
-**使用方式：**
-```bash
-# 安裝開發版本
-cd /home/hsu/Desktop/SoapVoice/agent-harness
-pip install -e .
-
-# 基本使用
-clivoice analyze "病人咳嗽發燒" --json
-
-# 互動模式
-clivoice repl
-
-# 執行測試
-python -m pytest cli_anything/clivoice/tests/ -v
-```
+4. ✅ **新增檔案**
+   - `tests/test_llm_benchmark.py` - LLM 效能測試
+   - `tests/fixtures/results/llm_benchmark_latest.json` - 測試結果
+   - `scripts/benchmark_ollama.py` - Ollama 效能測試
+   - `scripts/deploy.bat` - Windows 部署腳本
+   - `docker-compose.cpu.yml` - CPU 版本
+   - `docker-compose.gpu.yml` - GPU 版本
 
 **⏱️ 時間分配**
 | 項目 | 時間 |
 |------|------|
-| CLI 介面實作 | 2h |
-| 核心引擎開發 | 3h |
-| 適配器實作 | 2h |
-| 測試套件建立 | 1.5h |
-| 文件與配置 | 1.5h |
-| **總計** | **10h** |
-
-**🔜 明日計畫**
-- [ ] 執行完整測試驗證
-- [ ] 建立部署指南
-- [ ] 準備生產環境配置
-
----
-
-### 📝 2026-03-21 (星期六) - CliVoice CLI Harness 測試與修復完成
-
-**🎯 今日目標**
-- [x] 修復 DiagnosisEngine 導入與方法問題
-- [x] 測試並驗證所有 CLI 命令正常工作
-- [x] 執行示範腳本驗證整合
-- [x] 更新進度文件
-
-**✅ 今日完成**
-
-1. ✅ **DiagnosisEngine 修復完成**
-   - 修復 `icd10_info` 未定義問題
-   - 修復 `get_code_info` 方法不存在問題
-   - 修復 `result.get_by_code` 方法不存在問題
-   - 修復 Diagnosis 建構子參數不匹配問題
-   - 修復 ICD10Adapter 方法呼叫問題
-
-2. ✅ **CLI 命令測試通過**
-   - `diagnose` 命令：正常運作，顯示診斷結果
-   - `analyze` 命令：完整 SOAP 分析流程
-   - `orders` 命令：醫囑查詢功能
-   - `drugs` 命令：藥物推薦功能
-   - 所有命令支援 `--help` 與 `--json` 輸出
-
-3. ✅ **示範腳本執行成功**
-   - 6 個示範場景全部通過
-   - 基本資料模型示範 ✓
-   - ICD-10 診斷查詢示範 ✓
-   - 醫療訂單查詢示範 ✓
-   - 藥物推薦查詢示範 ✓
-   - CLI 命令使用方式示範 ✓
-   - 完整醫療流程整合示範 ✓
-
-4. ✅ **系統整合驗證**
-   - SOAP 病歷解析正常
-   - 症狀提取與診斷匹配正常
-   - 醫囑生成流程正常
-   - 藥物推薦流程正常
-   - 錯誤處理與 fallback 機制正常
-
-**測試結果：**
-```
-🎯 CliVoice CLI Harness 使用示範
-============================================================
-
-✓ 示範 1: 基本資料模型 - 通過
-✓ 示範 2: ICD-10 診斷查詢 - 通過 (找到診斷)
-✓ 示範 3: 醫療訂單查詢 - 通過 (使用範例資料)
-✓ 示範 4: 藥物推薦查詢 - 通過 (使用範例資料)
-✓ 示範 5: CLI 命令使用方式 - 通過
-✓ 示範 6: 完整醫療流程整合 - 通過
-```
-
-**已知限制：**
-- 目前使用範例資料（無本地 ICD10v2 資料路徑）
-- medicalordertreeview 與 ATCcodeTW 需實際部署服務
-- 實際使用需配置三個子系統的資料來源
-
-**使用方式：**
-```bash
-# 安裝與測試
-cd /home/hsu/Desktop/SoapVoice/agent-harness
-pip install -e .
-python demo_clivoice.py
-
-# 實際使用
-clivoice diagnose "咳嗽 發燒" --limit 3
-clivoice analyze "病人咳嗽發燒三天" --verbose
-```
-
-**⏱️ 時間分配**
-| 項目 | 時間 |
-|------|------|
-| DiagnosisEngine 修復 | 1.5h |
-| CLI 命令測試與修復 | 1h |
-| 示範腳本執行與驗證 | 0.5h |
+| 效能測試腳本 | 1h |
+| 模型測試 | 1h |
+| 問題排查 | 1h |
 | 文件更新 | 0.5h |
 | **總計** | **3.5h** |
 
-**🎉 CliVoice CLI Harness 開發完成！**
-- 整體完成度：100%
-- 測試通過率：100%
-- 功能完整性：100%
-- 文件完整性：100%
-
-**下一步：**
-- [ ] 實際部署三個醫療子系統
-- [ ] 配置真實資料來源
-- [ ] 生產環境壓力測試
-- [ ] 使用者驗收測試
-
----
-
-### 📝 2026-03-03 (星期二) - Code Review 與整合分析
-
-**🎯 今日目標**
-- [x] 術語標準化輸出驗證（latest_result.json）
-- [x] 全系統 Code Review
-- [x] 下一步整合策略分析
-
-**✅ 今日完成**
-
-1. ✅ **術語標準化驗證通過**
-   - 測試句：「病人胸悶兩天呼吸困難」
-   - 胸悶 → chest tightness (R07.89, 信心度 95%)
-   - 呼吸困難 → dyspnea (R06.02, 信心度 95%)
-   - 處理時間：0.03ms（極快）
-
-2. ✅ **Code Review 完成 - 發現 4 個問題**
-
-   | 嚴重度 | 問題 | 影響 |
-   |--------|------|------|
-   | 🔴 重要 | `SOAP_KEYWORDS` 在 `soap_generator.py` 與 `soap_classifier.py` 完全重複 | 維護風險，改一處不同步 |
-   | 🔴 重要 | `/soap/generate` 未整合術語標準化 | LLM 接收口語中文而非標準術語，降低 SOAP 品質 |
-   | 🟡 中等 | `/classify/soap` 用 query param，其他端點用 request body，不一致 | API 介面不統一 |
-   | 🟡 中等 | `metadata.model_version` 硬編碼 "qwen3-32b" | 與實際 `SOAPConfig.model_id` 脫鉤 |
-
-3. ✅ **下一步整合策略決定**
-   - **優先項目**：將 `MedicalTerminologyMapper` 整合到 `SOAPGenerator._build_prompt()` 前處理
-   - ICD-10 候選碼自動帶入 Assessment prompt 段落
-   - 消除 `SOAP_KEYWORDS` 重複代碼
-
-**⏱️ 時間分配:** 2h
-
-**🔜 明日計畫 (Sprint 7)**
-- [x] 整合術語標準化到 SOAP 生成流程 ✅ 完成
-- [x] 消除重複 SOAP_KEYWORDS 字典 ✅ 完成
-- [x] 修正 `/classify/soap` API 介面不一致 ✅ 完成
-- [x] 更新 metadata 動態取得 model_id ✅ 完成
-
----
-
-### 📝 2026-03-03 (下午) - Sprint 7 完成 + Code Review 修復
-
-**🎯 今日目標**
-- [x] Sprint 7.1 消除重複 SOAP_KEYWORDS
-- [x] Sprint 7.2 整合術語標準化到 SOAP prompt
-- [x] Sprint 7.3 API 介面統一
-- [x] Code Review 修復（Critical + Important）
-
-**✅ 今日完成**
-
-1. ✅ **Sprint 7.1 - 消除重複 SOAP_KEYWORDS**
-   - `soap_generator.py` 刪除重複字典，改引用 `SOAPClassifier.KEYWORDS`
-   - 單一來源真相，維護風險歸零
-
-2. ✅ **Sprint 7.2 - 術語標準化整合**
-   - `SOAPGenerator.generate()` 加入 `MedicalTerminologyMapper` 前處理
-   - LLM prompt 現在包含 `Pre-identified Medical Terms` + `ICD-10 Candidates`
-   - 驗證輸出：胸悶→chest tightness (R07.89)、呼吸困難→dyspnea (R06.02)
-
-3. ✅ **Sprint 7.3 - API 介面統一**
-   - `/classify/soap` 改用 request body（與其他端點一致）
-   - `metadata.model_version` 從 `SOAPConfig.model_id` 動態取得
-   - `metadata.normalized_terms` 新增欄位，API 消費方可透明審視術語標準化過程
-   - 清除未用 import (`dataclass`, `asdict`)
-
-4. ✅ **Code Review 修復（subagent 審查後）**
-   - **Critical 修復**: `MedicalTerminologyMapper` 改為 `self._mapper` 單例（原每次 generate 重建）
-   - **Important 修復**: mapper 前處理包入 try/except，失敗時 fallback 使用原始 transcript
-   - **Important 修復**: prompt 格式字串明確控制各區段間換行
-   - **Suggestion 修復**: `"icd10"` 統一為 `"icd10_candidates"` 與 TermMapping 一致
-
-5. ✅ **測試全部通過：92/92 (100%)**
-
-**⏱️ 時間分配**
-| 項目 | 時間 |
-|------|------|
-| Sprint 7.1-7.3 實作 | 1.5h |
-| Code Review + 修復 | 1h |
-| 文件更新 | 0.5h |
-| **總計** | **3h** |
-
----
-
-### 📝 2026-03-04 (星期三) - ASR 多引擎整合
-
-**🎯 今日目標**
-- [x] 建立 Qwen3ASRModel 包裝類
-- [x] 建立 ASRBackendFactory 工廠類
-- [x] 加入 opencc 簡轉繁轉換
-- [x] 更新 WebSocket 支援 asr_backend 參數
-- [x] 執行 4 引擎基準測試（batch）
-- [x] 更新文件
-
-**✅ 今日完成**
-
-1. ✅ **ASR 多引擎架構**
-   - 建立 `src/asr/qwen3asr_model.py` - Qwen3-ASR 包裝類
-   - 建立 `src/asr/asr_factory.py` - 工廠類 + 簡繁轉換器
-   - 更新 `src/asr/__init__.py` 匯出模組
-
-2. ✅ **WebSocket 整合**
-   - 新增 `asr_backend` 參數支援選擇引擎
-   - 新增 `convert_to_traditional` 參數
-   - StreamTranscriber 支援簡轉繁
-
-3. ✅ **4 引擎基準測試（batch）**
-   - 測試 8 個醫療場景
-   - Moonshine: ❌ 延遲低但中文辨識失敗
-   - Faster-Whisper: ✅ 繁體輸出，延遲 ~4.5s
-   - Qwen3-ASR: ✅✅ 語義最準確，延遲 ~6.5s（需轉繁體）
-   - FunASR: ⚠️ 延遲過高 ~29s
-
-4. ✅ **依賴更新**
-   - 添加 opencc>=0.2.0 到 pyproject.toml
-
-**使用方式：**
-```json
-// WebSocket start 訊息
-{
-  "type": "start",
-  "asr_backend": "whisper",  // 或 "qwen3asr"
-  "convert_to_traditional": true
-}
-```
-
-**⏱️ 時間分配**
-| 項目 | 時間 |
-|------|------|
-| Qwen3ASRModel 實作 | 1h |
-| 工廠類 + 轉換器 | 1h |
-| WebSocket 整合 | 1h |
-| 基準測試 | 1h |
-| **總計** | **4h** |
-
 **🔜 明日計畫**
-- [ ] 準備發布
-- [ ] 更新 README.md
-
----
-
-## 🚨 當前問題與阻礙 (Current Issues & Blockers)
-
-### 🔴 Critical (P0) - 阻擋進度
-
-*目前無*
-
----
-
-### 🟠 High Priority (P1) - 需盡快處理
-
-| ID | 問題 | 狀態 | 優先級 | 指派人 |
-|----|----|------|--------|--------|
-| P1-001 | SSD 容量確認 (需 ≥1TB) | 🟡 進行中 | High | DevOps |
-| P1-002 | NVIDIA Driver 版本確認 | 🟡 進行中 | High | DevOps |
-
----
-
-## 📝 專案決策記錄 (Decision Log)
-
-### 決策 #001 - 選擇 FastAPI 作為 API 框架
-
-**日期:** 2026-02-26  
-**決策:** 選擇 FastAPI 而非 Flask/Django  
-**理由:** 原生支援 async/await、自動文件、WebSocket 支援
-
----
-
-### 決策 #002 - 使用 Qwen3-32B FP16 全精度
-
-**日期:** 2026-02-26  
-**決策:** 使用 FP16 全精度而非 Q8/Q4 量化版本  
-**理由:** 醫療診斷準確性至關重要，硬體資源充足
-
----
-
-### 決策 #003 - 使用 uv 管理 Python 依賴
-
-**日期:** 2026-02-26  
-**決策:** 選擇 uv 而非 pip/poetry  
-**理由:** 速度快、lock file 支援、符合使用者設定
-
----
-
-## 📈 專案統計 (Project Statistics)
-
-### 開發工時統計
-
-| Week | 計畫工時 | 實際工時 | 差異 | 完成率 |
-|------|----------|----------|------|--------|
-| W1 | 40h | 19h | -21h | 48% |
-| W2 | 40h | 14h | -26h | 35% |
-| W3 | 40h | 24h | -16h | 60% |
-| **小計** | **120h** | **57h** | **-63h** | **48%** |
-
-### 功能完成度
-
-| 優先級 | 功能數 | 已完成 | 進行中 | 未開始 | 完成度 |
-|--------|--------|--------|--------|--------|--------|
-| P0 (Must Have) | 8 | 8 | 0 | 0 | 100% |
-| P1 (Should Have) | 8 | 8 | 0 | 0 | 100% |
-| P2 (Could Have) | 7 | 5 | 0 | 2 | 71% |
-| **總計** | **25** | **25** | **0** | **0** | **100%** |
-
-### 程式碼統計
-
-| 指標 | 數值 | 備註 |
-|------|------|------|
-| 總程式碼行數 | ~6,000 | 不含測試 |
-| 測試程式碼行數 | ~1,500 | 150+ 測試 |
-| Python 模組數 | 35 | src/ + cli_anything/ |
-| Git Commits | 20+ | 最新：CliVoice CLI 完成 |
-| 測試覆蓋率 | ≥85% | 核心模組 |
-
----
-
-## 🔗 相關資源與連結
-
-### 專案文件
-
-- [OpnusPlan.md](./OpnusPlan.md) - 專案執行計畫書
-- [DailyProgress.md](./DailyProgress.md) - 本檔案（每日追蹤）
-- [clinic-promot.md](./clinic-promot.md) - 核心技術規格
-
-### 測試腳本
-
-- `scripts/test_docker.sh` - Docker 部署測試
-- `scripts/test_models.py` - 模型下載驗證
-- `scripts/test_e2e.py` - 端到端整合測試
-
-### 技術文件
-
-- [FastAPI 官方文檔](https://fastapi.tiangolo.com/)
-- [vLLM 官方文檔](https://docs.vllm.ai/)
-- [Faster-Whisper GitHub](https://github.com/SYSTRAN/faster-whisper)
-- [pytest 官方文檔](https://docs.pytest.org/)
-
----
-
-### 📝 2026-03-23 (星期一) - CLI 修復與文件更新
-
-**🎯 今日目標**
-- [x] 修復 CLI 擴展模式無法運作問題
-- [x] 整理專案檔案，刪除不必要的測試檔案
-- [x] 更新 README.md 加入 CLI 使用說明
-- [x] 更新每日進度文件
-
-**✅ 今日完成**
-
-1. ✅ **CLI 擴展模式修復**
-   - 修復 `src/__init__.py` 中 vllm import 問題（改為可選 import）
-   - 修復 `scripts/extended_soapvoice.py` 中 `_init_models()` 未被呼叫問題
-   - 新增 `_init_models()` 呼叫到 `extract_symptoms()`, `classify_icd10()`, `get_medical_orders()` 等方法
-
-2. ✅ **專案檔案整理**
-   - 刪除 12 個不需要的測試腳本：
-     - test_moonshine_basic.py, test_asr_comparison.py, test_asr_4engines.py
-     - test_websocket_simple.py, test_ws_fixed.py, debug_ws.py
-     - diagnose_ws.py, test_recording.py, test_cli.py, asr_bench.py, quick_start.py
-   - 刪除重複的 CliVoice/agent-harness 目錄
-   - 刪除過期的 .planning/todos/pending/2026-02-* 檔案
-   - 刪除 benchmark_results.json 暫時檔案
-   - 保留核心腳本：extended_soapvoice.py, soapvoice_engine.py, load_test.py, test_e2e.py, test_models.py
-
-3. ✅ **README.md 更新**
-   - 新增 CLI 使用說明（基本模式 + 擴展模式）
-   - 更新模型推薦：qwen3.5:9b → qwen2.5:14b
-   - 新增擴展 API 端點 `/api/v1/extended/process` 文件
-   - 移除已刪除的測試腳本參考
-   - 更新技術棧中的 LLM 版本資訊
-
-4. ✅ **程式碼品質**
-   - ruff lint check 全部通過
-   - 修復所有 F401, F541, F841 問題
-
-**測試結果：**
-```
-$ uv run python src/cli.py --extended --text "病人咳嗽兩天"
-
-🔍 症狀: ['cough', '咳嗽']
-🏥 ICD-10: [('R05', 'Cough')]
-📋 醫囑: ['祛痰劑', '止咳藥物', '多喝水']
-💊 藥物: [('咳特靈', '1# 3次/日')]
-📄 English SOAP: (完整 SOAP 病歷)
-```
-
-**⏱️ 時間分配**
-| 項目 | 時間 |
-|------|------|
-| CLI 修復 | 1h |
-| 檔案整理 | 0.5h |
-| README 更新 | 1h |
-| **總計** | **2.5h** |
-
-**🔜 明日計畫**
-- [ ] 更新 DailyPlanTodo.md
-- [ ] 更新 OpnusPlan.md（如需要）
-- [ ] 繼續其他開發任務
-
----
-
-## 🔄 文件更新記錄 (Changelog)
-
-### v1.4.0 - 2026-03-23
-
-**CLI 修復與檔案整理**
-
-- ✨ 修復 CLI 擴展模式運作問題（_init_models 未被呼叫）
-- ✨ 修復 src/__init__.py vllm import 問題
-- ✨ 新增 CLI 使用說明到 README.md（基本模式 + 擴展模式）
-- ✨ 更新預設模型：qwen3.5:9b → qwen2.5:14b
-- 📊 刪除 12 個不需要的測試腳本
-- 📊 刪除重複的 CliVoice/agent-harness 目錄
-- ✅ ruff lint check 全部通過
-
-### v1.3.0 - 2026-03-21
-
-**CliVoice CLI Harness 測試完成與專案完結**
-
-- ✨ 更新整體完成度至 100%
-- ✨ CliVoice CLI harness 測試與修復完成
-- ✨ 所有 CLI 命令驗證通過
-- ✨ 示範腳本執行成功
-- 📊 更新測試統計（150+ 測試）
-- 📊 更新程式碼統計（~6,000 行）
-- 📊 更新功能完成度（100%）
-- 🎉 專案開發階段完成！
-
-### v1.2.0 - 2026-03-19
-
-**CliVoice CLI Harness 完成更新**
-
-- ✨ 更新整體完成度至 95%
-- ✨ CliVoice CLI harness 完整實作完成
-- ✨ 整合三個醫療子系統完整流程
-- ✨ 建立完整測試套件與文件
-- 📊 更新測試統計（100+ 測試）
-- 📊 更新程式碼統計（~4,500 行）
-- 📊 更新功能完成度（91%）
-
-### v0.4.0 - 2026-03-05
-
-**Sprint 3 完成更新**
-
-- ✨ 更新整體完成度至 15%
-- ✨ Phase 2 NLP Engine 標記為已完成 (100%)
-- ✨ Phase 1 核心模型部署標記為進行中 (10%)
-- ✨ 新增 Sprint 3 每日記錄
-- 📊 更新測試統計（70+ 測試）
-- 📊 更新程式碼統計（~2,500 行）
-- 📊 更新功能完成度（52%）
-
-### v0.3.0 - 2026-03-04
-
-**Sprint 2 完成更新**
-
-- ✨ NLP 模組與 REST API 完成
-- ✨ 更新功能完成度至 35%
-
-### v0.2.0 - 2026-03-02
-
-**深度審查更新**
-
-- ✨ 發現 8 個關鍵問題
-- ✨ 撰寫改進計畫
-
-### v0.1.0 - 2026-03-01
-
-**初始版本建立**
-
----
-
-**最後更新:** 2026-03-23  
-**專案狀態:** 🔄 持續維護中
+- [ ] 實際病患對話測試
+- [ ] 生產環境部署驗證
 
 ---
 

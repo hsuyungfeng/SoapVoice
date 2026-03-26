@@ -2,206 +2,38 @@
 
 **專案名稱:** SoapVoice - Medical Voice-to-SOAP System  
 **建立日期:** 2026-03-19  
-**當前階段:** 🟢 Phase 1 ✅ 完成，Phase 2 ✅ 完成，Phase 3 ✅ 完成，Phase 4 ⏳ CLI 優化中  
-**測試狀態:** 92/92 通過 ✅  
-**最後更新:** 2026-03-23  
+**當前階段:** 🟢 Phase 1 ✅ 完成，Phase 2 ✅ 完成，Phase 3 ✅ 完成，Phase 4 ✅ 完成，Phase 5 ✅ 完成，Phase 6 ✅ 完成（前端網頁整合）
+**測試狀態:** 105/105 通過 ✅  
+**最後更新:** 2026-03-24  
 
 ---
 
 ## 📅 2026-03-23 — 今日完成
 
-### Phase 4: CLI 修復與檔案整理 ✅
+### Phase 4: CLI 修復與檔案整理 ✅ 完成
 
-#### CLI 擴展模式修復
-
-| 問題 | 解決方案 |
-|------|----------|
-| `src/__init__.py` vllm import 錯誤 | 改為可選 import，Ollama 為主後端 |
-| `extended_soapvoice.py` NLP 模組未初始化 | 新增 `_init_models()` 呼叫到各方法 |
-
-**修復後測試：**
-```bash
-$ uv run python src/cli.py --extended --text "病人咳嗽兩天"
-
-🔍 症狀: ['cough', '咳嗽']
-🏥 ICD-10: [('R05', 'Cough')]
-📋 醫囑: ['祛痰劑', '止咳藥物', '多喝水']
-💊 藥物: [('咳特靈', '1# 3次/日')]
-📄 English SOAP: (完整 SOAP 病歷)
-```
-
-#### 檔案整理
-
-| 動作 | 說明 |
-|------|------|
-| 刪除 12 個測試腳本 | test_moonshine_basic.py, test_asr_comparison.py, 等 |
-| 刪除重複目錄 | CliVoice/agent-harness/ |
-| 刪除過期檔案 | .planning/todos/pending/2026-02-* |
-| 刪除暫時檔案 | benchmark_results.json |
-
-**保留的核心腳本：**
-- `scripts/extended_soapvoice.py` - 擴展 SOAP 流程
-- `scripts/soapvoice_engine.py` - 基本引擎
-- `scripts/load_test.py` - 負載測試
-- `scripts/test_e2e.py` - 端到端測試
-- `scripts/test_models.py` - 模型驗證
-
-#### README.md 更新
-
-- ✅ 新增 CLI 使用說明（基本模式 + 擴展模式）
-- ✅ 新增 `--extended`, `--audio`, `--model` 等 CLI 選項說明
-- ✅ 更新預設模型：qwen2.5:14b（qwen3.5:9b 有 CUDA 問題）
-- ✅ 新增擴展 API 端點 `/api/v1/extended/process` 文件
-- ✅ 移除已刪除測試腳本參考
-- ✅ 程式碼品質：ruff check 全部通過
-
----
-
-## 📅 2026-03-21 — 今日完成
-
-### Phase 3.5: 模型測試 ✅
-
-#### Ollama 模型測試結果
-
-| 模型 | 狀態 | SOAP 生成 | 處理時間 | 語言 | 備註 |
-|------|------|-----------|----------|------|------|
-| **qwen3.5:9b** | ❌ | - | - | - | CUDA 錯誤（RTX 2080 Ti 雙卡不相容） |
-| **qwen2.5:7b** | ✅ | ✅ 優秀 | ~3.5s | 繁體中文 | **首選推薦** |
-| **qwen2.5:3b** | ✅ | ✅ 良好 | ~3s | 繁體中文 | 快速備用 |
-| **llama3:8b** | ✅ | ⚠️ 一般 | ~7s | 英文為主 | 不適合中文場景 |
-
-#### qwen2.5:7b SOAP 生成測試
-
-```
-輸入：醫療對話（咳嗽、喉嚨痛、無發燒）
-
-S - 主觀資料:
-- 症狀：咳嗽兩天，有痰，喉嚨痛
-- 發燒：無
-
-O - 客觀資料:
-- 體溫: 正常（未測量）
-- 喉嚨：紅腫（+）
-- 扁桃腺：無腫大（-）
-- 肺部聽診：無異常呼吸音（-）
-
-A - 評估分析:
-- 上呼吸道感染
-
-P - 計劃:
-- 處理方式：醫師開具藥物
-- 隨訪建議：按時服藥，注意觀察症狀是否有改善或惡化
-```
-
-### Phase 3.6: NotebookLM 研究 ✅
-
-#### 新增來源（12 個）
-
-| # | 來源 | 類型 |
-|---|------|------|
-| 1 | Ollama Blog | web_page |
-| 2 | HuggingFace Text Generation | web_page |
-| 3 | Ollama GitHub | web_page |
-| 4 | SOAP Note Wikipedia | web_page |
-| 5 | llama.cpp GitHub | web_page |
-| 6 | Qwen GitHub | web_page |
-| 7 | Qwen HuggingFace | web_page |
-| 8 | HuatuoGPT GitHub | web_page |
-| 9 | PMC-LLaMA paper | web_page |
-| 10 | ChatDoctor paper | web_page |
-| 11 | NHI 網站 | web_page |
-| 12 | LLaMA-Factory | web_page |
-
-#### NotebookLM 研究發現
-
-- **哈佛研究：** Llama 3.1 405B 在醫學診斷超越 GPT-4（70% vs 64%）
-- **台灣趨勢：** 75% 醫療單位最期待「醫療紀錄摘要」應用
-- **SOAP 最佳實踐：** RAG + 知識圖譜 + 臨床指南約束
-
-#### NotebookLM Notebook
-
-- **ID:** `0035a6c6-1ef6-49ad-88b0-a39e0f316469`
-- **URL:** https://notebooklm.google.com/notebook/0035a6c6-1ef6-49ad-88b0-a39e0f316469
-- **來源數量:** 22 個 ✅
-
-### Phase 3.7: 策略調整 ⚠️
-
-> **重要變更：** 從 Ollama 轉向 llama.cpp + HuggingFace
-
-| 變更項目 | 原因 |
-|----------|------|
-| ~~Ollama~~ | qwen3.5:9b 有 CUDA 相容性問題 |
-| **llama.cpp + HuggingFace** | 更靈活、無 CUDA 問題 |
-
-### Phase 3: LLM 部署與外部整合 ✅ 完成
-
-#### 3.1 LlamaEngine 實作 ✅
-
-- [x] 建立 `src/llm/llama_engine.py` — LlamaEngine 類別
-  - [x] 使用 llama-cpp-python
-  - [x] 支援 GGUF 格式模型（Q4_K_M 量化）
-  - [x] GPU offload 設定
-  - [x] 串流生成支援
-  - [x] 聊天模式支援
-
-#### 3.2 DoctorConsultation API 整合 ✅
-
-- [x] 建立 `src/llm/doctor_consultation.py` — DoctorConsultationClient
-  - [x] API Key 認證
-  - [x] SOAP 病歷生成端點
-  - [x] 錯誤處理與重試機制
-  - [x] 診斷驗證、治療建議、藥物交互作用檢查
-
-#### 3.3 雙軌 LLM 引擎 ✅
-
-- [x] 建立 `src/llm/dual_engine.py` — DualLLMEngine
-  - [x] 自動選擇本地/雲端 LLM
-  - [x] 支援 4 種策略：local_first, cloud_first, local_only, cloud_only
-  - [x] Fallback 機制
-
-#### 3.4 Docker 部署設定 ✅
-
-- [x] 更新 `Dockerfile` — 多階段建置（development, production, production-gpu）
-- [x] 更新 `docker-compose.yml` — 開發環境配置
-- [x] 更新 `docker-compose.prod.yml` — 生產環境配置
-- [x] 更新 `.env.example` — 完整環境變數
-
-#### 3.5 模組更新 ✅
-
-- [x] 更新 `src/llm/__init__.py` — 導出所有 LLM 引擎
-
----
-
-## 📌 完成總覽
-
-### Phase 1: 本地資料庫 ✅
+### Phase 5: RAG 系統建立 ✅ 完成
 
 | 項目 | 狀態 | 說明 |
 |------|------|------|
-| 資料庫初始化 | ✅ | 66.32 MB，110,947 筆資料 |
-| ATC 分類 | ✅ | 14 大類，37+ 症狀映射 |
-| 查詢 API | ✅ | ICD-10、藥品、醫療服務 |
+| RAG 系統 | ✅ | 1,665 個病例範本區塊 |
+| Chroma 向量資料庫 | ✅ | 支援語義搜尋 |
+| medical.db 同步 | ✅ | case_templates 表 1,665 筆 |
+| SOAP 整合 | ✅ | RAG 結果加入 LLM Prompt |
+| 完整 Pipeline 測試 | ✅ | 術語+ICD-10+RAG+SOAP |
+| 檔案清理 | ✅ | 節省 300+ MB |
 
-### Phase 2: 看診流程 ✅
-
-| 項目 | 狀態 | 說明 |
-|------|------|------|
-| ConsultationFlow | ✅ | 715 行 |
-| SessionManager | ✅ | 300 行 |
-| RealtimeSearch | ✅ | 575 行，37+ 症狀關鍵字 |
-| API 端點 | ✅ | 400+ 行 |
-
-### Phase 3: LLM 部署 ✅
+### Phase 6: 前端網頁整合 ✅ 完成
 
 | 項目 | 狀態 | 說明 |
 |------|------|------|
-| LlamaEngine | ✅ | llama.cpp 本地推理 |
-| DoctorConsultationClient | ✅ | 雲端 API 整合 |
-| DualLLMEngine | ✅ | 雙軌自動切換 |
-| Docker | ✅ | 4 種建置目標 |
-| .env | ✅ | 完整環境變數 |
-| 模型測試 | ✅ | qwen2.5:7b SOAP 生成 ~3.5s |
-| NotebookLM 研究 | ✅ | 22 個來源研究完成 |
+| 靜態網頁 | ✅ | static/index.html |
+| 麥克風錄音 | ✅ | MediaRecorder API |
+| 語音轉譯 | ✅ | Whisper medium 模型 |
+| SOAP 生成 | ✅ | Extended API 整合 |
+| 模型選擇 | ✅ | qwen2.5:14b/7b/3b |
+| 處理時間顯示 | ✅ | ASR + LLM 時間 |
+| 測試音檔 | ✅ | 8 個場景測試檔案 |
 
 ---
 
@@ -372,133 +204,213 @@ def test_qwen2_5_7b_soap_generation():
     assert "P - 計劃" in result
 ```
 
-**最後更新:** 2026-03-23  
+**最後更新:** 2026-03-24  
 **下次更新:** 待續
 
 ---
 
-## ✅ 2026-03-23 下午完成項目
+## 📅 2026-03-24 — 今日完成
 
-### 1. Qwen3.5-9B 模型 ✅
+### Phase 5: RAG 系統建立與病例範本同步 ✅
 
-- [x] 使用 Ollama 下載 `qwen3.5:9b` (6.6 GB)
-- [x] 模型可用但有 EOF 錯誤（可能是 RTX 2080 Ti 雙卡不相容問題）
-- [x] **替代方案：** 使用 `qwen2.5:7b` 正常運作
+#### 1. Git 推送與 Git LFS 設定 ✅
 
-### 2. Whisper CLI 整合 ✅
+| 項目 | 說明 |
+|------|------|
+| 問題 | GitHub 檔案大小限制（50MB 推薦，100MB 上限）|
+| 解決 | 使用 `git filter-repo` 清理歷史記錄 + Git LFS 追蹤 `.db`/`.pdf` |
+| 結果 | 成功推送 medical.db（70 MB via LFS）|
 
-- [x] 載入 openai-whisper skill
-- [x] Whisper CLI 有 numba/numpy 相容性問題
-- [x] 使用 faster-whisper 替代（已安裝）
-- [x] 測試轉寫：`tests/fixtures/sample_zh.wav` → 中文
+#### 2. 病例範本補充腳本 ✅
 
-### 3. 完整 Pipeline 測試 ✅
+- 建立 `src/db/supplement_case_templates.py`（180 行）
+- 支援 `.txt`, `.doc`, `.docx` 檔案格式
+- 發現 748 個病例範本檔案（大部分 .doc 格式無法讀取）
 
-**流程：** Whisper (faster-whisper) → Ollama (qwen2.5:7b) → SOAP 病歷
+#### 3. RAG 系統建立 ✅
+
+**安裝套件：**
+```bash
+uv add chromadb sentence-transformers
+```
+
+**建立模組：**
+- `src/rag/case_template_rag.py` - RAG 系統主程式
+- `src/rag/__init__.py` - 模組初始化
+
+**功能：**
+- Chroma 向量資料庫（支援語義搜尋）
+- Sentence-transformers 嵌入模型
+- 文字分塊（500 字元區塊，50 字元重疊）
+- SQLite 備份匯出
+
+**命令列工具：**
+```bash
+# 初始化
+uv run python -m src.rag.case_template_rag init --template-dir "CurrentData/各种病例规范模板/" --clear
+
+# 搜尋
+uv run python -m src.rag.case_template_rag search --query "冠心病 胸悶" --top-k 5
+
+# 統計
+uv run python -m src.rag.case_template_rag stats
+```
+
+#### 4. LibreOffice .doc 轉 .txt ✅
+
+**問題：** 742 個 `.doc` 檔案無法用 python-docx 讀取
+
+**解決：** 使用 LibreOffice 命令列轉換
+```bash
+libreoffice --headless --convert-to txt "*.doc"
+```
+
+**結果：** 成功轉換所有 `.doc` → `.txt`
+
+#### 5. RAG 數據同步到 medical.db ✅
+
+**同步結果：**
+```
+RAG 向量資料庫：1,665 個區塊
+medical.db case_templates：1,665 筆
+
+專科分佈：
+- 一般: 1,073
+- 胃腸疾病病例: 258
+- 冠心病病例: 169
+- 糖尿病病例: 91
+- 肺炎病例: 57
+- 肺癌病例: 13
+- 慢阻肺病例: 4
+```
+
+**medical.db 最新內容：**
+```
+icd10_codes:     96,802 筆  (疾病分類)
+drugs:           12,042 筆  (藥品資料)
+medical_orders:   2,102 筆  (醫療服務)
+case_templates:   1,665 筆  (病例範本) ← 新增 RAG
+```
+
+#### RAG 搜尋測試結果
 
 ```bash
-# Step 1: 語音轉文字
-轉錄結果: 病人 阻塑胸悶兩天 伴隨呼吸困難血壓偏高 建議心電圖胸部X光檢查...
+$ uv run python -m src.rag.case_template_rag search --query "冠心病 胸悶 胸痛 高血壓" --top-k 3
 
-# Step 2: 生成 SOAP 病歷
-S - 主觀資料:
-- 病人主訴：阻塞性胸悶兩天，伴隨呼吸困難
-- 血壓偏高
-
-O - 客觀資料:
-- 未提供具體的客觀檢查結果
-
-A - 評估:
-- 病人可能患有胸悶和呼吸困難，需進一步檢查
-
-P - 計劃:
-- 建議進行心電圖檢查及胸部X光檢查
+結果 1: 劉蘭英病歷.docx (相似度: 0.1494)
+結果 2: 馬林花病歷.docx (相似度: 0.1460)
+結果 3: 病程記錄.txt (相似度: 0.1419)
 ```
 
-### Ollama 可用模型
+#### 6. RAG 整合到 SOAP 生成流程 ✅
 
-| 模型 | 大小 | 狀態 | 原因 |
-|------|------|------|------|
-| qwen3.5:9b | 6.6 GB | ❌ EOF/CRASH | RTX 2080 Ti 雙卡 CUDA 不相容 |
-| qwen2.5:7b | 4.7 GB | ✅ 正常 | 穩定運作 |
-| qwen2.5:3b | 1.9 GB | ✅ 正常 | 穩定運作 |
-| qwen2.5:14b | 9.0 GB | 未測試 | 可能也有問題 |
+**更新檔案：**
+- `src/soap/soap_generator.py` - 新增 RAG 檢索功能
+- `src/__init__.py` - 改為 Ollama 為主後端
+- `tests/test_init.py` - 更新為 Ollama 測試
 
-### 🐛 RTX 2080 Ti 雙卡問題
+**整合方式：**
+- LLM Prompt 中加入病例範本作為 reference context
+- API 回傳 `result["case_templates"]` 包含檢索結果
+- CLI 顯示 logger.info 檢索結果
 
-**錯誤日誌：**
+#### 7. 完整 Pipeline 測試 ✅
+
+**測試輸入：** 病人胸悶兩天，有高血壓病史，呼吸困難
+
+**Pipeline 流程：**
 ```
-panic: failed to sample token
-CUDA error: an illegal instruction was encountered
+語音輸入 → ASR → 術語標準化 → ICD-10 → RAG 檢索 → LLM → SOAP
 ```
-
-**原因：**
-- RTX 2080 Ti 是 Turing 架構 (compute 7.5)
-- 雙 GPU 設置觸發 CUDA 相容性問題
-- **僅 qwen3.5:9b 觸發錯誤**（其他模型正常）
 
 **測試結果：**
-| 模型 | 大小 | 狀態 |
-|------|------|------|
-| **qwen3.5:9b** | 6.6 GB | ❌ 崩潰 | MTP 架構不相容 |
-| qwen2.5:14b | 9.0 GB | ✅ 正常 | |
-| phi4:latest | 9.1 GB | ✅ 正常 | |
-| qwen2.5:7b | 4.7 GB | ✅ 正常 | 首選 |
-| qwen2.5:3b | 1.9 GB | ✅ 正常 | |
+- 術語標準化：3 個術語（胸悶→chest tightness、高血壓→hypertension、呼吸困難→dyspnea）
+- ICD-10 分類：3 個診斷碼（R07.89、R06.02、I10）
+- RAG 病例範本檢索：3 個相關病例
+- SOAP 生成：✅ 成功
 
-**解決方案：**
-1. **首選：** 使用 `qwen2.5:7b` 或 `qwen2.5:14b`
-2. **避免使用 qwen3.5:9b**
-3. 可嘗試單 GPU 模式：
+#### 8. 檔案清理 ✅
+
+| 動作 | 說明 |
+|------|------|
+| 刪除 `CurrentData/各種病例規範模板/` | 282 MB（已同步到 medical.db）|
+| 刪除 `agent-harness/` | 清理舊測試目錄 |
+| 刪除 `skills/` | 清理重複技能目錄 |
+| 刪除 `.planning/` | 清理規劃暫存 |
+| 刪除 `tests/test_vllm.py` | 清理過期測試 |
+
+**節省空間：** 300+ MB
+
+#### 9. 測試通過 ✅
 
 ```bash
-# 單 GPU 模式（可能仍有問題）
-CUDA_VISIBLE_DEVICES=0 ollama run qwen3.5:9b
+$ uv run pytest tests/ -v
+=================== 105 passed ===================
 ```
-
-**根本原因：** qwen3.5 使用新的 MTP (Multi-Token Prediction) 架構，與 RTX 2080 Ti 雙卡 CUDA 設定不相容。這是 Ollama 與特定 GPU 配置的已知問題。
 
 ---
 
-### 🎯 待完成項目
+## ⏳ 待完成項目
+
+### 未來規劃
 
 | 項目 | 說明 | 優先級 |
 |------|------|--------|
-| **Windows Docker 自動化** | 建立 Windows 啟動腳本 | 🟡 P1 |
-| **Web API 文件** | 行動 app 整合文件 | 🟡 P1 |
-| **醫療術語擴充** | 增加更多術語映射 | 🟡 P2 |
+| **實際病患對話測試** | 前端網頁實際錄音測試 | 🔴 P0 |
+| **生產環境部署測試** | Docker 部署驗證 | 🟡 P1 |
+| **效能優化** | 模型量化、批次處理 | 🟡 P1 |
 
-### 🚀 使用方式
-
-#### CLI 模式
-
-```bash
-# 基本 SOAP 生成
-uv run python src/cli.py --text "病人咳嗽兩天"
-
-# 擴展模式（含症狀/ICD-10/醫囑/藥物）
-uv run python src/cli.py --extended --text "病人胸悶兩天"
-
-# 音訊輸入
-uv run python src/cli.py --audio recording.wav --extended
-```
-
-#### API 模式
+### 使用方式
 
 ```bash
 # 啟動 API 伺服器
-uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 
-# 基本 SOAP 生成
+# 瀏覽器開啟
+http://localhost:8000
+
+# API 測試
 curl -X POST http://localhost:8000/api/v1/clinical/soap/generate \
   -H "Content-Type: application/json" \
-  -d '{"transcript": "病人咳嗽兩天"}'
+  -d '{"transcript": "病人胸悶兩天，有高血壓病史"}'
 
-# 擴展 SOAP（含症狀/ICD-10/醫囑/藥物）
-curl -X POST http://localhost:8000/api/v1/extended/process \
-  -H "Content-Type: application/json" \
-  -d '{"text": "病人咳嗽兩天", "include_all": true}'
+# CLI 模式
+uv run python src/cli.py --extended --text "病人咳嗽兩天"
 ```
 
-**最後更新:** 2026-03-23  
-**下次更新:** 待續
+### 測試音檔位置
+
+```
+tests/fixtures/scenarios/
+├── chest_pain.wav       # 胸痛
+├── diabetes.wav        # 糖尿病
+├── doctor_patient.wav  # 醫病對話
+├── drug_order.wav      # 藥物醫囑
+├── hypertension.wav    # 高血壓
+├── respiratory.wav     # 呼吸系統
+├── surgery_record.wav  # 手術記錄
+└── wound_care.wav      # 傷口護理
+```
+
+**最後更新:** 2026-03-25
+
+---
+
+## 📅 2026-03-25 — LLM 效能測試
+
+### Qwen3.5 兼容性問題 ⚠️
+
+- Qwen3.5 系列在 RTX 2080 Ti (Turing) 崩潰
+- GitHub Issue #14715 已標記 not_planned
+- 錯誤: CUDA error: an illegal instruction
+
+### 測試結果
+
+| 模型 | 平均時間 | 狀態 |
+|------|----------|------|
+| qwen2.5:3b | 1.93s | ✅ |
+| qwen2.5:7b | 5.11s | ✅ |
+| qwen2.5:14b | 20.66s | ✅ |
+| qwen3.5:9b | - | ⏭️ 跳過 |
+
+**結論：僅使用 Qwen2.5 系列**

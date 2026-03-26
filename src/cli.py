@@ -192,6 +192,19 @@ class SoapVoiceCLI:
                     else ""
                 )
                 print(f"  • {term['original']} → {term['standard']}{icd10_str}")
+
+        # 顯示病例範本檢索結果（RAG）
+        case_templates = result.get("case_templates", [])
+        if case_templates:
+            print("\n📚 參考病例範本 (RAG 檢索):")
+            for i, ct in enumerate(case_templates, 1):
+                specialty = ct.get("specialty", "一般")
+                rank = ct.get("rank", i)
+                content = ct.get("content", "")[:150]
+                if len(content) >= 150:
+                    content = content[:150] + "..."
+                print(f"  [{i}] {specialty} (排名 #{rank})")
+                print(f"      {content}")
             print()
 
         # 顯示分類置信度

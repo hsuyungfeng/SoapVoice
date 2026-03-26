@@ -7,6 +7,7 @@ SOAP 生成模組
 import logging
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
+from pathlib import Path
 
 from src.llm.ollama_engine import OllamaEngine, ModelConfig
 from src.nlp.soap_classifier import SOAPClassifier
@@ -17,6 +18,10 @@ logger = logging.getLogger(__name__)
 
 # 共用 SOAPClassifier 的關鍵字字典，避免重複定義
 SOAP_KEYWORDS = SOAPClassifier.KEYWORDS
+
+# RAG 相關設定
+RAG_DB_PATH = Path("data/rag/chroma")
+RAG_SQLITE_PATH = Path("data/rag/case_templates.db")
 
 
 @dataclass
@@ -29,6 +34,9 @@ class SOAPConfig:
     temperature: float = 0.3
     num_ctx: int = 4096
     max_subjective_length: int = 100  # 字元限制
+    enable_rag: bool = True  # 啟用 RAG 病例範本檢索
+    rag_top_k: int = 3  # RAG 檢索結果數量
+    rag_min_similarity: float = 0.3  # RAG 最小相似度
 
 
 class SOAPGenerator:
@@ -43,6 +51,185 @@ class SOAPGenerator:
         self.config = config or SOAPConfig()
         self._engine: Optional[OllamaEngine] = None
         self._mapper: MedicalTerminologyMapper = MedicalTerminologyMapper()
+
+        # RAG 系統初始化
+        self._rag_client = None
+        self._rag_collection = None
+        self._embedding_model = None
+        if self.config.enable_rag:
+            self._init_rag()
+
+    def _init_rag(self) -> None:
+        """初始化 RAG 系統"""
+        try:
+            import chromadb
+            from chromadb.config import Settings
+            from sentence_transformers import SentenceTransformer
+
+            # 初始化 Chroma 向量資料庫
+            self._rag_client = chromadb.PersistentClient(
+                path=str(RAG_DB_PATH), settings=Settings(anonymized_telemetry=False)
+            )
+
+            # 取得集合
+            try:
+                self._rag_collection = self._rag_client.get_collection("case_templates")
+                logger.info(f"RAG 系統已初始化，病例範本數量: {self._rag_collection.count()}")
+            except Exception:
+                logger.warning("RAG 集合不存在，跳過病例範本檢索")
+                self._rag_client = None
+                return
+
+            # 初始化嵌入模型
+            self._embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+
+        except ImportError as e:
+            logger.warning(f"RAG 套件未安裝，跳過病例範本檢索: {e}")
+            self._rag_client = None
+        except Exception as e:
+            logger.warning(f"RAG 初始化失敗，跳過病例範本檢索: {e}")
+            self._rag_client = None
+
+    def _search_case_templates(self, query: str) -> List[Dict[str, Any]]:
+        """搜尋相關病例範本
+
+        Args:
+            query: 搜尋查詢文字
+
+        Returns:
+            相關病例範本列表
+        """
+        if not self._rag_client or not self._embedding_model or not self._rag_collection:
+            return []
+
+        try:
+            # 生成嵌入向量
+            query_embedding = self._embedding_model.encode(query)
+
+            # 執行搜尋
+            results = self._rag_collection.query(
+                query_embeddings=[query_embedding.tolist()],
+                n_results=self.config.rag_top_k,
+                include=["documents", "metadatas", "distances"],
+            )
+
+            # 處理結果
+            case_templates = []
+            if results["documents"]:
+                for i in range(len(results["documents"][0])):
+                    document = results["documents"][0][i]
+                    metadata = results["metadatas"][0][i]
+                    distance = results["distances"][0][i]
+
+                    # Chroma 使用餘弦距離 (0-2)，轉換為相似度 (0-1)
+                    # 相似度 = 1 - (distance / 2)
+                    similarity = max(0, 1.0 - distance / 2)
+
+                    # 由於距離值很大，使用相對排名而非絕對閾值
+                    case_templates.append(
+                        {
+                            "content": document[:500],
+                            "specialty": metadata.get("specialty", "一般"),
+                            "source_file": metadata.get("source_name", ""),
+                            "rank": i + 1,
+                            "distance": round(distance, 3),
+                            "similarity": round(similarity, 3),
+                        }
+                    )
+
+            if case_templates:
+                logger.info(f"RAG 檢索找到 {len(case_templates)} 個相關病例範本")
+                for ct in case_templates:
+                    logger.debug(f"  - {ct['specialty']}: 距離={ct['distance']}")
+
+            return case_templates
+
+        except Exception as e:
+            logger.warning(f"RAG 搜尋失敗: {e}")
+            return []
+
+        try:
+            # 生成嵌入向量
+            query_embedding = self._embedding_model.encode([query]).tolist()[0]
+
+            # 執行搜尋
+            results = self._rag_collection.query(
+                query_embeddings=[query_embedding],
+                n_results=self.config.rag_top_k,
+                include=["documents", "metadatas", "distances"],
+            )
+
+            # 處理結果 - Chroma 使用餘弦距離
+            # 距離範圍通常為 0-2，轉換為相似度
+            case_templates = []
+            if results["documents"]:
+                for i in range(len(results["documents"][0])):
+                    document = results["documents"][0][i]
+                    metadata = results["metadatas"][0][i]
+                    distance = results["distances"][0][i]
+
+                    # 轉換距離為相似度 (0=相同, 2=相反)
+                    # 使用 max(0, 1 - distance/2) 確保範圍在 0-1
+                    similarity = max(0, 1.0 - distance / 2)
+
+                    # 使用較低的閾值讓更多結果通過
+                    if similarity >= 0.1:  # 降低閾值
+                        case_templates.append(
+                            {
+                                "content": document[:500],  # 限制長度
+                                "specialty": metadata.get("specialty", "一般"),
+                                "source_file": metadata.get("source_name", ""),
+                                "similarity": round(similarity, 3),
+                            }
+                        )
+
+            if case_templates:
+                logger.info(f"RAG 檢索找到 {len(case_templates)} 個相關病例範本")
+
+            return case_templates
+
+        except Exception as e:
+            logger.warning(f"RAG 搜尋失敗: {e}")
+            return []
+
+        try:
+            # 生成嵌入向量
+            query_embedding = self._embedding_model.encode([query]).tolist()[0]
+
+            # 執行搜尋
+            results = self._rag_collection.query(
+                query_embeddings=[query_embedding],
+                n_results=self.config.rag_top_k,
+                include=["documents", "metadatas", "distances"],
+            )
+
+            # 處理結果
+            case_templates = []
+            if results["documents"]:
+                for i in range(len(results["documents"][0])):
+                    document = results["documents"][0][i]
+                    metadata = results["metadatas"][0][i]
+                    distance = results["distances"][0][i]
+                    similarity = 1.0 - distance
+
+                    if similarity >= self.config.rag_min_similarity:
+                        case_templates.append(
+                            {
+                                "content": document[:500],  # 限制長度
+                                "specialty": metadata.get("specialty", "一般"),
+                                "source_file": metadata.get("source_name", ""),
+                                "similarity": round(similarity, 3),
+                            }
+                        )
+
+            if case_templates:
+                logger.info(f"RAG 檢索找到 {len(case_templates)} 個相關病例範本")
+
+            return case_templates
+
+        except Exception as e:
+            logger.warning(f"RAG 搜尋失敗: {e}")
+            return []
 
     def initialize(self, engine: Optional[OllamaEngine] = None) -> None:
         """初始化 LLM 引擎
@@ -72,6 +259,7 @@ class SOAPGenerator:
         normalized_text: str = "",
         term_mappings: Optional[List[TermMapping]] = None,
         icd10_candidates: Optional[List[str]] = None,
+        case_templates: Optional[List[Dict[str, Any]]] = None,
     ) -> str:
         """建立 SOAP 生成提示詞
 
@@ -81,6 +269,7 @@ class SOAPGenerator:
             normalized_text: 術語標準化後的文字
             term_mappings: 術語映射結果列表
             icd10_candidates: ICD-10 候選碼列表
+            case_templates: 相關病例範本列表（RAG 檢索結果）
 
         Returns:
             完整的提示詞
@@ -104,6 +293,18 @@ class SOAPGenerator:
             sections.append("Pre-identified Medical Terms:\n" + "\n".join(term_lines))
         if icd10_candidates:
             sections.append(f"ICD-10 Candidates: {', '.join(icd10_candidates)}")
+
+        # RAG 病例範本段落
+        if case_templates:
+            template_lines = []
+            for idx, template in enumerate(case_templates, 1):
+                specialty = template.get("specialty", "一般")
+                content = template.get("content", "")[:200]  # 限制長度
+                similarity = template.get("similarity", 0)
+                template_lines.append(
+                    f"  [{idx}] {specialty} (相似度: {similarity})\n    {content}..."
+                )
+            sections.append("參考病例範本:\n" + "\n".join(template_lines))
 
         header = "\n\n".join(sections) + "\n\n" if sections else ""
 
@@ -176,12 +377,23 @@ CONVERSATION_SUMMARY:
         except Exception as norm_err:
             logger.warning("術語標準化失敗，使用原始 transcript: %s", norm_err)
 
+        # RAG 病例範本檢索
+        case_templates = []
+        if self.config.enable_rag and self._rag_client:
+            try:
+                case_templates = self._search_case_templates(transcript)
+                if case_templates:
+                    logger.info(f"RAG 檢索完成，找到 {len(case_templates)} 個相關病例範本")
+            except Exception as rag_err:
+                logger.warning(f"RAG 檢索失敗: {rag_err}")
+
         prompt = self._build_prompt(
             transcript,
             patient_context,
             normalized_text=normalized_text,
             term_mappings=term_mappings,
             icd10_candidates=icd10_candidates,
+            case_templates=case_templates,
         )
 
         try:
@@ -201,6 +413,8 @@ CONVERSATION_SUMMARY:
                 }
                 for m in term_mappings
             ]
+            # 加入 RAG 病例範本檢索結果
+            result["case_templates"] = case_templates
             return result
         except Exception as e:
             logger.error(f"SOAP generation error: {e}")

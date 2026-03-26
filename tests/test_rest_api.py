@@ -20,9 +20,13 @@ class TestHealthEndpoints:
         """測試根路徑"""
         response = client.get("/")
         assert response.status_code == 200
-        data = response.json()
-        assert data["service"] == "SoapVoice API"
-        assert data["status"] == "running"
+        content_type = response.headers.get("content-type", "")
+        if "application/json" in content_type:
+            data = response.json()
+            assert data["service"] == "SoapVoice API"
+            assert data["status"] == "running"
+        else:
+            assert "text/html" in content_type
 
     def test_health(self, client):
         """測試健康檢查"""
