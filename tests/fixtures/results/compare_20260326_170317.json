@@ -1,0 +1,878 @@
+{
+  "qwen2.5:14b": {
+    "results": [
+      {
+        "name": "胸痛",
+        "file": "static/chest_pain.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+        "transcribe_time": 15.61,
+        "llm_time": 2.69,
+        "total_time": 18.3,
+        "symptoms": [
+          "ECG",
+          "fever",
+          "cough",
+          "chest",
+          "heart",
+          "dyspnea",
+          "咳嗽",
+          "發燒"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "R06.02",
+            "description": "Shortness of breath",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "胸部X光",
+          "祛痰劑",
+          "氧气治疗",
+          "多喝水",
+          "止咳藥物"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          }
+        ],
+        "soap": {
+          "en": "No response",
+          "zh": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張"
+        }
+      },
+      {
+        "name": "高血壓",
+        "file": "static/hypertension.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+        "transcribe_time": 16.04,
+        "llm_time": 2.77,
+        "total_time": 18.81,
+        "symptoms": [
+          "hypertension",
+          "blood pressure measurement",
+          "dizziness",
+          "heart",
+          "kidney"
+        ],
+        "icd10_codes": [
+          {
+            "code": "I10",
+            "description": "Essential (primary) hypertension",
+            "confidence": 0.9
+          },
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來"
+        }
+      },
+      {
+        "name": "糖尿病",
+        "file": "static/diabetes.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧、奇異果比較好一次不要超過一碗醫師,我的腳有時候會麻是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查",
+        "transcribe_time": 17.04,
+        "llm_time": 2.74,
+        "total_time": 19.77,
+        "symptoms": [
+          "diabetes mellitus"
+        ],
+        "icd10_codes": [
+          {
+            "code": "E11.9",
+            "description": "Type 2 diabetes mellitus without complications",
+            "confidence": 0.9
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧、奇異果比較好一次不要超過一碗醫師,我的腳有時候會麻是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查"
+        }
+      },
+      {
+        "name": "傷口護理",
+        "file": "static/wound_care.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在癒合會癢,盡量不要抓我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕平時傷口保持乾燥",
+        "transcribe_time": 16.92,
+        "llm_time": 2.84,
+        "total_time": 19.76,
+        "symptoms": [
+          "inflammation",
+          "dressing change"
+        ],
+        "icd10_codes": [
+          {
+            "code": "L29.9",
+            "description": "Pruritus, unspecified",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在癒合會癢,盡量不要抓我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕平時傷口保持乾燥"
+        }
+      },
+      {
+        "name": "呼吸道",
+        "file": "static/respiratory.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果,如果肺部有發炎可能需要住院治療",
+        "transcribe_time": 16.09,
+        "llm_time": 2.71,
+        "total_time": 18.8,
+        "symptoms": [
+          "fever",
+          "cough",
+          "severe pain",
+          "chest",
+          "throat",
+          "pneumonia",
+          "inflammation",
+          "blood draw",
+          "lung",
+          "咳嗽",
+          "發燒",
+          "喉嚨痛"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "J18.9",
+            "description": "Pneumonia, unspecified organism",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "祛痰劑",
+          "止咳藥物",
+          "多喝水"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          },
+          {
+            "name": "含片",
+            "dosage": "每日數次",
+            "category": "局部"
+          }
+        ],
+        "soap": {
+          "en": "No response",
+          "zh": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果,如果肺部有發炎可能需要住院治療"
+        }
+      },
+      {
+        "name": "醫囑",
+        "file": "static/drug_order.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是瀝尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力,如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診,瀝尿劑看情況可以停",
+        "transcribe_time": 16.61,
+        "llm_time": 2.71,
+        "total_time": 19.31,
+        "symptoms": [
+          "dizziness",
+          "stomach"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是瀝尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力,如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診,瀝尿劑看情況可以停"
+        }
+      },
+      {
+        "name": "手術記錄",
+        "file": "static/surgery_record.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成",
+        "transcribe_time": 19.49,
+        "llm_time": 2.71,
+        "total_time": 22.2,
+        "symptoms": [
+          "inflammation",
+          "suturing"
+        ],
+        "icd10_codes": [],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成"
+        }
+      },
+      {
+        "name": "醫病對話",
+        "file": "static/doctor_patient.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療",
+        "transcribe_time": 17.16,
+        "llm_time": 2.71,
+        "total_time": 19.88,
+        "symptoms": [
+          "fatigue",
+          "palpitation"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R53.83",
+            "description": "Other fatigue",
+            "confidence": 0.85
+          },
+          {
+            "code": "R00.2",
+            "description": "Palpitations",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療"
+        }
+      }
+    ],
+    "total_time": 156.83
+  },
+  "qwen2.5:7b": {
+    "results": [
+      {
+        "name": "胸痛",
+        "file": "static/chest_pain.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+        "transcribe_time": 16.54,
+        "llm_time": 2.75,
+        "total_time": 19.28,
+        "symptoms": [
+          "ECG",
+          "fever",
+          "cough",
+          "chest",
+          "heart",
+          "dyspnea",
+          "咳嗽",
+          "發燒"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "R06.02",
+            "description": "Shortness of breath",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "胸部X光",
+          "祛痰劑",
+          "氧气治疗",
+          "多喝水",
+          "止咳藥物"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          }
+        ],
+        "soap": {
+          "en": "No response",
+          "zh": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張"
+        }
+      },
+      {
+        "name": "高血壓",
+        "file": "static/hypertension.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+        "transcribe_time": 16.53,
+        "llm_time": 2.77,
+        "total_time": 19.3,
+        "symptoms": [
+          "hypertension",
+          "blood pressure measurement",
+          "dizziness",
+          "heart",
+          "kidney"
+        ],
+        "icd10_codes": [
+          {
+            "code": "I10",
+            "description": "Essential (primary) hypertension",
+            "confidence": 0.9
+          },
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來"
+        }
+      },
+      {
+        "name": "糖尿病",
+        "file": "static/diabetes.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧、奇異果比較好一次不要超過一碗醫師,我的腳有時候會麻是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查",
+        "transcribe_time": 17.66,
+        "llm_time": 2.68,
+        "total_time": 20.33,
+        "symptoms": [
+          "diabetes mellitus"
+        ],
+        "icd10_codes": [
+          {
+            "code": "E11.9",
+            "description": "Type 2 diabetes mellitus without complications",
+            "confidence": 0.9
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧、奇異果比較好一次不要超過一碗醫師,我的腳有時候會麻是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查"
+        }
+      },
+      {
+        "name": "傷口護理",
+        "file": "static/wound_care.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在癒合會癢,盡量不要抓我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕平時傷口保持乾燥",
+        "transcribe_time": 17.38,
+        "llm_time": 2.82,
+        "total_time": 20.2,
+        "symptoms": [
+          "inflammation",
+          "dressing change"
+        ],
+        "icd10_codes": [
+          {
+            "code": "L29.9",
+            "description": "Pruritus, unspecified",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在癒合會癢,盡量不要抓我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕平時傷口保持乾燥"
+        }
+      },
+      {
+        "name": "呼吸道",
+        "file": "static/respiratory.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果,如果肺部有發炎可能需要住院治療",
+        "transcribe_time": 17.06,
+        "llm_time": 2.75,
+        "total_time": 19.81,
+        "symptoms": [
+          "fever",
+          "cough",
+          "severe pain",
+          "chest",
+          "throat",
+          "pneumonia",
+          "inflammation",
+          "blood draw",
+          "lung",
+          "咳嗽",
+          "發燒",
+          "喉嚨痛"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "J18.9",
+            "description": "Pneumonia, unspecified organism",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "祛痰劑",
+          "止咳藥物",
+          "多喝水"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          },
+          {
+            "name": "含片",
+            "dosage": "每日數次",
+            "category": "局部"
+          }
+        ],
+        "soap": {
+          "en": "No response",
+          "zh": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果,如果肺部有發炎可能需要住院治療"
+        }
+      },
+      {
+        "name": "醫囑",
+        "file": "static/drug_order.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是瀝尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力,如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診,瀝尿劑看情況可以停",
+        "transcribe_time": 16.81,
+        "llm_time": 2.67,
+        "total_time": 19.48,
+        "symptoms": [
+          "dizziness",
+          "stomach"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是瀝尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力,如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診,瀝尿劑看情況可以停"
+        }
+      },
+      {
+        "name": "手術記錄",
+        "file": "static/surgery_record.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成",
+        "transcribe_time": 19.32,
+        "llm_time": 2.71,
+        "total_time": 22.04,
+        "symptoms": [
+          "inflammation",
+          "suturing"
+        ],
+        "icd10_codes": [],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成"
+        }
+      },
+      {
+        "name": "醫病對話",
+        "file": "static/doctor_patient.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療",
+        "transcribe_time": 16.69,
+        "llm_time": 2.69,
+        "total_time": 19.39,
+        "symptoms": [
+          "fatigue",
+          "palpitation"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R53.83",
+            "description": "Other fatigue",
+            "confidence": 0.85
+          },
+          {
+            "code": "R00.2",
+            "description": "Palpitations",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療"
+        }
+      }
+    ],
+    "total_time": 159.83
+  },
+  "qwen2.5:3b": {
+    "results": [
+      {
+        "name": "胸痛",
+        "file": "static/chest_pain.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+        "transcribe_time": 16.14,
+        "llm_time": 2.75,
+        "total_time": 18.89,
+        "symptoms": [
+          "ECG",
+          "fever",
+          "cough",
+          "chest",
+          "heart",
+          "dyspnea",
+          "咳嗽",
+          "發燒"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "R06.02",
+            "description": "Shortness of breath",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "胸部X光",
+          "祛痰劑",
+          "氧气治疗",
+          "多喝水",
+          "止咳藥物"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          }
+        ],
+        "soap": {
+          "en": "No response",
+          "zh": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張"
+        }
+      },
+      {
+        "name": "高血壓",
+        "file": "static/hypertension.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+        "transcribe_time": 16.76,
+        "llm_time": 2.71,
+        "total_time": 19.47,
+        "symptoms": [
+          "hypertension",
+          "blood pressure measurement",
+          "dizziness",
+          "heart",
+          "kidney"
+        ],
+        "icd10_codes": [
+          {
+            "code": "I10",
+            "description": "Essential (primary) hypertension",
+            "confidence": 0.9
+          },
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來"
+        }
+      },
+      {
+        "name": "糖尿病",
+        "file": "static/diabetes.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧、奇異果比較好一次不要超過一碗醫師,我的腳有時候會麻是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查",
+        "transcribe_time": 17.71,
+        "llm_time": 2.71,
+        "total_time": 20.43,
+        "symptoms": [
+          "diabetes mellitus"
+        ],
+        "icd10_codes": [
+          {
+            "code": "E11.9",
+            "description": "Type 2 diabetes mellitus without complications",
+            "confidence": 0.9
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧、奇異果比較好一次不要超過一碗醫師,我的腳有時候會麻是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查"
+        }
+      },
+      {
+        "name": "傷口護理",
+        "file": "static/wound_care.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在癒合會癢,盡量不要抓我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕平時傷口保持乾燥",
+        "transcribe_time": 17.36,
+        "llm_time": 2.69,
+        "total_time": 20.06,
+        "symptoms": [
+          "inflammation",
+          "dressing change"
+        ],
+        "icd10_codes": [
+          {
+            "code": "L29.9",
+            "description": "Pruritus, unspecified",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在癒合會癢,盡量不要抓我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕平時傷口保持乾燥"
+        }
+      },
+      {
+        "name": "呼吸道",
+        "file": "static/respiratory.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果,如果肺部有發炎可能需要住院治療",
+        "transcribe_time": 16.31,
+        "llm_time": 2.73,
+        "total_time": 19.03,
+        "symptoms": [
+          "fever",
+          "cough",
+          "severe pain",
+          "chest",
+          "throat",
+          "pneumonia",
+          "inflammation",
+          "blood draw",
+          "lung",
+          "咳嗽",
+          "發燒",
+          "喉嚨痛"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "J18.9",
+            "description": "Pneumonia, unspecified organism",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "祛痰劑",
+          "止咳藥物",
+          "多喝水"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          },
+          {
+            "name": "含片",
+            "dosage": "每日數次",
+            "category": "局部"
+          }
+        ],
+        "soap": {
+          "en": "No response",
+          "zh": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果,如果肺部有發炎可能需要住院治療"
+        }
+      },
+      {
+        "name": "醫囑",
+        "file": "static/drug_order.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是瀝尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力,如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診,瀝尿劑看情況可以停",
+        "transcribe_time": 16.47,
+        "llm_time": 2.7,
+        "total_time": 19.17,
+        "symptoms": [
+          "dizziness",
+          "stomach"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是瀝尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力,如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診,瀝尿劑看情況可以停"
+        }
+      },
+      {
+        "name": "手術記錄",
+        "file": "static/surgery_record.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成",
+        "transcribe_time": 19.08,
+        "llm_time": 2.73,
+        "total_time": 21.82,
+        "symptoms": [
+          "inflammation",
+          "suturing"
+        ],
+        "icd10_codes": [],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成"
+        }
+      },
+      {
+        "name": "醫病對話",
+        "file": "static/doctor_patient.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療",
+        "transcribe_time": 16.33,
+        "llm_time": 2.71,
+        "total_time": 19.04,
+        "symptoms": [
+          "fatigue",
+          "palpitation"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R53.83",
+            "description": "Other fatigue",
+            "confidence": 0.85
+          },
+          {
+            "code": "R00.2",
+            "description": "Palpitations",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "No response",
+          "zh": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療"
+        }
+      }
+    ],
+    "total_time": 157.9
+  }
+}

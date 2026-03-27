@@ -1,0 +1,58 @@
+[
+  {
+    "detail": "Not Found",
+    "name": "胸痛",
+    "file": "chest_pain.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0022399425506591797
+  },
+  {
+    "detail": "Not Found",
+    "name": "高血壓",
+    "file": "hypertension.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0019478797912597656
+  },
+  {
+    "detail": "Not Found",
+    "name": "糖尿病",
+    "file": "diabetes.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0013928413391113281
+  },
+  {
+    "detail": "Not Found",
+    "name": "傷口護理",
+    "file": "wound_care.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0012428760528564453
+  },
+  {
+    "detail": "Not Found",
+    "name": "呼吸道",
+    "file": "respiratory.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0010592937469482422
+  },
+  {
+    "detail": "Not Found",
+    "name": "醫囑",
+    "file": "drug_order.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0010445117950439453
+  },
+  {
+    "detail": "Not Found",
+    "name": "手術記錄",
+    "file": "surgery_record.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.0009770393371582031
+  },
+  {
+    "detail": "Not Found",
+    "name": "醫病對話",
+    "file": "doctor_patient.wav",
+    "model": "qwen2.5:14b",
+    "total_time": 0.000997781753540039
+  }
+]

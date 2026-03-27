@@ -1,0 +1,38 @@
+[
+  {
+    "model": "qwen2.5:3b",
+    "mode": "CPU",
+    "llm_time": 15.3,
+    "total_time": 15.3,
+    "status": "\u2705",
+    "symptoms": 5,
+    "icd10": 3
+  },
+  {
+    "model": "qwen2.5:7b",
+    "mode": "CPU",
+    "llm_time": 9.62,
+    "total_time": 9.62,
+    "status": "\u2705",
+    "symptoms": 5,
+    "icd10": 3
+  },
+  {
+    "model": "qwen3.5:4b",
+    "mode": "CPU",
+    "llm_time": 63.73,
+    "total_time": 63.73,
+    "status": "\u2705",
+    "symptoms": 5,
+    "icd10": 3
+  },
+  {
+    "model": "qwen3.5:9b",
+    "mode": "CPU",
+    "llm_time": 83.1,
+    "total_time": 83.1,
+    "status": "\u2705",
+    "symptoms": 5,
+    "icd10": 3
+  }
+]

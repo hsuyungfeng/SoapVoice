@@ -185,7 +185,7 @@ P - Plan:
                 "model": self.llm_model,
                 "prompt": prompt_en,
                 "stream": False,
-                "options": {"temperature": 0.3, "num_predict": 512},
+                "options": {"temperature": 0.3, "num_predict": 2048, "device": "cpu"},
             },
         )
 
@@ -203,7 +203,7 @@ P - Plan:
                 "model": self.llm_model,
                 "prompt": prompt_zh,
                 "stream": False,
-                "options": {"temperature": 0.3, "num_predict": 512},
+                "options": {"temperature": 0.3, "num_predict": 2048, "device": "cpu"},
             },
         )
 

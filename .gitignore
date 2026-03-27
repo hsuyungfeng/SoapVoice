@@ -39,6 +39,7 @@ env/
 *.log
 .docker/
 docker-compose.override.yml
+Dockerfile
 
 # IDE
 .vscode/
@@ -47,9 +48,10 @@ docker-compose.override.yml
 *.swo
 *~
 
-# Model cache
-models/
-cache/
+# Model cache (keep small test files, ignore large models)
+models/*.gguf
+models/whisper/
+models/.cache/
 *.pth
 *.bin
 *.onnx
@@ -68,8 +70,19 @@ htmlcov/
 # Ruff/Black
 .ruff_cache/
 
-# Large database files (exceeds GitHub 100MB limit)
-# data/local_db/medical.db  # 暫時註解，使用 Git LFS 管理
+# Large database files (use Git LFS)
+# data/local_db/medical.db
+# data/rag/case_templates.db
 
 # Large PDF files and data directories
 CurrentData/
+
+# Audio test files (generated)
+static/*.wav
+
+# PyInstaller
+build/
+*.spec
+
+# Planning
+.planning/

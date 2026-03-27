@@ -414,3 +414,155 @@ tests/fixtures/scenarios/
 | qwen3.5:9b | - | ⏭️ 跳過 |
 
 **結論：僅使用 Qwen2.5 系列**
+
+---
+
+## 📅 2026-03-26 ~ 2026-03-27 — 模型比較測試
+
+### CompareModel.md 建立 ✅
+
+**測試配置：**
+- 模型：qwen2.5:14b, qwen2.5:7b, qwen2.5:3b
+- 音檔：8 個醫療場景測試
+- 環境：Ollama + GPU (RTX 2080 Ti)
+
+### 測試結果 (GPU 模式)
+
+| 模型 | 胸痛 | 高血壓 |
+|------|------|--------|
+| qwen2.5:14b | 83.86秒 | 68.09秒 |
+| qwen2.5:7b | 16.33秒 | 6.22秒 |
+| qwen2.5:3b | 12.9秒 | 25.21秒 |
+
+### 問題修復 ⚠️
+
+1. **音檔重複問題**：8 個音檔曾是相同內容 → 已使用 edge-tts 重新生成
+2. **SOAP 亂碼問題**：`num_predict` 太小 (512) → 增加到 2048
+3. **API 掛起問題**：非同步端點中的阻塞調用 → 使用 `asyncio.to_thread()`
+
+### GPU 錯誤狀態 ⚠️
+
+- GPU 0: ERR! 狀態，無法載入模型
+- GPU 1: ERR! 狀態
+- Ollama CUDA error: unable to allocate CUDA0 buffer
+- 無法執行 CPU 測試
+
+### 待完成
+
+| 項目 | 說明 | 優先級 |
+|------|------|--------|
+| GPU 重置 | 需要管理員執行 `nvidia-smi --gpu-reset` | 🔴 P0 |
+| CPU 模式測試 | 比較 CPU vs GPU 效能 | 🟡 P1 |
+
+### 產出檔案
+
+- `CompareModel.md` - 模型比較報告
+- `tests/fixtures/results/compare_20260326_163919.json` - 測試結果
+
+**最後更新:** 2026-03-27
+
+---
+
+## 📅 2026-03-27 — Windows EXE 部署規劃
+
+### Windows EXE 部署架構
+
+**推薦方案：llama.cpp CPU 模式**
+
+```
+SoapVoice.exe
+├── FastAPI Server (Port 8000)
+└── llama.cpp (Qwen2.5:7b Q4_K_M, ~4.5GB)
+```
+
+### 模型選擇
+
+| 模型 | 量化 | 大小 | 速度 |
+|------|------|------|------|
+| qwen2.5:7b | Q4_K_M | ~4.5GB | ~8-12 tok/s ⭐推薦 |
+| qwen2.5:3b | Q4_K_M | ~2.0GB | ~15-20 tok/s |
+
+### Windows 部署選項
+
+| 選項 | 說明 | 優點 | 缺點 |
+|------|------|------|------|
+| 方案一 | PyInstaller + Ollama 外置 | 穩定 | 需兩段式安裝 |
+| 方案二 | llama.cpp CPU | 單一 EXE | 僅 CPU |
+| 方案三 | 混合模式 | 彈性高 | 複雜 |
+
+### 待執行工作
+
+| 優先 | 工作 | 說明 | 狀態 |
+|------|------|------|------|
+| P0 | llama.cpp 引擎整合 | 建立 src/llm/llama_engine.py | ✅ 已完成 |
+| P1 | CLI 介面建立 | Typer 命令列工具 | ✅ 已完成 |
+| P1.1 | 模型比較測試 | qwen2.5:3b/7b vs qwen3.5:4b/9b | ✅ 已完成 |
+| P2 | Webhook 端點 | 事件驅動整合 | ✅ 已完成 |
+| P3 | 檔案監控服務 | watch/ 目錄自動化 | ✅ 已完成 |
+| P4 | PyInstaller 包裝 | Windows EXE 編譯 | ✅ 已完成 |
+
+### 2026-03-27 完成項目
+
+| 項目 | 說明 | 狀態 |
+|------|------|------|
+| Qwen2.5 GGUF 模型 | 已存在於 models/ 目錄 | ✅ |
+| Ollama qwen2.5:7b | 已下載並可用 | ✅ |
+| Ollama qwen2.5:3b | 已下載並可用 | ✅ |
+| Typer CLI | 建立 src/cli_typer.py (200+ 行) | ✅ |
+| CompareModel.md | 更新 8 音檔 4 模型測試結果 | ✅ |
+| Webhook API | 建立 src/api/webhook_api.py | ✅ |
+| 檔案監控服務 | 建立 src/services/file_monitor.py | ✅ |
+| PyInstaller 腳本 | 建立 SoapVoice.spec + build_windows.sh | ✅ |
+
+### 新增 API 端點
+
+```bash
+# Webhook
+curl http://localhost:8000/api/v1/webhooks/health
+curl -X POST http://localhost:8000/api/v1/webhooks/trigger
+
+# 檔案監控
+curl http://localhost:8000/api/v1/file-monitor/health
+curl -X POST http://localhost:8000/api/v1/file-monitor/init
+curl -X POST http://localhost:8000/api/v1/file-monitor/start
+```
+
+### 2026-03-27 完成項目
+
+| 項目 | 說明 | 狀態 |
+|------|------|------|
+| Qwen2.5 GGUF 模型 | 已存在於 models/ 目錄 | ✅ |
+| Ollama qwen2.5:7b | 已下載並可用 | ✅ |
+| Ollama qwen2.5:3b | 已下載並可用 | ✅ |
+| Typer CLI | 建立 src/cli_typer.py (200+ 行) | ✅ |
+| CompareModel.md | 更新 8 音檔 4 模型測試結果 | ✅ |
+
+### 模型比較結果 (CPU 模式)
+
+| 模型 | 大小 | 平均時間 | 推薦度 |
+|------|------|----------|--------|
+| qwen2.5:7b | 4.7 GB | 9.6 秒 | ⭐⭐⭐ 最佳 |
+| qwen2.5:3b | 1.9 GB | 15.3 秒 | ⭐⭐ 推薦 |
+| qwen3.5:4b | 3.4 GB | 63.7 秒 | 不推薦 |
+| qwen3.5:9b | 6.6 GB | 83.1 秒 | 不推薦 |
+
+### 使用方式
+
+```bash
+# 使用 Ollama 後端（需先啟動 ollama serve）
+uv run python src/cli_typer.py main --text "病人咳嗽" --backend ollama --model qwen2.5:7b
+
+# 使用 llama.cpp 後端（CPU 模式，約 4.5GB 模型）
+uv run python src/cli_typer.py main --text "病人咳嗽" --backend llama.cpp --model-path "models/qwen2.5-7b-instruct-q4_k_m.gguf"
+
+# 啟動 API 伺服器
+uv run python src/cli_typer.py serve
+```
+
+### 已知問題
+
+1. **GPU 不可用**：CUDA error - 需要系統重啟
+2. **llama.cpp 模型載入**：目前 GGUF 模型載入失敗（需更新 llama-cpp-python）
+3. **建議**：使用 Ollama 後端進行測試
+
+**最後更新:** 2026-03-27

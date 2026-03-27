@@ -1,0 +1,293 @@
+{
+  "qwen2.5:14b": {
+    "results": [
+      {
+        "name": "胸痛",
+        "file": "static/chest_pain.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+        "transcribe_time": 0,
+        "llm_time": 83.86,
+        "total_time": 83.86,
+        "symptoms": [
+          "ECG",
+          "fever",
+          "cough",
+          "chest",
+          "heart",
+          "dyspnea",
+          "咳嗽",
+          "發燒"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "R06.02",
+            "description": "Shortness of breath",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "胸部X光",
+          "祛痰劑",
+          "氧气治疗",
+          "多喝水",
+          "止咳藥物"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          }
+        ],
+        "soap": {
+          "en": "**SOAP Note**\n\n**S - Subjective:**  \nPatient reports onset of chest discomfort and shortness of breath starting two days ago. Symptoms include difficulty breathing when walking quickly, but no fever or coughing. The patient denies a history of heart problems but admits to smoking for approximately ten years.\n\n**O - Objective:**  \n- Patient appears anxious.\n- No fever noted upon examination.\n- Respiratory rate is elevated slightly during physical activity.\n- Heart sounds are normal without murmurs or gallops.\n- No wheezing heard on auscultation of lungs.\n- Order for chest X-ray and ECG pending.\n\n**A - Assessment:**  \nThe patient presents with symptoms suggestive of respiratory distress, possibly related to smoking history. Given the onset of shortness of breath and chest discomfort, differential diagnoses include chronic obstructive pulmonary disease (COPD), asthma exacerbation, or cardiac-related issues such as angina. The absence of fever and coughing makes infectious causes less likely at this time.\n\n**P - Plan:**  \n1. Order a chest X-ray to evaluate for any lung pathology.\n2. Schedule an ECG to rule out cardiac causes.\n3. Prescribe Cough-Teling (Ketotifen) 1 tablet, three times daily for cough suppression.\n4. Advise the use of pain relief medication such as Paracetamol 500mg, three times daily if needed.\n5. Recommend increased fluid intake and oxygen therapy if shortness of breath persists or worsens.\n6. Encourage smoking cessation counseling to address underlying risk factors.\n\nICD-10 Codes:  \nR05 (Cough), R06.02 (Shortness of breath), R50.9 (Fever, unspecified)",
+          "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n患者報告兩天前開始出現胸痛和呼吸困難。症狀包括走路快時會感到呼吸困難，但沒有發燒或咳嗽的情況。患者否認有心臟病史，但承認自己吸煙約十年。\n\n**O - 客觀:**  \n- 患者表現出焦慮。\n- 對其進行檢查後未發現發燒症狀。\n- 在體力活動期間呼吸頻率略有升高。\n- 心音正常，無雜音或奔馬律。\n- 聲響聽診肺部時未聽到哮鳴音。\n- 命令安排胸部X光和心電圖檢查。\n\n**A - 評估:**  \n患者表現出疑似呼吸困難的症狀，可能與吸煙史有關。考慮到短暫性呼吸困難和胸痛的出現，差異診斷包括慢性阻塞性肺病（COPD）、哮喘加重或由心臟相關問題如心絞痛引起的情況。由於沒有發燒和咳嗽的情況，目前感染原因的可能性較低。\n\n**P - 計劃:**  \n1. 安排胸部X光檢查以評估任何肺部病理。\n2. 預約心電圖以排除心臟相關問題。\n3. 处方止咳藥Cough-Teling（Ketotifen）每日三次，每次一片。\n4. 如需要，建議使用如Paracetamol 500mg每日三次的止痛藥。\n5. 如果呼吸困難持續或加劇，建議增加水分攝入量並進行氧療。\n6. 鼓勵戒煙諮詢以解決潛在風險因素。\n\nICD-10代碼:  \nR05（咳嗽），R06.02（呼吸困難），R50.9（未特指的發燒）"
+        }
+      },
+      {
+        "name": "高血壓",
+        "file": "static/hypertension.wav",
+        "model": "qwen2.5:14b",
+        "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+        "transcribe_time": 0,
+        "llm_time": 68.09,
+        "total_time": 68.09,
+        "symptoms": [
+          "hypertension",
+          "blood pressure measurement",
+          "dizziness",
+          "heart",
+          "kidney"
+        ],
+        "icd10_codes": [
+          {
+            "code": "I10",
+            "description": "Essential (primary) hypertension",
+            "confidence": 0.9
+          },
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "**SOAP Note**\n\n**S - Subjective:**  \nMr. Zhang reports that his blood pressure control has not improved recently, with morning readings consistently above 160 mmHg. He confirms adherence to medication but admits to a preference for salty foods and excessive salt intake. Mr. Zhang also mentions experiencing occasional dizziness.\n\n**O - Objective:**  \n- Blood pressure readings: Morning readings consistently >160 mmHg.\n- Patient reports dizziness, especially when blood pressure is high.\n- Medication compliance confirmed by patient but dietary habits are poor (high sodium intake).\n\n**A - Assessment:**  \nEssential (primary) hypertension (ICD-10: I10), with symptoms of dizziness and giddiness (ICD-10: R42). The patient's blood pressure remains uncontrolled despite medication adherence, likely due to dietary factors such as high sodium intake. Dizziness is a common symptom associated with elevated blood pressure.\n\n**P - Plan:**  \n1. Adjust current antihypertensive medications based on recent readings and symptoms.\n2. Emphasize the importance of reducing salt intake and monitoring daily blood pressure levels.\n3. Encourage lifestyle modifications including reduced dietary sodium, increased physical activity, and regular blood pressure monitoring.\n4. Schedule a follow-up appointment in 1 month to reassess blood pressure control and medication efficacy.\n\nNo specific medical orders or drug recommendations are provided at this time as the plan focuses on patient education and lifestyle changes.",
+          "zh": "**SOAP筆錄**\n\n**S - 主觀:**  \n張先生報告說他最近的血壓控制沒有改善，早上測量值持續超過160 mmHg。他表示有服藥，但承認偏好食用鹹食且攝取過多鹽分。张先生還提到偶爾會感到頭暈。\n\n**O - 客觀:**  \n- 血壓讀數：早晨血壓讀數持續高於160 mmHg。\n- 病人報告在血壓高的時候會感到頭暈。\n- 病人確認服藥依從性良好，但飲食習慣不佳（攝取過多鹽分）。\n\n**A - 評估:**  \n原發性高血壓（ICD-10: I10），症狀包括頭暈和眩暈（ICD-10: R42）。儘管病人服藥依從性良好，但其血壓仍未能控制住，這可能是由於攝取過多鹽分等飲食因素所致。頭暈是高血壓的常見症狀。\n\n**P - 計劃:**  \n1. 根據最近的讀數和症狀調整目前的降血壓藥物。\n2. 强調減少鹽分攝入並監測每日血壓的重要性。\n3. 鼓勵生活方式的改變，包括減少飲食中的鈉含量、增加體力活動以及定期監測血壓。\n4. 安排一個月後的隨訪，以重新評估血壓控制和藥物效果。\n\n目前沒有提供具體的醫療指示或藥物建議，因為計劃主要集中在病人教育和生活方式的改變上。"
+        }
+      }
+    ]
+  },
+  "qwen2.5:7b": {
+    "results": [
+      {
+        "name": "胸痛",
+        "file": "static/chest_pain.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+        "transcribe_time": 0,
+        "llm_time": 16.33,
+        "total_time": 16.33,
+        "symptoms": [
+          "ECG",
+          "fever",
+          "cough",
+          "chest",
+          "heart",
+          "dyspnea",
+          "咳嗽",
+          "發燒"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "R06.02",
+            "description": "Shortness of breath",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "胸部X光",
+          "祛痰劑",
+          "氧气治疗",
+          "多喝水",
+          "止咳藥物"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          }
+        ],
+        "soap": {
+          "en": "S - Subjective:\nThe patient is a 45-year-old male who reports feeling chest tightness and shortness of breath for approximately two days. He denies fever or coughing. The symptoms worsen with physical exertion, such as walking quickly. The patient has a smoking history of about ten years but no known cardiac history.\n\nO - Objective:\nThe patient appears in good general condition upon examination. Vital signs are within normal limits: temperature 98.6°F (37°C), heart rate 80 bpm, respiratory rate 16 breaths per minute, and blood pressure 120/80 mmHg. Auscultation of the lungs reveals clear breath sounds with no wheezing or rales noted.\n\nA - Assessment:\nThe patient's symptoms suggest a possible respiratory condition such as bronchitis or asthma exacerbation given his smoking history. No fever is present, which rules out a likely viral infection; however, further diagnostic testing is warranted to rule out other potential causes of the symptoms.\n\nP - Plan:\n1. Order a chest X-ray and an ECG.\n2. Prescribe a course of expectorant (Ambroxol 30 mg three times daily) for symptom relief.\n3. Provide symptomatic treatment with cough suppressants (Codeine Phosphate Syrup, 1# three times daily).\n4. Advise the patient to increase fluid intake and use supplemental oxygen if shortness of breath persists or worsens.\n5. Schedule a follow-up appointment in one week or sooner if symptoms do not improve or worsen.",
+          "zh": "主觀（S）：\n患者為45歲男性，自述約兩天來感到胸悶和呼吸困難。他沒有發燒或咳嗽的症狀。這些症狀在運動時會加劇，例如快速行走。患者有約十年的抽菸史，但無已知的心臟病史。\n\n客觀（O）：\n檢查發現患者整體狀況良好。生命徵象均在正常範圍內：溫度98.6°F（37°C）、心率80次/分鐘、呼吸頻率16次/分鐘、血壓120/80 mmHg。聽診肺部清晰，未發現哮鳴音或濕羅音。\n\n評估（A）：\n患者的症狀可能表明存在如支氣管炎或哮喘發作等呼吸道疾病的可能性，考慮到他的抽菸史。沒有發燒，排除了病毒性感染的可能；然而，仍需進一步的診斷檢查以排除其他潛在病因。\n\n計畫（P）：\n1. 訂單胸部X光和心電圖檢查。\n2. 預開化痰藥物（阿溴索30 mg每日三次）以緩解症狀。\n3. 用止咳藥物（嗎啡磷酸鹽酏劑，1#每日三次）進行對癥治療。\n4. 為患者建議增加水分攝入，在呼吸困難持續或加劇時使用額外的氧氣吸入。\n5. 訂於一周後或症狀未改善或惡化時盡快安排隨診。"
+        }
+      },
+      {
+        "name": "高血壓",
+        "file": "static/hypertension.wav",
+        "model": "qwen2.5:7b",
+        "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+        "transcribe_time": 0,
+        "llm_time": 6.22,
+        "total_time": 6.22,
+        "symptoms": [
+          "hypertension",
+          "blood pressure measurement",
+          "dizziness",
+          "heart",
+          "kidney"
+        ],
+        "icd10_codes": [
+          {
+            "code": "I10",
+            "description": "Essential (primary) hypertension",
+            "confidence": 0.9
+          },
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "S - Subjective:\nThe patient, Mr. Zhang, reports that his blood pressure has been consistently high recently, reaching over 160 in the morning despite taking medication regularly. He mentions that he has been consuming more salt than recommended and is experiencing occasional dizziness.\n\nO - Objective: \nBlood pressure was not measured during this visit; however, the patient reported a history of elevated readings in the morning. No other objective findings were noted.\n\nA - Assessment:\nThe patient presents with essential (primary) hypertension (ICD-10 Code: I10). He also reports experiencing dizziness, which is consistent with high blood pressure (ICD-10 Code: R42).\n\nP - Plan:\n1. Advise the patient to strictly adhere to a low-sodium diet and reduce overall salt intake.\n2. Recommend increasing physical activity levels as tolerated.\n3. Instruct the patient to monitor his blood pressure daily and record readings for follow-up appointments.\n4. Consider adjusting the current antihypertensive regimen to better control blood pressure, particularly in the morning when it is elevated.\n\nNote: No specific medical orders or drug recommendations are required at this time.",
+          "zh": "主觀（S）：\n患者張先生報告近期他的血壓持續偏高，即使規律服藥，早上仍達到160毫米汞柱以上。他提到自己攝取的鹽分比建議量多，並且偶有頭暈現象。\n\n客觀（O）：\n本次就診未測量血壓；然而，患者報告過去早晨有高血壓的讀數。其他無其他客觀發現。\n\n評估（A）：\n患者患有原發性高血壓（ICD-10代碼：I10）。他還報告偶有頭暈現象，這與高血壓相符（ICD-10代碼：R42）。\n\n計畫（P）：\n1. 要求患者嚴格遵循低鈉飲食，減少總體鹽攝取量。\n2. 推薦根據耐受情況增加運動量。\n3. 指導患者每日監測血壓並記錄讀數以供隨後就診時跟蹤。\n4. 考慮調整目前的降血壓藥物方案，特別是在早晨血壓偏高的情況下更好地控制血壓。\n\n注意：目前無需特定的醫學指示或藥物建議。"
+        }
+      }
+    ]
+  },
+  "qwen2.5:3b": {
+    "results": [
+      {
+        "name": "胸痛",
+        "file": "static/chest_pain.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+        "transcribe_time": 0,
+        "llm_time": 12.9,
+        "total_time": 12.9,
+        "symptoms": [
+          "ECG",
+          "fever",
+          "cough",
+          "chest",
+          "heart",
+          "dyspnea",
+          "咳嗽",
+          "發燒"
+        ],
+        "icd10_codes": [
+          {
+            "code": "R05",
+            "description": "Cough",
+            "confidence": 0.9
+          },
+          {
+            "code": "R50.9",
+            "description": "Fever, unspecified",
+            "confidence": 0.9
+          },
+          {
+            "code": "R06.02",
+            "description": "Shortness of breath",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [
+          "胸部X光",
+          "祛痰劑",
+          "氧气治疗",
+          "多喝水",
+          "止咳藥物"
+        ],
+        "drug_recommendations": [
+          {
+            "name": "咳特靈",
+            "dosage": "1# 3次/日",
+            "category": "止咳"
+          },
+          {
+            "name": "普拿疼",
+            "dosage": "500mg 3次/日",
+            "category": "退燒"
+          }
+        ],
+        "soap": {
+          "en": "**SOAP Note**\n\n**S - Subjective:**  \nThe patient reports that he has been experiencing chest tightness and difficulty breathing for about two days. He did not have a fever or cough, but noticed shortness of breath when walking faster. The patient denies any history of heart disease. However, he has smoked for approximately ten years.\n\n**O - Objective:**  \n- Vital signs: Blood pressure 120/80 mmHgofs, Heart rate 75 bpm, Respiratory rate 16 breaths per minute.\n- Physical examination findings:\n    - Auscultation of lungs reveals no wheezing or crackles.\n    - Cardiac auscultation is normal without murmurs or gallops.\n    - Chest X-ray shows no significant abnormalities.\n    - Electrocardiogram (ECG) results pending.\n\n**A - Assessment:**  \n- The patient presents with symptoms consistent with respiratory distress, specifically shortness of breath and chest tightness. Given his smoking history, these symptoms could be related to chronic obstructive pulmonary disease (COPD), but a definitive diagnosis requires further evaluation.\n- He does not have any significant medical history that would exclude the possibility of heart-related issues.\n\n**P - Plan:**  \n1. Chest X-ray: To evaluate for any structural abnormalities in theofs lungs or other thoracic structures.\n2. ECG: To assess for any cardiac arrhythmias or ischemicurret on the patient's cardiovascular, or, hisof on your name (ECG) is recommended to investigate,\n3. Follow-up with a pulpos on the patient's heart (EC) is recommended to determine if his condition.\n4. Recommend:\n    - Ongoing monitoring of respiratory and activity tolerance.\n    - Presong on the patient's medication (water): Increase fluid intake, as dehydration can exacerbment on the patient's symptoms.\n    - Oxygen therapy: To ensure adequate oxygenation.\n    - Pharmacologic management with cough suppressants (Cough Suppressant) to alleviate his discomfort.\n5. Order:\n    - Chest X-ray\n    - O2 Therapy\n    - Increased Fluid Intake\n    - Cough Suppressant (Cough Suppressant)\n6. Follow-up: Schedule a follow-up appointment in one week for further evaluation and management.\n\n**Recommended MedicalOccurred on the patient's medication (water): Increase fluid intake, as dehydration is a common issue.\n- Oxygen Therapy: To ensure adequate oxygen, if needed.\n- Pharmacologic Management: Cough Suppressant (Cough Suppressant)\n- Follow-up Appointment: In one week.",
+          "zh": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了十年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張"
+        }
+      },
+      {
+        "name": "高血壓",
+        "file": "static/hypertension.wav",
+        "model": "qwen2.5:3b",
+        "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+        "transcribe_time": 0,
+        "llm_time": 25.21,
+        "total_time": 25.21,
+        "symptoms": [
+          "hypertension",
+          "blood pressure measurement",
+          "dizziness",
+          "heart",
+          "kidney"
+        ],
+        "icd10_codes": [
+          {
+            "code": "I10",
+            "description": "Essential (primary) hypertension",
+            "confidence": 0.9
+          },
+          {
+            "code": "R42",
+            "description": "Dizziness and giddiness",
+            "confidence": 0.85
+          }
+        ],
+        "medical_orders": [],
+        "drug_recommendations": [],
+        "soap": {
+          "en": "**SOAP Note**\n\n**S - Subjective:**  \nPatient, Mr. Zhang, reports that his blood pressure control has been challenging recently. He mentions that his blood pressure is still quite high in the morning, often reaching over 160/90 mmHg. He states he takes his medication as prescribed but wonders if he needs to modify his diet, particularly regarding salt intake. Mr. Zhang also notes experiencing occasional dizziness and asks whether this could be related to his elevated blood pressure.\n\n**O - Objective:**  \nMr. Zhang is a 58-year-old male who presents with no acute complaints other than hypertension. His vital signs are stable at presentation. He appears alert and overhead, but he does report some dizziness when standing up quickly from a seated position. His skin is of normal coloration without any visible edema or pallor. His blood pressure was measured in the clinic setting (160/95 mmHg) with his usual antihypertensive medication already administered.\n\n**也不例外，他提到自己在日常饮食中使用较多的盐分。**\n\n**A - Assessment:**  \nMr. Zhang has primary essential hypertension, characterized by persistently elevated blood pressure despite the use of prescribed medications and dietary modifications. His dizziness is likely due to his high blood pressure. Mr. Zhang also reports occasional episodes of dizziness that may be related to his hypertension.\n\n**P - Plan:**\n1. Continue current antihypertensive medication regimen as per prescription.\n2. Advise patient on lifestyle modifications including reduced salt intake and increased physical activity.\n3. Monitor blood pressure at home日内血压控制在家中记录下来。\n4. Refer the patient for a follow-up appointment in 4 weeks to reassess his blood pressure control and discuss any additional interventions if necessary kostenlose_simps\ni的p症状1vsvidity世界ml袢iofs SELECTsppingsprpingsprprfrprprptinsrprtsipprprscprprtfprtfprprpprprtfprtfprtfprprprprpprspprprtfprtfprtfprtfprtfprprprprtfprtfprtfprtfprprprprtfprtfprpprpprtfprtfprtfprtfprpprvsmmprprtfprtfprmprpprtfprtfprtfprtfofsipprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfofsipprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfkaarfrvptiurjdpbqenmopkscwftnksdmtkshpmdtakmaghxhpxsypfppzmbxkqoaxrpsydfkqmpstftrknsyofsipprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfprtfpr overhead, but he does notOccurred with no visible symptoms of kidney or heart disease. He has a history of hypertension and is on the recommended medications for铉首s血压控制良好。他没有出现肾脏或心脏疾病的症状。\n3. Refer to a dietitian for further dietary advice.\n4. Schedule an appointment in 4 weeks for reassessment.\n\n**Referred to Dietitians for additional nutrition guidance and follow-up in 4 weeks.**\n\n**Diagnosis:**  \n- Hypertension (essential, primary)  \n- Dizziness and giddiness\n\n**Medications:**  \n- [Prescription Medications]  \n- [Antihypertensive medications]\n\n**Referred to Dietitians for additional nutrition guidance and follow-up in 4 weeks.**\n\n**Referred to Dietitians for additional nutrition advice and follow-up in 4 weeks.**",
+          "zh": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來"
+        }
+      }
+    ]
+  }
+}

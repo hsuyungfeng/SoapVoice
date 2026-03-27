@@ -18,6 +18,8 @@ from src.api.websocket import router as websocket_router
 from src.api.rest import router as rest_router
 from src.api.consultation_api import router as consultation_router
 from src.api.extended_api import router as extended_router
+from src.api.webhook_api import router as webhook_router
+from src.api.file_monitor_api import router as file_monitor_router
 from src.llm.ollama_engine import initialize_engine, ModelConfig
 
 
@@ -99,6 +101,8 @@ app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
 app.include_router(rest_router, prefix="/api/v1", tags=["Clinical NLP"])
 app.include_router(consultation_router, prefix="/api/v1", tags=["Consultation Flow"])
 app.include_router(extended_router, prefix="/api/v1", tags=["Extended Pipeline"])
+app.include_router(webhook_router, tags=["Webhooks"])
+app.include_router(file_monitor_router, tags=["File Monitor"])
 
 
 @app.get("/")

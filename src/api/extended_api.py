@@ -4,6 +4,7 @@
 提供完整 Pipeline：語音轉錄 → 症狀提取 → ICD-10 → 醫囑 → 藥物 → SOAP
 """
 
+import asyncio
 import logging
 import time
 from typing import Optional, Dict, Any, List
@@ -17,15 +18,22 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/extended", tags=["Extended Pipeline"])
 
 _extended_engine = None
+_engine_lock = asyncio.Lock()
 
 
-def get_extended_engine():
-    """取得擴展引擎"""
+async def get_extended_engine():
+    """取得擴展引擎（非同步安全）"""
     global _extended_engine
     if _extended_engine is None:
-        from scripts.extended_soapvoice import ExtendedSoapVoiceEngine
+        async with _engine_lock:
+            if _extended_engine is None:
+                from scripts.extended_soapvoice import ExtendedSoapVoiceEngine
 
-        _extended_engine = ExtendedSoapVoiceEngine(whisper_model="medium", llm_model="qwen2.5:14b")
+                logger.info("Initializing ExtendedSoapVoiceEngine...")
+                _extended_engine = ExtendedSoapVoiceEngine(
+                    whisper_model="medium", llm_model="qwen2.5:14b"
+                )
+                logger.info("ExtendedSoapVoiceEngine initialized")
     return _extended_engine
 
 
@@ -33,6 +41,7 @@ class ExtendedProcessRequest(BaseModel):
     """擴展處理請求"""
 
     transcript: str = Field(..., description="醫療對話文字")
+    model: Optional[str] = Field("qwen2.5:14b", description="LLM 模型名稱")
     include_symptoms: bool = Field(True, description="包含症狀提取")
     include_icd10: bool = Field(True, description="包含 ICD-10 分類")
     include_orders: bool = Field(True, description="包含醫囑建議")
@@ -67,39 +76,44 @@ async def extended_process(request: ExtendedProcessRequest):
     """
     start = time.time()
 
-    engine = get_extended_engine()
+    engine = await get_extended_engine()
 
     try:
-        # 症狀提取
+        # 症狀提取（阻塞操作，在執行緒池中執行）
         symptoms = []
         if request.include_symptoms:
-            symptoms = engine.extract_symptoms(request.transcript)
+            symptoms = await asyncio.to_thread(engine.extract_symptoms, request.transcript)
 
         # ICD-10 分類
         icd10_codes = []
         if request.include_icd10:
-            icd10_codes = engine.classify_icd10(request.transcript)
+            icd10_codes = await asyncio.to_thread(engine.classify_icd10, request.transcript)
 
         # 醫囑建議
         medical_orders = []
         if request.include_orders:
-            medical_orders = engine.get_medical_orders(symptoms, [c["code"] for c in icd10_codes])
+            medical_orders = await asyncio.to_thread(
+                engine.get_medical_orders, symptoms, [c["code"] for c in icd10_codes]
+            )
 
         # 藥物建議
         drug_recommendations = []
         if request.include_drugs:
-            drug_recommendations = engine.get_drug_recommendations(
-                symptoms, [c["code"] for c in icd10_codes]
+            drug_recommendations = await asyncio.to_thread(
+                engine.get_drug_recommendations, symptoms, [c["code"] for c in icd10_codes]
             )
 
-        # 生成 SOAP
-        soap_result = engine.generate_extended_soap(
+        # 生成 SOAP（阻塞操作）- 使用請求中的模型
+        if request.model:
+            engine.llm_model = request.model
+        soap_result = await asyncio.to_thread(
+            engine.generate_extended_soap,
             request.transcript,
             symptoms,
             icd10_codes,
             medical_orders,
             drug_recommendations,
-            output_lang=request.output_lang,
+            request.output_lang,
         )
 
         processing_time = time.time() - start
@@ -127,7 +141,7 @@ async def transcribe_audio(audio: UploadFile = File(...)):
 
     上傳音訊檔案，輸出轉錄結果
     """
-    engine = get_extended_engine()
+    engine = await get_extended_engine()
 
     # 保存上傳的檔案
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
@@ -136,11 +150,13 @@ async def transcribe_audio(audio: UploadFile = File(...)):
         tmp_path = tmp.name
 
     try:
-        transcript = engine.transcribe(tmp_path)
+        # 阻塞的 Whisper 轉錄，在執行緒池中執行
+        transcript = await asyncio.to_thread(engine.transcribe, tmp_path)
         return {
             "transcript": transcript,
             "language": "zh",
             "model": engine.whisper_model or "whisper-medium",
+            "processing_time": 0,
         }
     finally:
         os.unlink(tmp_path)
@@ -149,34 +165,34 @@ async def transcribe_audio(audio: UploadFile = File(...)):
 @router.get("/symptoms/{text}")
 async def extract_symptoms(text: str):
     """症狀提取"""
-    engine = get_extended_engine()
-    symptoms = engine.extract_symptoms(text)
+    engine = await get_extended_engine()
+    symptoms = await asyncio.to_thread(engine.extract_symptoms, text)
     return {"symptoms": symptoms}
 
 
 @router.get("/icd10/{text}")
 async def classify_icd10(text: str):
     """ICD-10 分類"""
-    engine = get_extended_engine()
-    icd10_codes = engine.classify_icd10(text)
+    engine = await get_extended_engine()
+    icd10_codes = await asyncio.to_thread(engine.classify_icd10, text)
     return {"icd10_codes": icd10_codes}
 
 
 @router.get("/orders")
 async def get_orders(symptoms: str, icd10_codes: str):
     """醫囑建議"""
-    engine = get_extended_engine()
+    engine = await get_extended_engine()
     symptoms_list = symptoms.split(",")
     icd_list = icd10_codes.split(",")
-    orders = engine.get_medical_orders(symptoms_list, icd_list)
+    orders = await asyncio.to_thread(engine.get_medical_orders, symptoms_list, icd_list)
     return {"medical_orders": orders}
 
 
 @router.get("/drugs")
 async def get_drugs(symptoms: str, icd10_codes: str):
     """藥物建議"""
-    engine = get_extended_engine()
+    engine = await get_extended_engine()
     symptoms_list = symptoms.split(",")
     icd_list = icd10_codes.split(",")
-    drugs = engine.get_drug_recommendations(symptoms_list, icd_list)
+    drugs = await asyncio.to_thread(engine.get_drug_recommendations, symptoms_list, icd_list)
     return {"drug_recommendations": drugs}
