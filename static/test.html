@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoapVoice - SOAP 病歷測試</title>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { max-width: 800px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #eee; }
+        h1 { text-align: center; color: #00d9ff; margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; }
+        textarea { 
+            width: 100%; height: 100px; padding: 12px; 
+            border: 1px solid #333; border-radius: 8px; 
+            background: #16213e; color: #fff; font-size: 16px;
+        }
+        select {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #333; border-radius: 8px;
+            background: #16213e; color: #fff; font-size: 14px;
+        }
+        button {
+            width: 100%; padding: 14px; background: #00d9ff;
+            border: none; border-radius: 8px; color: #1a1a2e;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #00a8cc; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        
+        .result { 
+            margin-top: 20px; padding: 20px; 
+            background: #16213e; border-radius: 12px; 
+            border: 1px solid #333;
+        }
+        .result h3 { color: #00d9ff; margin-bottom: 15px; }
+        .section { margin-bottom: 15px; padding: 12px; background: #0f3460; border-radius: 8px; }
+        .section-label { color: #00d9ff; font-weight: bold; margin-bottom: 5px; }
+        .section-content { color: #ccc; white-space: pre-wrap; line-height: 1.5; }
+        
+        .loading { text-align: center; color: #00d9ff; padding: 20px; }
+        .error { color: #ff6b6b; padding: 15px; background: #2d1b1b; border-radius: 8px; }
+        .history { margin-top: 30px; }
+        .history-item { 
+            padding: 10px; margin-bottom: 10px; 
+            background: #16213e; border-radius: 8px; border-left: 3px solid #00d9ff;
+        }
+        .history-input { color: #888; font-size: 12px; }
+        .history-output { color: #ccc; margin-top: 5px; }
+        
+        .auto-mode {
+            display: none; padding: 15px; background: #1a472a;
+            border-radius: 8px; margin-bottom: 15px;
+        }
+        .auto-mode.active { display: block; }
+    </style>
+</head>
+<body>
+    <h1>🏥 SoapVoice - SOAP 病歷測試</h1>
+    
+    <div class="input-group">
+        <label>選擇模型 (預設 qwen2.5:7b):</label>
+        <select id="modelSelect">
+            <option value="qwen2.5:7b">qwen2.5:7b (推薦 - 完整)</option>
+            <option value="qwen2.5:3b">qwen2.5:3b (快速 - 輕量)</option>
+        </select>
+        
+        <label>輸入對話文字:</label>
+        <textarea id="inputText" placeholder="例如：患者主訴心悸、胸悶兩個禮拜，晚上睡不好覺，有時呼吸喘。醫師問診後建議做心電圖檢查。"></textarea>
+        
+        <button id="submitBtn" onclick="generateSOAP()">生成 SOAP 病歷</button>
+    </div>
+    
+    <div id="result" class="result" style="display: none;"></div>
+    
+    <div class="history">
+        <h3 style="color: #00d9ff;">📜 歷史記錄</h3>
+        <div id="historyList"></div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://' + window.location.host;
+        
+        async function generateSOAP() {
+            const input = document.getElementById('inputText').value.trim();
+            const model = document.getElementById('modelSelect').value;
+            const resultDiv = document.getElementById('result');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!input) {
+                alert('請輸入對話文字');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '生成中...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">正在生成 SOAP 病歷...</div>';
+            
+            try {
+                const response = await fetch(API_URL + '/api/v1/clinical/soap/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transcript: input, model: model })
+                });
+                
+                if (!response.ok) throw new Error('API 請求失敗');
+                
+                const data = await response.json();
+                displayResult(data, input);
+                
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">錯誤: ' + error.message + '</div>';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '生成 SOAP 病歷';
+            }
+        }
+        
+        function displayResult(data, input) {
+            const soap = data.soap;
+            const time = data.processing_time_ms;
+            const model = data.metadata.model_version;
+            
+            let html = `
+                <h3>📋 SOAP 病歷 (${time}ms | ${model})</h3>
+                <div class="section">
+                    <div class="section-label">S - 主訴 (Subjective)</div>
+                    <div class="section-content">${soap.subjective || '(無)'}</div>
+                </div>
+                <div class="section">
+                    <div class="section-label">O - 客觀發現 (Objective)</div>
+                    <div class="section-content">${soap.objective || '(無)'}</div>
+                </div>
+                <div class="section">
+                    <div class="section-label">A - 評估診斷 (Assessment)</div>
+                    <div class="section-content">${soap.assessment || '(無)'}</div>
+                </div>
+                <div class="section">
+                    <div class="section-label">P - 計畫 (Plan)</div>
+                    <div class="section-content">${soap.plan || '(無)'}</div>
+                </div>
+                <div class="section">
+                    <div class="section-label">📝 對話摘要</div>
+                    <div class="section-content">${soap.conversation_summary || '(無)'}</div>
+                </div>
+            `;
+            
+            if (data.metadata.normalized_terms && data.metadata.normalized_terms.length > 0) {
+                html += '<div class="section"><div class="section-label">🔑 術語標準化</div><div class="section-content">';
+                data.metadata.normalized_terms.forEach(term => {
+                    html += `• ${term.original} → ${term.standard}<br>`;
+                });
+                html += '</div></div>';
+            }
+            
+            document.getElementById('result').innerHTML = html;
+            addToHistory(input, soap);
+        }
+        
+        function addToHistory(input, soap) {
+            const historyList = document.getElementById('historyList');
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div class="history-input">輸入: ${input.substring(0, 50)}...</div>
+                <div class="history-output">
+                    <strong>S:</strong> ${(soap.subjective || '').substring(0, 80)}...<br>
+                    <strong>A:</strong> ${(soap.assessment || '').substring(0, 80)}...
+                </div>
+            `;
+            historyList.insertBefore(item, historyList.firstChild);
+            
+            if (historyList.children.length > 10) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+        
+        // Enter key to submit
+        document.getElementById('inputText').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateSOAP();
+            }
+        });
+    </script>
+</body>
+</html>

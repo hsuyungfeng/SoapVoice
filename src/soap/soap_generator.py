@@ -284,7 +284,6 @@ class SOAPGenerator:
             if chief_complaint:
                 context_str += f"Chief Complaint: {chief_complaint}\n"
 
-        # 術語標準化提示段落（各區段明確控制換行）
         sections: list[str] = []
         if context_str:
             sections.append(context_str.rstrip("\n"))
@@ -294,12 +293,11 @@ class SOAPGenerator:
         if icd10_candidates:
             sections.append(f"ICD-10 Candidates: {', '.join(icd10_candidates)}")
 
-        # RAG 病例範本段落
         if case_templates:
             template_lines = []
             for idx, template in enumerate(case_templates, 1):
                 specialty = template.get("specialty", "一般")
-                content = template.get("content", "")[:200]  # 限制長度
+                content = template.get("content", "")[:200]
                 similarity = template.get("similarity", 0)
                 template_lines.append(
                     f"  [{idx}] {specialty} (相似度: {similarity})\n    {content}..."
@@ -307,39 +305,18 @@ class SOAPGenerator:
             sections.append("參考病例範本:\n" + "\n".join(template_lines))
 
         header = "\n\n".join(sections) + "\n\n" if sections else ""
-
-        # 若有標準化文字，優先提供給 LLM；否則使用原始文字
         transcript_for_llm = normalized_text if normalized_text else transcript
 
-        prompt = f"""You are an advanced medical documentation assistant. Convert the following clinician-patient conversation into a structured SOAP note.
+        prompt = f"""你是專業的醫療記錄助理。請將醫師與病患的語音記錄轉換成 SOAP 病歷。
 
-{header}Conversation Transcript:
-{transcript_for_llm}
+對話：{transcript_for_llm}
 
-Rules:
-- Correct transcription errors and remove filler words
-- Use the pre-identified medical terms and ICD-10 candidates above when applicable
-- Apply keyword-based S/O/A/P classification
-- Subjective section must be ≤{self.config.max_subjective_length} characters
-- Omit Plan section if no plan mentioned
-- Add Traditional Chinese conversation summary (3-5 sentences)
-- Output only the structured SOAP and summary
-
-Output format:
-S:
-[Subjective - English, ≤{self.config.max_subjective_length} chars]
-
-O:
-[Objective findings - English]
-
-A:
-[Assessment + ICD-10 codes]
-
-P:
-[Plan - omit if empty]
-
-CONVERSATION_SUMMARY:
-[3-5 sentences in Traditional Chinese]
+格式（嚴格按照輸出）：
+S: [主訴-英文專業醫療用語]
+O: [客觀發現-英文]
+A: [評估診斷含ICD-10代碼-英文]
+P: [計畫-英文]
+CONVERSATION_SUMMARY: [繁體中文摘要3-5句話]
 """
         return prompt
 
@@ -444,6 +421,14 @@ CONVERSATION_SUMMARY:
         }
 
         lines = response.strip().split("\n")
+        soap = {
+            "subjective": "",
+            "objective": "",
+            "assessment": "",
+            "plan": "",
+            "conversation_summary": "",
+            "raw_response": response,
+        }
         current_section = None
 
         for line in lines:
@@ -451,20 +436,36 @@ CONVERSATION_SUMMARY:
             if not line_stripped:
                 continue
 
-            if line_stripped.startswith("S:"):
+            line_upper = line_stripped.upper()
+
+            if line_upper.startswith("S:") or line_upper.startswith("S："):
                 current_section = "subjective"
-            elif line_stripped.startswith("O:"):
+                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
+                if content:
+                    soap[current_section] += content + "\n"
+            elif line_upper.startswith("O:") or line_upper.startswith("O："):
                 current_section = "objective"
-            elif line_stripped.startswith("A:"):
+                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
+                if content:
+                    soap[current_section] += content + "\n"
+            elif line_upper.startswith("A:") or line_upper.startswith("A："):
                 current_section = "assessment"
-            elif line_stripped.startswith("P:"):
+                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
+                if content:
+                    soap[current_section] += content + "\n"
+            elif line_upper.startswith("P:") or line_upper.startswith("P："):
                 current_section = "plan"
-            elif line_stripped.startswith("CONVERSATION_SUMMARY:"):
+                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
+                if content:
+                    soap[current_section] += content + "\n"
+            elif "CONVERSATION_SUMMARY" in line_upper:
                 current_section = "conversation_summary"
+                content = line_stripped.split(":", 1)[1].strip() if ":" in line_stripped else ""
+                if content:
+                    soap[current_section] += content + "\n"
             elif current_section:
                 soap[current_section] += line_stripped + "\n"
 
-        # 清理多餘空白
         for key in soap:
             soap[key] = soap[key].strip()
 

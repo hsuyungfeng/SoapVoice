@@ -48,13 +48,22 @@ Dockerfile
 *.swo
 *~
 
-# Model cache (keep small test files, ignore large models)
-models/*.gguf
+# Models - large files
+models/
+*.gguf
 models/whisper/
 models/.cache/
 *.pth
 *.bin
 *.onnx
+
+# Large data
+data/local_db/
+data/rag/
+data/recordings/
+
+# Large test files
+static/*.wav
 
 # OS
 .DS_Store

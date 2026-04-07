@@ -19,7 +19,7 @@ FILES = [
     ("doctor_patient.wav", "醫病對話"),
 ]
 
-MODEL = "qwen2.5:14b"
+MODEL = "qwen2.5:7b"
 OUTPUT_FILE = RESULTS_DIR / f"{MODEL.replace(':', '_')}_results_new.json"
 
 results = []

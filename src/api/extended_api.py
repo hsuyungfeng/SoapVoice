@@ -31,7 +31,7 @@ async def get_extended_engine():
 
                 logger.info("Initializing ExtendedSoapVoiceEngine...")
                 _extended_engine = ExtendedSoapVoiceEngine(
-                    whisper_model="medium", llm_model="qwen2.5:14b"
+                    whisper_model="medium", llm_model="qwen2.5:7b"
                 )
                 logger.info("ExtendedSoapVoiceEngine initialized")
     return _extended_engine
@@ -41,7 +41,7 @@ class ExtendedProcessRequest(BaseModel):
     """擴展處理請求"""
 
     transcript: str = Field(..., description="醫療對話文字")
-    model: Optional[str] = Field("qwen2.5:14b", description="LLM 模型名稱")
+    model: Optional[str] = Field("qwen2.5:7b", description="LLM 模型名稱")
     include_symptoms: bool = Field(True, description="包含症狀提取")
     include_icd10: bool = Field(True, description="包含 ICD-10 分類")
     include_orders: bool = Field(True, description="包含醫囑建議")

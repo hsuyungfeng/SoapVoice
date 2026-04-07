@@ -7,7 +7,7 @@ from datetime import datetime
 
 RESULTS_DIR = Path("/home/hsu/Desktop/SoapVoice/tests/fixtures/results")
 
-MODELS = ["qwen2.5:3b", "qwen2.5:7b", "qwen2.5:14b"]
+MODELS = ["qwen2.5:3b", "qwen2.5:7b"]
 
 AUDIO_FILES = [
     ("chest_pain.wav", "胸痛"),
@@ -122,7 +122,7 @@ def main():
 
 ## 測試配置
 
-- **模型**: qwen2.5:3b, qwen2.5:7b, qwen2.5:14b
+- **模型**: qwen2.5:3b, qwen2.5:7b
 - **音檔數量**: 8 個
 - **測試環境**: Ollama + GPU (RTX 2080 Ti)
 - **測試總數**: {len(results)} 筆

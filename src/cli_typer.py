@@ -334,8 +334,7 @@ def models():
     table.add_column("說明", style="white")
 
     # Ollama 模型
-    table.add_row("qwen2.5:14b", "Ollama", "大型模型，準確度高")
-    table.add_row("qwen2.5:7b", "Ollama", "平衡模型，推薦使用")
+    table.add_row("qwen2.5:7b", "Ollama", "中型模型，平衡準確度與速度")
     table.add_row("qwen2.5:3b", "Ollama", "快速模型，資源需求低")
 
     # llama.cpp

@@ -265,7 +265,7 @@ def main():
     )
 
     parser.add_argument(
-        "--model", default="qwen2.5:14b", help="指定使用的 Ollama 模型 (預設: qwen2.5:14b)"
+        "--model", default="qwen2.5:7b", help="指定使用的 Ollama 模型 (預設: qwen2.5:7b)"
     )
 
     parser.add_argument(

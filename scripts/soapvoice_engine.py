@@ -22,7 +22,7 @@ class SoapVoiceEngine:
         self,
         compute_mode: ComputeMode = ComputeMode.GPU,
         whisper_model: str = "medium",
-        llm_model: str = "qwen2.5:14b",
+        llm_model: str = "qwen2.5:7b",
         ollama_url: str = "http://localhost:11434",
     ):
         self.compute_mode = compute_mode
@@ -152,7 +152,7 @@ def cpu_mode_demo():
     engine = SoapVoiceEngine(
         compute_mode=ComputeMode.CPU,
         whisper_model="medium",
-        llm_model="qwen2.5:14b",
+        llm_model="qwen2.5:7b",
     )
 
     result = engine.process(
@@ -172,7 +172,7 @@ def gpu_mode_demo():
     engine = SoapVoiceEngine(
         compute_mode=ComputeMode.GPU,
         whisper_model="medium",
-        llm_model="qwen2.5:14b",
+        llm_model="qwen2.5:7b",
     )
 
     result = engine.process(

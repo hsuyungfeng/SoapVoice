@@ -3,839 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoapVoice - 醫療語音轉 SOAP 病歷</title>
+    <title>SoapVoice - 醫療 SOAP 病歷系統</title>
+    <meta http-equiv="refresh" content="30">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { max-width: 900px; margin: 0 auto; padding: 20px; background: #0f0f23; color: #eee; }
+        h1 { text-align: center; color: #00d9ff; margin-bottom: 15px; font-size: 1.8em; }
+        
+        .status { color: #00ff88; font-size: 12px; margin-bottom: 15px; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #888; font-size: 14px; }
+        
+        select {
+            width: 100%; padding: 12px; margin-bottom: 10px;
+            border: 1px solid #333; border-radius: 8px;
+            background: #1a1a3e; color: #fff; font-size: 14px;
         }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        
-        .recorder {
-            text-align: center;
-        }
+        .btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
         
         .record-btn {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: none;
-            background: #e74c3c;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+            flex: 1; padding: 20px; 
+            background: #ff4757;
+            border: none; border-radius: 12px; color: #fff;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .record-btn:hover { background: #ff6b7a; }
+        .record-btn.recording { background: #ff0000; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .process-btn {
+            flex: 1; padding: 20px; 
+            background: #00d9ff;
+            border: none; border-radius: 12px; color: #0f0f23;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+        }
+        .process-btn:hover { background: #00a8cc; }
+        .process-btn:disabled { background: #555; cursor: not-allowed; }
+        
+        textarea { 
+            width: 100%; height: 100px; padding: 12px; 
+            border: 1px solid #333; border-radius: 8px; 
+            background: #1a1a3e; color: #fff; font-size: 14px;
         }
         
-        .record-btn:hover {
-            transform: scale(1.05);
+        .result { margin-top: 20px; }
+        
+        .stats { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .stat { 
+            padding: 8px 12px; background: #1a1a3e; 
+            border-radius: 8px; font-size: 12px; color: #00d9ff;
         }
         
-        .record-btn.recording {
-            background: #c0392b;
-            animation: pulse 1.5s infinite;
-        }
+        .section { margin-bottom: 12px; padding: 12px; background: #1a1a3e; border-radius: 8px; }
+        .section-title { color: #00d9ff; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
         
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(231, 76, 60, 0); }
-        }
-        
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        .status.waiting {
-            background: #f8f9fa;
-            color: #6c757d;
-        }
-        
-        .status.recording {
-            background: #ffeaa7;
-            color: #d63031;
-        }
-        
-        .status.processing {
-            background: #74b9ff;
-            color: #0984e3;
-        }
-        
-        .transcript {
-            min-height: 100px;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        
-        .results {
-            display: none;
-        }
-        
-        .results.visible {
-            display: block;
-        }
-        
-        .section {
-            margin-bottom: 20px;
-        }
-        
-        .section h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #667eea;
-        }
-        
-        .soap-note {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            white-space: pre-wrap;
-            font-family: "Courier New", monospace;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
+        .tags { display: flex; flex-wrap: wrap; gap: 5px; }
         .tag {
-            background: #667eea;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 4px 10px; background: #2d2d5a;
+            border-radius: 15px; font-size: 12px; color: #aaa;
         }
         
-        .drug-list, .order-list {
-            list-style: none;
-            padding: 0;
-        }
+        .soap-note { background: #16213e; padding: 15px; border-radius: 8px; border: 1px solid #333; }
+        .soap-note h4 { color: #00d9ff; margin: 10px 0 5px 0; font-size: 13px; }
+        .soap-note p { margin: 0; color: #ccc; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
         
-        .drug-list li, .order-list li {
-            padding: 8px 12px;
-            background: #f8f9fa;
-            margin-bottom: 6px;
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-        }
+        .loading { text-align: center; color: #00d9ff; padding: 15px; }
+        .error { color: #ff6b6b; padding: 12px; background: #2d1b1b; border-radius: 8px; }
         
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
+        .auto-refresh { position: fixed; top: 10px; right: 10px; background: #1a1a3e; padding: 5px 10px; border-radius: 5px; font-size: 11px; color: #00ff88; }
         
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
+        .recording-indicator { display: none; text-align: center; padding: 10px; background: #ff4757; border-radius: 8px; margin-bottom: 10px; color: #fff; font-weight: bold; }
+        .recording-indicator.active { display: block; }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .audio-status { text-align: center; padding: 8px; color: #888; font-size: 12px; margin-bottom: 5px; }
         
-        .error {
-            background: #ffeaa7;
-            color: #c0392b;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
+        .test-audio { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
+        .test-audio h3 { color: #00d9ff; text-align: center; margin-bottom: 15px; font-size: 16px; }
+        .test-btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .test-btn {
+            padding: 15px 20px; background: #2d2d5a;
+            border: none; border-radius: 10px; color: #aaa;
+            font-size: 14px; cursor: pointer; transition: all 0.3s;
         }
-        
-        .test-files {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .test-files h4 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .file-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-        
-        .file-btn {
-            padding: 10px 12px;
-            background: white;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            color: #2c3e50;
-            transition: all 0.2s;
-            text-align: left;
-        }
-        
-        .file-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .file-btn.processing {
-            background: #f39c12;
-            border-color: #f39c12;
-            color: white;
-        }
-        
-        .file-btn.done {
-            background: #27ae60;
-            border-color: #27ae60;
-            color: white;
-        }
-        
-        .file-btn .filename {
-            font-weight: bold;
-            display: block;
-        }
-        
-        .file-btn .time {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-        
-        .or-divider {
-            text-align: center;
-            margin: 20px 0;
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .or-divider::before,
-        .or-divider::after {
-            content: "";
-            display: inline-block;
-            width: 40%;
-            height: 1px;
-            background: #dee2e6;
-            vertical-align: middle;
-        }
-        
-        .or-divider span {
-            padding: 0 10px;
-        }
-        
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-        
-        .results-table th,
-        .results-table td {
-            border: 1px solid #dee2e6;
-            padding: 8px;
-            text-align: left;
-        }
-        
-        .results-table th {
-            background: #667eea;
-            color: white;
-        }
-        
-        .results-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        
-        .model-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .model-14b { background: #9b59b6; color: white; }
-        .model-7b { background: #3498db; color: white; }
-        .model-3b { background: #1abc9c; color: white; }
+        .test-btn:hover { background: #3d3d7a; color: #fff; }
+        .test-btn.processing { background: #00d9ff; color: #0f0f23; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🩺 SoapVoice</h1>
+    <div class="auto-refresh">⏱️ Auto: 30s</div>
+    
+    <h1>🩺 SoapVoice</h1>
+    <div class="status">🟢 Online | Port: 8010</div>
+    
+    <div class="input-group">
+        <label>🤖 模型選擇:</label>
+        <select id="modelSelect">
+            <option value="qwen2.5:3b">qwen2.5:3b (快速)</option>
+            <option value="qwen2.5:7b">qwen2.5:7b (完整)</option>
+        </select>
         
-        <div class="card">
-            <div class="recorder">
-                <button id="recordBtn" class="record-btn">
-                    🎤 開始錄音
-                </button>
-                <div id="status" class="status waiting">
-                    點擊按鈕開始錄音
-                </div>
-                <div id="transcript" class="transcript" style="display: none;"></div>
-                
-                <div id="resultsTable" style="display: none;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
-                        <h4 style="color: #2c3e50;margin:0;">📊 處理結果</h4>
-                        <button onclick="clearAllResults()" style="padding:6px 12px;background:#e74c3c;color:white;border:none;border-radius:6px;cursor:pointer;">清除全部</button>
-                    </div>
-                    <table class="results-table" id="resultsTableContent">
-                        <thead>
-                            <tr>
-                                <th>檔案</th>
-                                <th>模型</th>
-                                <th>音頻<br>時間/大小</th>
-                                <th>轉譯</th>
-                                <th>LLM</th>
-                                <th>總時間</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                 
-                <div style="margin-top: 15px; text-align: center;">
-                    <label for="modelSelect" style="margin-right: 10px;">🤖 模型:</label>
-                    <select id="modelSelect" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
-                        <option value="qwen2.5:14b">qwen2.5:14b (推薦)</option>
-                        <option value="qwen2.5:7b">qwen2.5:7b (快速)</option>
-                        <option value="qwen2.5:3b">qwen2.5:3b (最小)</option>
-                    </select>
-                </div>
-                
-                <div class="or-divider"><span>或選擇測試音檔</span></div>
-                
-                <div class="test-files">
-                    <h4>📁 測試音檔 (點擊處理)</h4>
-                    <div class="file-grid" id="fileGrid"></div>
-                </div>
-            </div>
+        <div class="recording-indicator" id="recordingIndicator">🔴 錄音中... 點擊停止</div>
+        
+        <div class="btn-row">
+            <button class="record-btn" id="recordBtn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">🎤 開始錄音</button>
+            <button class="process-btn" id="processBtn" onclick="processText()">處理完成！</button>
         </div>
         
-        <div id="results" class="card results">
-            <div class="section">
-                <h3>📋 症狀分析</h3>
-                <div id="symptoms" class="tags"></div>
-            </div>
-            
-            <div class="section">
-                <h3>🏥 ICD-10 診斷</h3>
-                <div id="icd10"></div>
-            </div>
-            
-            <div class="section">
-                <h3>💊 藥物建議</h3>
-                <ul id="drugs" class="drug-list"></ul>
-            </div>
-            
-            <div class="section">
-                <h3>📝 醫囑</h3>
-                <ul id="orders" class="order-list"></ul>
-            </div>
-            
-            <div class="section">
-                <h3>📄 SOAP 病歷</h3>
-                <div id="soap" class="soap-note"></div>
-            </div>
-        </div>
+        <div class="audio-status" id="audioStatus">按住「開始錄音」按鈕說話</div>
         
-        <div id="loading" class="card loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>正在處理語音...</p>
-        </div>
-        
-        <div id="error" class="card error" style="display: none;"></div>
+        <textarea id="inputText" placeholder="錄音完成後會自動顯示文字，或手動輸入對話文字..."></textarea>
     </div>
-
+    
+    <div id="result" class="result" style="display: none;"></div>
+    
+    <!-- 測試音檔區塊 -->
+    <div class="test-audio">
+        <h3>📁 測試音檔 (點擊自動處理)</h3>
+        <div class="test-btn-row">
+            <button class="test-btn" onclick="runTestPipeline('static/hypertension.wav', this)">高血壓</button>
+            <button class="test-btn" onclick="runTestPipeline('static/chest_pain.wav', this)">胸痛</button>
+            <button class="test-btn" onclick="runTestPipeline('static/diabetes.wav', this)">糖尿病</button>
+            <button class="test-btn" onclick="runTestPipeline('static/wound_care.wav', this)">傷口護理</button>
+            <button class="test-btn" onclick="runTestPipeline('static/respiratory.wav', this)">呼吸道</button>
+            <button class="test-btn" onclick="runTestPipeline('static/drug_order.wav', this)">醫囑</button>
+            <button class="test-btn" onclick="runTestPipeline('static/surgery_record.wav', this)">手術記錄</button>
+            <button class="test-btn" onclick="runTestPipeline('static/doctor_patient.wav', this)">醫病對話</button>
+        </div>
+    </div>
+    
     <script>
-        const recordBtn = document.getElementById('recordBtn');
-        const status = document.getElementById('status');
-        const transcript = document.getElementById('transcript');
-        const results = document.getElementById('results');
-        const loading = document.getElementById('loading');
-        const errorDiv = document.getElementById('error');
-        const fileGrid = document.getElementById('fileGrid');
-        const resultsTable = document.getElementById('resultsTable');
-        const resultsTableBody = document.querySelector('#resultsTableContent tbody');
-        
-        const testFiles = [
-            { name: '胸痛', file: 'chest_pain.wav' },
-            { name: '高血壓', file: 'hypertension.wav' },
-            { name: '糖尿病', file: 'diabetes.wav' },
-            { name: '傷口護理', file: 'wound_care.wav' },
-            { name: '呼吸道', file: 'respiratory.wav' },
-            { name: '醫囑', file: 'drug_order.wav' },
-            { name: '手術記錄', file: 'surgery_record.wav' },
-            { name: '醫病對話', file: 'doctor_patient.wav' }
-        ];
-        
-        const STORAGE_KEY = 'soapvoice_results';
-        
-        function loadResults() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                return saved ? JSON.parse(saved) : [];
-            } catch (e) {
-                return [];
-            }
-        }
-        
-        function saveResults(results) {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
-            } catch (e) {
-                console.error('儲存失敗:', e);
-            }
-        }
-        
-        let processedResults = loadResults();
-        
-        function initFileButtons() {
-            fileGrid.innerHTML = testFiles.map((f, i) => `
-                <button class="file-btn" data-file="${f.file}" data-name="${f.name}" data-index="${i}">
-                    <span class="filename">${f.name}</span>
-                    <span class="time" id="time-${i}">點擊處理</span>
-                </button>
-            `).join('');
-            
-            fileGrid.querySelectorAll('.file-btn').forEach(btn => {
-                btn.addEventListener('click', () => processTestFile(btn));
-            });
-        }
-        
-        async function processTestFile(btn) {
-            const file = btn.dataset.file;
-            const name = btn.dataset.name;
-            const model = document.getElementById('modelSelect').value;
-            const index = btn.dataset.index;
-            
-            btn.classList.add('processing');
-            btn.querySelector('.time').textContent = '處理中...';
-            
-            try {
-                const response = await fetch('/static/' + file);
-                const blob = await response.blob();
-                
-                // 取得音頻資訊
-                const audioSize = (blob.size / 1024).toFixed(1) + ' KB';
-                let audioDuration = '?';
-                
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const arrayBuffer = await blob.arrayBuffer();
-                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                    audioDuration = audioBuffer.duration.toFixed(1);
-                    await audioContext.close();
-                } catch (e) {
-                    console.log('無法取得音頻長度:', e);
-                }
-                
-                const startTime = Date.now();
-                
-                const formData = new FormData();
-                formData.append('audio', blob, file);
-                
-                const transcribeRes = await fetch('/api/v1/extended/transcribe', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                let transcribeTime = 0;
-                let transcriptText = '';
-                
-                if (transcribeRes.ok) {
-                    const tData = await transcribeRes.json();
-                    transcriptText = tData.transcript || '';
-                    transcribeTime = ((Date.now() - startTime) / 1000).toFixed(2);
-                }
-                
-                if (!transcriptText) {
-                    throw new Error('轉譯失敗');
-                }
-                
-                const llmStartTime = Date.now();
-                const soapRes = await fetch('/api/v1/extended/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ transcript: transcriptText, model: model, output_lang: "en" })
-                });
-                
-                let soapData = {};
-                if (soapRes.ok) {
-                    soapData = await soapRes.json();
-                }
-                
-                const llmTime = ((Date.now() - llmStartTime) / 1000).toFixed(2);
-                const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
-                
-                const result = {
-                    name,
-                    file,
-                    model,
-                    model_used: model,
-                    audioDuration,
-                    audioSize,
-                    transcript: transcriptText,
-                    transcribeTime,
-                    llmTime,
-                    totalTime,
-                    asr_model: 'whisper',
-                    asr_time: transcribeTime,
-                    processing_time: totalTime,
-                    symptoms: soapData.symptoms || [],
-                    icd10_codes: soapData.icd10_codes || [],
-                    drug_recommendations: soapData.drug_recommendations || [],
-                    medical_orders: soapData.medical_orders || [],
-                    soap: soapData.soap || {}
-                };
-                
-                processedResults.push(result);
-                saveResults(processedResults);
-                updateResultsTable();
-                
-                btn.classList.remove('processing');
-                btn.classList.add('done');
-                btn.querySelector('.time').textContent = `${totalTime}秒`;
-                
-                displayResults(result);
-                
-            } catch (err) {
-                btn.classList.remove('processing');
-                btn.querySelector('.time').textContent = '錯誤';
-                showError(`處理 ${name} 失敗: ${err.message}`);
-            }
-        }
-        
-        function updateResultsTable() {
-            if (processedResults.length === 0) {
-                resultsTable.style.display = 'none';
-                return;
-            }
-            
-            resultsTable.style.display = 'block';
-            const modelClass = (m) => {
-                if (m.includes('14b')) return 'model-14b';
-                if (m.includes('7b')) return 'model-7b';
-                return 'model-3b';
-            };
-            
-            resultsTableBody.innerHTML = '';
-            processedResults.forEach((r, i) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${r.name}</td>
-                    <td><span class="model-tag ${modelClass(r.model)}">${r.model}</span></td>
-                    <td>${r.audioDuration || '?'}秒<br><small>${r.audioSize || '?'}</small></td>
-                    <td>${r.transcribeTime}秒</td>
-                    <td>${r.llmTime}秒</td>
-                    <td><strong>${r.totalTime}秒</strong></td>
-                    <td>
-                        <button class="view-btn" data-index="${i}" style="padding:4px 8px;cursor:pointer;margin-right:4px;">查看</button>
-                        <button class="delete-btn" data-index="${i}" style="padding:4px 8px;cursor:pointer;background:#e74c3c;color:white;border:none;border-radius:4px;">刪除</button>
-                    </td>
-                `;
-                resultsTableBody.appendChild(row);
-            });
-            
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const idx = parseInt(btn.dataset.index);
-                    viewResult(idx);
-                });
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const idx = parseInt(btn.dataset.index);
-                    deleteResult(idx);
-                });
-            });
-        }
-        
-        function deleteResult(index) {
-            if (confirm('確定要刪除這筆記錄嗎？')) {
-                processedResults.splice(index, 1);
-                saveResults(processedResults);
-                updateResultsTable();
-            }
-        }
-        
-        function clearAllResults() {
-            if (confirm('確定要清除所有記錄嗎？')) {
-                processedResults = [];
-                saveResults(processedResults);
-                updateResultsTable();
-                results.classList.remove('visible');
-            }
-        }
-        
-        function viewResult(index) {
-            displayResults(processedResults[index]);
-        }
-        
+        const API_URL = 'http://' + window.location.host;
         let mediaRecorder = null;
         let audioChunks = [];
-        let isRecording = false;
-        
-        recordBtn.addEventListener('click', async () => {
-            if (!isRecording) {
-                await startRecording();
-            } else {
-                stopRecording();
-            }
-        });
-        
-
         
         async function startRecording() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
                 
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
                 };
                 
                 mediaRecorder.onstop = async () => {
-                    await processAudio();
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    await transcribeAudio(audioBlob);
                     stream.getTracks().forEach(track => track.stop());
                 };
                 
-                // 開始錄音
-                mediaRecorder.start(500);
-                isRecording = true;
-                status.textContent = '正在錄音...';
-                status.className = 'status recording';
-                recordBtn.textContent = '⏹ 停止錄音';
-                recordBtn.classList.add('recording');
+                mediaRecorder.start();
+                document.getElementById('recordBtn').textContent = '⏹️ 停止錄音';
+                document.getElementById('recordBtn').classList.add('recording');
+                document.getElementById('recordingIndicator').classList.add('active');
+                document.getElementById('audioStatus').textContent = '錄音中...';
                 
             } catch (err) {
-                showError('無法訪問麥克風: ' + err.message);
+                alert('無法訪問麥克風: ' + err.message);
             }
         }
         
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                 mediaRecorder.stop();
+                document.getElementById('recordBtn').textContent = '🎤 開始錄音';
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('recordingIndicator').classList.remove('active');
+                document.getElementById('audioStatus').textContent = '處理中...';
             }
-            isRecording = false;
-            recordBtn.textContent = '🎤 開始錄音';
-            recordBtn.classList.remove('recording');
-            status.textContent = '錄音完成，正在處理...';
-            status.className = 'status processing';
         }
         
-        async function processAudio() {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        async function transcribeAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.wav');
             
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                const base64Audio = reader.result.split(',')[1];
-                
-                try {
-                    loading.style.display = 'block';
-                    results.classList.remove('visible');
-                    errorDiv.style.display = 'none';
-                    
-                    // 先轉譯音頻 - 使用 FormData
-                    const formData = new FormData();
-                    formData.append('audio', audioBlob, 'recording.webm');
-                    
-                    const transcribeStartTime = Date.now();
-                    const transcribeResponse = await fetch('/api/v1/extended/transcribe', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    let transcriptText = '';
-                    let asrModel = 'N/A';
-                    let transcribeTime = 0;
-                    
-                    if (transcribeResponse.ok) {
-                        const transcribeData = await transcribeResponse.json();
-                        transcriptText = transcribeData.transcript || '';
-                        asrModel = transcribeData.model || 'whisper';
-                        transcribeTime = ((Date.now() - transcribeStartTime) / 1000).toFixed(2);
-                        
-                        // 顯示轉譯稿
-                        transcript.style.display = 'block';
-                        transcript.innerHTML = `<strong>🎤 轉譯稿:</strong> ${transcriptText}<br><small style="color:#666;">🤖 ASR: ${asrModel} | ⏱️ 轉譯: ${transcribeTime}秒</small>`;
-                    }
-                    
-                    // 如果沒有轉譯文字，使用輸入框
-                    if (!transcriptText) {
-                        transcriptText = prompt('請輸入或說出您的不舒服症狀：') || '';
-                        transcript.style.display = 'block';
-                        transcript.textContent = transcriptText;
-                    }
-                    
-                    // 生成 SOAP - 傳遞 ASR 資訊
-                    if (transcriptText) {
-                        await generateSOAP(transcriptText, { asrModel, transcribeTime });
-                    } else {
-                        showError('無法識別語音，請輸入文字');
-                    }
-                    
-                } catch (err) {
-                    showError('處理失敗: ' + err.message);
-                } finally {
-                    loading.style.display = 'none';
-                }
-            };
-            reader.readAsDataURL(audioBlob);
-        }
-        
-        async function generateSOAP(text, asrInfo = null) {
-            if (!text) return;
-            
-            const selectedModel = document.getElementById('modelSelect').value;
-            const startTime = Date.now();
-            
-            loading.style.display = 'block';
-            results.classList.remove('visible');
-            errorDiv.style.display = 'none';
+            document.getElementById('audioStatus').textContent = '語音辨識中...';
             
             try {
-                const response = await fetch('/api/v1/extended/process', {
+                const response = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('轉錄失敗');
+                
+                const data = await response.json();
+                document.getElementById('inputText').value = data.transcript || '';
+                document.getElementById('audioStatus').textContent = '轉錄完成！點擊「處理完成」生成 SOAP';
+                
+            } catch (err) {
+                document.getElementById('audioStatus').textContent = '轉錄錯誤: ' + err.message;
+            }
+        }
+        
+        async function runTestPipeline(filename, btn) {
+            const model = document.getElementById('modelSelect').value;
+            const resultDiv = document.getElementById('result');
+            
+            // 顯示 loading
+            btn.classList.add('processing');
+            btn.textContent = '處理中...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">處理中: ' + filename + '</div>';
+            
+            try {
+                // 1. 上傳音檔轉錄
+                const audioResponse = await fetch(filename);
+                const audioBlob = await audioResponse.blob();
+                
+                const formData = new FormData();
+                formData.append('audio', audioBlob, filename.split('/').pop());
+                
+                const transcribeRes = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!transcribeRes.ok) throw new Error('轉錄失敗');
+                
+                const transcribeData = await transcribeRes.json();
+                const transcript = transcribeData.transcript;
+                document.getElementById('inputText').value = transcript;
+                
+                // 2. 處理 SOAP
+                const processRes = await fetch(API_URL + '/api/v1/extended/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        transcript: text,
-                        model: selectedModel
+                        transcript: transcript, 
+                        model: model,
+                        include_symptoms: true,
+                        include_icd10: true,
+                        include_orders: true,
+                        include_drugs: true
                     })
                 });
                 
-                if (!response.ok) {
-                    throw new Error('API 請求失敗');
-                }
+                if (!processRes.ok) throw new Error('處理失敗');
                 
-                const data = await response.json();
-                const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
-                const llmTime = (data.processing_time_ms ? data.processing_time_ms / 1000 : totalTime).toFixed(2);
-                
-                data.processing_time = totalTime;
-                data.llm_time = llmTime;
-                data.model_used = selectedModel;
-                data.asr_model = asrInfo?.asrModel || 'N/A';
-                data.asr_time = asrInfo?.transcribeTime || 0;
-                displayResults(data);
+                const processData = await processRes.json();
+                displayResult(processData, transcript);
                 
             } catch (err) {
-                showError('生成 SOAP 失敗: ' + err.message);
+                resultDiv.innerHTML = '<div class="error">錯誤: ' + err.message + '</div>';
             } finally {
-                loading.style.display = 'none';
+                btn.classList.remove('processing');
+                btn.textContent = filename.split('/').pop().replace('.wav', '');
             }
         }
         
-        function displayResults(data) {
-            results.classList.add('visible');
+        async function processText() {
+            const input = document.getElementById('inputText').value.trim();
+            const model = document.getElementById('modelSelect').value;
+            const resultDiv = document.getElementById('result');
+            const processBtn = document.getElementById('processBtn');
             
-            // 清除舊的 modelInfo（如果有多個）
-            const oldInfo = results.querySelector('.model-info');
-            if (oldInfo) oldInfo.remove();
+            if (!input) {
+                alert('請先錄音或輸入對話文字');
+                return;
+            }
             
-            // 顯示模型和處理時間
-            const modelInfo = document.createElement('div');
-            modelInfo.className = 'model-info';
-            modelInfo.style.cssText = 'background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #2e7d32;';
-            const asrInfo = data.asr_model && data.asr_model !== 'N/A' ? ` | 🎤 ASR: <strong>${data.asr_model}</strong> (${data.asr_time || 0}秒)` : '';
-            const llmInfo = data.llmTime ? ` | 🧠 LLM: <strong>${data.model_used || data.model}</strong> (${data.llmTime}秒)` : ` | 🧠 LLM: <strong>${data.model_used || data.model}</strong>`;
-            modelInfo.innerHTML = `⏱️ 總處理時間: <strong>${data.totalTime || data.processing_time || 0}秒</strong>${asrInfo}${llmInfo}`;
-            results.insertBefore(modelInfo, results.firstChild);
+            processBtn.disabled = true;
+            processBtn.textContent = '處理中...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">處理中...</div>';
             
-            // 顯示逐字稿
-            const transcriptDiv = document.getElementById('transcript');
-            transcriptDiv.style.display = 'block';
-            const transcriptContent = data.transcript || data.transcribe?.transcript || '';
-            transcriptDiv.innerHTML = `<strong>🎤 逐字稿:</strong> ${transcriptContent}`;
-            
-            // 症狀
-            const symptomsDiv = document.getElementById('symptoms');
-            symptomsDiv.innerHTML = (data.symptoms || []).map(s => 
-                `<span class="tag">${typeof s === 'string' ? s : s.name}</span>`
-            ).join('');
-            
-            // ICD-10
-            const icd10Div = document.getElementById('icd10');
-            icd10Div.innerHTML = (data.icd10_codes || []).map(c => 
-                `<span class="tag">${c.code} - ${c.description}</span>`
-            ).join('');
-            
-            // 藥物
-            const drugsUl = document.getElementById('drugs');
-            drugsUl.innerHTML = (data.drug_recommendations || []).map(d => 
-                `<li><strong>${d.name}</strong>: ${d.dosage || '依醫囑'}</li>`
-            ).join('');
-            
-            // 醫囑
-            const ordersUl = document.getElementById('orders');
-            ordersUl.innerHTML = (data.medical_orders || []).map(o => 
-                `<li>${o}</li>`
-            ).join('');
-            
-            // SOAP
-            const soapDiv = document.getElementById('soap');
-            soapDiv.textContent = data.soap?.en || data.soap?.zh || '無法生成 SOAP';
-            
-            status.textContent = '處理完成！';
-            status.className = 'status waiting';
+            try {
+                const response = await fetch(API_URL + '/api/v1/extended/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        transcript: input, 
+                        model: model,
+                        include_symptoms: true,
+                        include_icd10: true,
+                        include_orders: true,
+                        include_drugs: true
+                    })
+                });
+                
+                if (!response.ok) throw new Error('API請求失敗');
+                
+                const data = await response.json();
+                displayResult(data, input);
+                
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">錯誤: ' + error.message + '</div>';
+            } finally {
+                processBtn.disabled = false;
+                processBtn.textContent = '處理完成！';
+            }
         }
         
-        function showError(msg) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-            loading.style.display = 'none';
-            status.textContent = '發生錯誤';
-            status.className = 'status waiting';
+        function displayResult(data, input) {
+            const ext = data;
+            const soap = ext.soap || {};
+            
+            let subjective = '', objective = '', assessment = '', plan = '';
+            if (typeof soap === 'string') {
+                const sections = soap.split('\n');
+                let current = '';
+                for (const line of sections) {
+                    if (line.match(/S\s*[-–]\s*|Subjective/i)) current = 'subjective';
+                    else if (line.match(/O\s*[-–]\s*|Objective/i)) current = 'objective';
+                    else if (line.match(/A\s*[-–]\s*|Assessment/i)) current = 'assessment';
+                    else if (line.match(/P\s*[-–]\s*|Plan/i)) current = 'plan';
+                    else if (current && line.trim()) {
+                        if (current === 'subjective') subjective += line + '\n';
+                        else if (current === 'objective') objective += line + '\n';
+                        else if (current === 'assessment') assessment += line + '\n';
+                        else if (current === 'plan') plan += line + '\n';
+                    }
+                }
+            } else {
+                subjective = soap.subjective || '';
+                objective = soap.objective || '';
+                assessment = soap.assessment || '';
+                plan = soap.plan || '';
+            }
+            
+            const processingTime = ext.processing_time || 0;
+            
+            let html = `
+                <div class="stats">
+                    <div class="stat">⏱️ 處理: ${processingTime.toFixed(2)}秒</div>
+                    <div class="stat">📝 字數: ${input.length}</div>
+                </div>
+            `;
+            
+            if (ext.symptoms && ext.symptoms.length > 0) {
+                html += `<div class="section"><div class="section-title">📋 症狀</div><div class="tags">${ext.symptoms.map(s => `<span class="tag">${s}</span>`).join('')}</div></div>`;
+            }
+            
+            if (ext.icd10_codes && ext.icd10_codes.length > 0) {
+                html += `<div class="section"><div class="section-title">🏥 ICD-10</div><div class="tags">${ext.icd10_codes.map(i => `<span class="tag">${i.code} - ${i.description}</span>`).join('')}</div></div>`;
+            }
+            
+            html += `
+                <div class="soap-note">
+                    <div class="section-title">📄 SOAP 病歷</div>
+                    <h4>S - Subjective:</h4><p>${subjective || '(無)'}</p>
+                    <h4>O - Objective:</h4><p>${objective || '(無)'}</p>
+                    <h4>A - Assessment:</h4><p>${assessment || '(無)'}</p>
+                    <h4>P - Plan:</h4><p>${plan || '(無)'}</p>
+                </div>
+            `;
+            
+            document.getElementById('result').innerHTML = html;
         }
         
-        initFileButtons();
-        updateResultsTable();
+        // Auto-refresh
+        setTimeout(() => window.location.reload(), 30000);
     </script>
 </body>
 </html>

@@ -47,7 +47,7 @@ class ExtendedSoapVoiceEngine:
     def __init__(
         self,
         whisper_model: str = "medium",
-        llm_model: str = "qwen2.5:14b",
+        llm_model: str = "qwen2.5:7b",
         compute_mode: str = "cpu",
     ):
         self.whisper_model = whisper_model
@@ -263,7 +263,7 @@ P - Plan:
 
 def demo():
     """演示"""
-    engine = ExtendedSoapVoiceEngine(whisper_model="medium", llm_model="qwen2.5:14b")
+    engine = ExtendedSoapVoiceEngine(whisper_model="medium", llm_model="qwen2.5:7b")
 
     audio_file = "tests/fixtures/sample_zh.wav"
 

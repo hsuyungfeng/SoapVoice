@@ -21,7 +21,7 @@ FILES = [
     ("doctor_patient.wav", "醫病對話"),
 ]
 
-MODELS = ["qwen2.5:14b", "qwen2.5:7b", "qwen2.5:3b"]
+MODELS = ["qwen2.5:7b", "qwen2.5:3b"]
 
 
 def transcribe(audio_file):

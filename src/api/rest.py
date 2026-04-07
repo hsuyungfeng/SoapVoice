@@ -63,7 +63,7 @@ def get_soap_generator() -> SOAPGenerator:
         import os
 
         config = SOAPConfig(
-            model_id=os.getenv("LLM_MODEL", "qwen2.5:14b"),
+            model_id=os.getenv("LLM_MODEL", "qwen2.5:7b"),
         )
         _soap_generator = SOAPGenerator(config)
     return _soap_generator
@@ -133,6 +133,10 @@ class SOAPGenerateRequest(BaseModel):
     patient_context: Optional[Dict[str, Any]] = Field(
         default=None,
         description="病患背景（年齡、性別、主訴等）",
+    )
+    model: Optional[str] = Field(
+        default=None,
+        description="LLM 模型名稱（如 qwen2.5:3b, qwen2.5:7b）",
     )
 
 
@@ -319,16 +323,42 @@ async def generate_soap(
             "gender": "M",
             "chief_complaint": "chest pain"
         }
+        }
     }
     ```
     """
     start_time = time.time()
 
     try:
+        # 如果指定了模型，重新配置 generator
+        if request.model:
+            from src.soap.soap_generator import SOAPConfig
+
+            config = SOAPConfig(model_id=request.model)
+            generator = SOAPGenerator(config)
+
         # 生成 SOAP
         soap_dict = generator.generate(
             transcript=request.transcript,
             patient_context=request.patient_context,
+        )
+
+        processing_time = (time.time() - start_time) * 1000
+
+        return SOAPGenerateResponse(
+            soap=SOAPSection(
+                subjective=soap_dict.get("subjective", ""),
+                objective=soap_dict.get("objective", ""),
+                assessment=soap_dict.get("assessment", ""),
+                plan=soap_dict.get("plan", ""),
+                conversation_summary=soap_dict.get("conversation_summary", ""),
+            ),
+            metadata={
+                "confidence": soap_dict.get("classification_confidence", {}),
+                "model_version": generator.config.model_id,
+                "normalized_terms": soap_dict.get("normalized_terms", []),
+            },
+            processing_time_ms=round(processing_time, 2),
         )
 
         processing_time = (time.time() - start_time) * 1000

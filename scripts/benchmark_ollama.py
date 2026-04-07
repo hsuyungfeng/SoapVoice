@@ -127,7 +127,6 @@ def main():
     test_models = [
         ("Qwen2.5:3b", "qwen2.5:3b"),
         ("Qwen2.5:7b", "qwen2.5:7b"),
-        ("Qwen2.5:14b", "qwen2.5:14b"),
         ("Qwen3.5:9b", "qwen3.5:9b"),
     ]
     test_models = [(n, m) for n, m in test_models if m in available]
