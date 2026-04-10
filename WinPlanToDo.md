@@ -33,6 +33,12 @@
 - [x] 刪除所有根目錄的冗餘測試腳本（`test_ocr*.py`, `test_llama_soap*.py` 等）。
 - [x] 刪除舊版 benchmark 結果 JSON 與開發日誌。
 
+### OCR 段錯誤修復
+- [x] **修復 GUI 啟動記憶體區段錯誤**：OCR 解析器嘗試連接 Ollama Vision API 導致段錯誤。
+- [x] **離線 OCR 配置**：當 `USE_LLAMA_CPP=true` 時自動禁用 Ollama Vision 與 EasyOCR，確保全離線運行。
+- [x] **OCR 優先順序調整**：按照 AGENTS.md 規範，優先使用 Tesseract (pytesseract) 作為主力 OCR 引擎。
+- [x] **GUI 穩定啟動驗證**：測試確認 GUI 啟動無段錯誤，OCR 配置正確。
+
 ---
 
 ## 📅 短期目標 (Next Sprint)
