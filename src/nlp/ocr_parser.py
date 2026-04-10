@@ -1,6 +1,7 @@
 import logging
 import json
 import time
+import os
 
 import numpy as np
 
@@ -67,9 +68,14 @@ class OCRParser:
         self.HAS_TESSERACT = HAS_TESSERACT
         self.HAS_OLLAMA_VISION = HAS_OLLAMA_VISION
 
+        # 如果使用 llama.cpp 則禁用 Ollama Vision（全離線模式）
+        use_llama_cpp = os.getenv("USE_LLAMA_CPP", "false").lower() == "true"
+        if use_llama_cpp:
+            self.HAS_OLLAMA_VISION = False
+
     def _get_reader(self):
         if self.reader is None:
-            if HAS_EASYOCR:
+            if self.HAS_EASYOCR:
                 try:
                     logger.info("初始化 EasyOCR (首次可能需下載模型)...")
                     # 支援繁體中文與英文
@@ -111,7 +117,7 @@ class OCRParser:
     def _try_ocr_methods(self, image_np):
         """嘗試多種 OCR 方法"""
         # 方法 1: Ollama Vision Model - 嘗試多個模型
-        if HAS_OLLAMA_VISION:
+        if self.HAS_OLLAMA_VISION:
             for model in self.vision_models:
                 try:
                     logger.info(f"嘗試使用 Ollama Vision ({model})...")
@@ -126,7 +132,7 @@ class OCRParser:
                     continue
 
         # 方法 2: EasyOCR
-        if HAS_EASYOCR:
+        if self.HAS_EASYOCR:
             try:
                 logger.info("嘗試使用 EasyOCR...")
                 reader = self._get_reader()
@@ -140,7 +146,7 @@ class OCRParser:
                 logger.warning(f"EasyOCR 失敗: {e}")
 
         # 方法 3: pytesseract
-        if HAS_PYTESSERACT:
+        if self.HAS_PYTESSERACT:
             try:
                 logger.info("嘗試使用 pytesseract...")
                 # 轉換為 PIL Image
