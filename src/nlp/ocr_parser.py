@@ -97,18 +97,40 @@ class OCRParser:
         logger.info("擷取主螢幕畫面...")
 
         # 檢查截圖套件
-        if not HAS_MSS:
+        if not self.HAS_MSS:
             logger.error("mss 套件未安裝，無法截圖")
             return ""
 
         try:
             with mss.mss() as sct:
                 # 擷取第 1 個螢幕 (主螢幕)
+                if len(sct.monitors) < 2:
+                    logger.error("沒有可用的螢幕監視器")
+                    return ""
+
                 monitor = sct.monitors[1]
                 screenshot = sct.grab(monitor)
 
+                if screenshot is None:
+                    logger.error("截圖失敗，返回 None")
+                    return ""
+
+                # 檢查截圖尺寸
+                if screenshot.width == 0 or screenshot.height == 0:
+                    logger.error(f"截圖尺寸無效: {screenshot.width}x{screenshot.height}")
+                    return ""
+
                 # 轉成 numpy array
                 img_np = np.array(screenshot)
+
+                # 檢查 numpy array 是否有效
+                if img_np is None or img_np.size == 0:
+                    logger.error("numpy array 轉換失敗或為空")
+                    return ""
+
+                logger.debug(
+                    f"截圖成功，尺寸: {screenshot.width}x{screenshot.height}, numpy shape: {img_np.shape}, dtype: {img_np.dtype}"
+                )
 
                 # 嘗試多種 OCR 方案
                 text = self._try_ocr_methods(img_np)
@@ -116,6 +138,9 @@ class OCRParser:
 
         except Exception as e:
             logger.error(f"OCR 截圖轉換失敗: {e}")
+            import traceback
+
+            logger.error(traceback.format_exc())
             return ""
 
     def _try_ocr_methods(self, image_np):
