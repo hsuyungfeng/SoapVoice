@@ -68,10 +68,14 @@ class OCRParser:
         self.HAS_TESSERACT = HAS_TESSERACT
         self.HAS_OLLAMA_VISION = HAS_OLLAMA_VISION
 
-        # 如果使用 llama.cpp 則禁用 Ollama Vision（全離線模式）
+        # 如果使用 llama.cpp 則禁用需要網路/下載的 OCR 方法（全離線模式）
         use_llama_cpp = os.getenv("USE_LLAMA_CPP", "false").lower() == "true"
         if use_llama_cpp:
             self.HAS_OLLAMA_VISION = False
+            self.HAS_EASYOCR = False  # EasyOCR 需要下載模型，不符合全離線需求
+            logging.getLogger(__name__).info(
+                f"離線模式啟用: 禁用 Ollama Vision 與 EasyOCR，使用 Tesseract 主力 OCR"
+            )
 
     def _get_reader(self):
         if self.reader is None:
@@ -115,12 +119,29 @@ class OCRParser:
             return ""
 
     def _try_ocr_methods(self, image_np):
-        """嘗試多種 OCR 方法"""
-        # 方法 1: Ollama Vision Model - 嘗試多個模型
+        """嘗試多種 OCR 方法（按照 AGENTS.md 的優先順序）"""
+        # 方法 1: pytesseract（主力 OCR 引擎，全離線）
+        if self.HAS_PYTESSERACT:
+            try:
+                logger.info("嘗試使用 pytesseract (主力 OCR)...")
+                # 轉換為 PIL Image
+                from PIL import Image
+
+                img_pil = Image.fromarray(image_np)
+                text = pytesseract.image_to_string(img_pil, lang="chi_tra+eng")
+                if text.strip():
+                    logger.info(f"pytesseract 成功，文字長度: {len(text)}")
+                    return text
+                else:
+                    logger.warning("pytesseract 返回空文字，嘗試備援方案")
+            except Exception as e:
+                logger.warning(f"pytesseract 失敗: {e}")
+
+        # 方法 2: Ollama Vision Model（備援，僅當未禁用時）
         if self.HAS_OLLAMA_VISION:
             for model in self.vision_models:
                 try:
-                    logger.info(f"嘗試使用 Ollama Vision ({model})...")
+                    logger.info(f"嘗試使用 Ollama Vision ({model}) 備援...")
                     text = self._ocr_with_ollama_vision(image_np, model)
                     if text and len(text.strip()) > 50:
                         logger.info(f"Ollama Vision ({model}) 成功，文字長度: {len(text)}")
@@ -131,34 +152,21 @@ class OCRParser:
                     logger.warning(f"Ollama Vision ({model}) 失敗: {e}")
                     continue
 
-        # 方法 2: EasyOCR
+        # 方法 3: EasyOCR（最後備援，可能需要下載模型）
         if self.HAS_EASYOCR:
             try:
-                logger.info("嘗試使用 EasyOCR...")
+                logger.info("嘗試使用 EasyOCR（最後備援）...")
                 reader = self._get_reader()
                 if reader:
                     result = reader.readtext(image_np, detail=0)
                     text = " ".join(result)
                     if text.strip():
-                        logger.debug(f"EasyOCR 成功，文字長度: {len(text)}")
+                        logger.info(f"EasyOCR 成功，文字長度: {len(text)}")
                         return text
+                    else:
+                        logger.warning("EasyOCR 返回空文字")
             except Exception as e:
                 logger.warning(f"EasyOCR 失敗: {e}")
-
-        # 方法 3: pytesseract
-        if self.HAS_PYTESSERACT:
-            try:
-                logger.info("嘗試使用 pytesseract...")
-                # 轉換為 PIL Image
-                from PIL import Image
-
-                img_pil = Image.fromarray(image_np)
-                text = pytesseract.image_to_string(img_pil, lang="chi_tra+eng")
-                if text.strip():
-                    logger.debug(f"pytesseract 成功，文字長度: {len(text)}")
-                    return text
-            except Exception as e:
-                logger.warning(f"pytesseract 失敗: {e}")
 
         # 方法 4: 純文字備用
         logger.warning("所有 OCR 方法都失敗，返回空文字")
