@@ -360,20 +360,37 @@ class SoapVoiceApp:
             )
 
             ocr_text = self.ocr_parser.capture_screen_to_text()
-            if ocr_text and ocr_text.strip():
-                self.status_var.set("📸 OCR 擷取成功")
-                # 儲存 OCR 文字供後續使用
-                self.current_ocr_text = ocr_text
-                logger.debug(f"OCR 擷取成功，文字長度: {len(ocr_text)}")
-            else:
-                self.status_var.set("📸 無 OCR 文字")
-                self.current_ocr_text = ""
-                logger.debug("OCR 返回空文字")
+
+            # 使用主執行緒安全地更新 UI
+            def update_ui():
+                try:
+                    if ocr_text and ocr_text.strip():
+                        self.status_var.set("📸 OCR 擷取成功")
+                        # 儲存 OCR 文字供後續使用
+                        self.current_ocr_text = ocr_text
+                        logger.debug(f"OCR 擷取成功，文字長度: {len(ocr_text)}")
+                    else:
+                        self.status_var.set("📸 無 OCR 文字")
+                        self.current_ocr_text = ""
+                        logger.debug("OCR 返回空文字")
+                except Exception as e:
+                    logger.warning(f"更新 OCR UI 失敗: {e}")
+
+            # 在主執行緒中調度 UI 更新
+            self.root.after(0, update_ui)
+
         except Exception as e:
             logger = logging.getLogger(__name__)
             logger.warning(f"OCR 擷取失敗: {e}")
-            self.status_var.set("📸 OCR 略過")
-            self.current_ocr_text = ""
+
+            def update_error():
+                try:
+                    self.status_var.set("📸 OCR 略過")
+                    self.current_ocr_text = ""
+                except Exception as e2:
+                    logger.warning(f"更新錯誤 UI 失敗: {e2}")
+
+            self.root.after(0, update_error)
 
     def process_audio_api(self, wav_path):
         try:

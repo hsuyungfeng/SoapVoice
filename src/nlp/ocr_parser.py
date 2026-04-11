@@ -132,6 +132,30 @@ class OCRParser:
                     f"截圖成功，尺寸: {screenshot.width}x{screenshot.height}, numpy shape: {img_np.shape}, dtype: {img_np.dtype}"
                 )
 
+                # 如果影像太大，縮小以節省記憶體並加速 OCR
+                scale_factor = 0.5  # 縮小一半
+                if img_np.shape[0] > 1920 or img_np.shape[1] > 1920:
+                    try:
+                        from PIL import Image
+
+                        # 將 numpy array 轉為 PIL Image
+                        if img_np.shape[2] == 4:  # RGBA 轉 RGB
+                            img_pil = Image.fromarray(img_np, mode="RGBA").convert("RGB")
+                        else:
+                            img_pil = Image.fromarray(img_np)
+
+                        new_width = int(img_pil.width * scale_factor)
+                        new_height = int(img_pil.height * scale_factor)
+                        img_pil = img_pil.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+                        # 轉回 numpy array
+                        img_np = np.array(img_pil)
+                        logger.debug(
+                            f"影像已縮小至: {new_width}x{new_height}, 新 shape: {img_np.shape}"
+                        )
+                    except Exception as e:
+                        logger.warning(f"影像縮小失敗，使用原尺寸: {e}")
+
                 # 嘗試多種 OCR 方案
                 text = self._try_ocr_methods(img_np)
                 return text
