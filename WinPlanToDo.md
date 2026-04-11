@@ -35,8 +35,13 @@
 
 ### OCR 段錯誤修復
 - [x] **修復 GUI 啟動記憶體區段錯誤**：OCR 解析器嘗試連接 Ollama Vision API 導致段錯誤。
+  - **根本原因**：Ollama Vision 嘗試連線 `localhost:11434`，但系統為 llama.cpp CPU 離線模式
+  - **影像記憶體壓力**：全螢幕截圖 (3840x2160 RGBA) 導致記憶體衝突
+  - **執行緒安全問題**：背景執行緒直接更新 tkinter UI
 - [x] **離線 OCR 配置**：當 `USE_LLAMA_CPP=true` 時自動禁用 Ollama Vision 與 EasyOCR，確保全離線運行。
 - [x] **OCR 優先順序調整**：按照 AGENTS.md 規範，優先使用 Tesseract (pytesseract) 作為主力 OCR 引擎。
+- [x] **影像縮小優化**：對超過 1920px 的截圖進行 50% 縮小，減少記憶體使用與處理負擔。
+- [x] **執行緒安全 UI 更新**：使用 `root.after()` 進行主執行緒 UI 更新，避免 tkinter 執行緒安全問題。
 - [x] **GUI 穩定啟動驗證**：測試確認 GUI 啟動無段錯誤，OCR 配置正確。
 
 ---
