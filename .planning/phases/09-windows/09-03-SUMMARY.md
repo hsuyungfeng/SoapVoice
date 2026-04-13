@@ -64,7 +64,7 @@ Each task was committed atomically:
 2. **Task 2: 建立 Windows 打包自動化腳本與增強使用者指南** - `d1aaac3` (feat)
 3. **Task 3: Checkpoint: Windows 環境打包執行** - 部分完成，提供 Wine 替代方案（未單獨提交，修改包含於本 SUMMARY 提交）
 
-**Plan metadata:** `9c89390` (docs: complete plan)
+**Plan metadata:** `b6ef3db` (docs: complete plan)
 
 _Note: Task 3 因環境限制無法完成 Windows 環境打包，改以 Wine 交叉編譯方案替代。_
 
