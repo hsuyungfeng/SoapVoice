@@ -1,0 +1,135 @@
+30 INFO: PyInstaller: 6.19.0, contrib hooks: 2026.4
+30 INFO: Python: 3.13.11
+31 INFO: Platform: Linux-6.17.0-20-generic-x86_64-with-glibc2.39
+31 INFO: Python environment: /home/hsu/Desktop/SoapVoice/.venv
+32 INFO: Removing temporary files and cleaning cache in /home/hsu/.cache/pyinstaller
+33 INFO: Module search paths (PYTHONPATH):
+['/home/hsu/.local/share/uv/python/cpython-3.13.11-linux-x86_64-gnu/lib/python313.zip',
+ '/home/hsu/.local/share/uv/python/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13',
+ '/home/hsu/.local/share/uv/python/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/lib-dynload',
+ '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages',
+ '/home/hsu/Desktop/SoapVoice/src/gui',
+ '/home/hsu/Desktop/SoapVoice']
+196 INFO: Appending 'datas' from .spec
+199 INFO: checking Analysis
+199 INFO: Building Analysis because Analysis-00.toc is non existent
+199 INFO: Looking for Python shared library...
+207 INFO: Using Python shared library: /home/hsu/.local/share/uv/python/cpython-3.13.11-linux-x86_64-gnu/lib/libpython3.13.so.1.0
+207 INFO: Running Analysis Analysis-00.toc
+207 INFO: Target bytecode optimization level: 0
+207 INFO: Initializing module dependency graph...
+207 INFO: Initializing module graph hook caches...
+212 INFO: Analyzing modules for base_library.zip ...
+773 INFO: Processing standard module hook 'hook-encodings.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+1087 INFO: Processing standard module hook 'hook-heapq.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+1818 INFO: Processing standard module hook 'hook-pickle.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+2793 INFO: Caching module dependency graph...
+2817 INFO: Analyzing /home/hsu/Desktop/SoapVoice/src/gui/desktop_app.py
+2873 INFO: Processing standard module hook 'hook-platform.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+2894 INFO: Processing standard module hook 'hook-sysconfig.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+2897 INFO: Processing standard module hook 'hook-_ctypes.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+2939 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_find_module_path'
+2939 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+3073 INFO: Processing standard module hook 'hook-_tkinter.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+3135 INFO: Processing standard module hook 'hook-PIL.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+3218 INFO: Processing standard module hook 'hook-PIL.Image.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+3352 INFO: Processing standard module hook 'hook-numpy.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+3611 INFO: Processing standard module hook 'hook-difflib.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+3821 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+3935 INFO: Processing standard module hook 'hook-xml.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+5601 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5601 INFO: SetuptoolsInfo: initializing cached setuptools info...
+6155 INFO: Processing standard module hook 'hook-charset_normalizer.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+6389 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+6500 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+7149 INFO: Processing standard module hook 'hook-sqlite3.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+7596 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+7612 INFO: Processing standard module hook 'hook-importlib_metadata.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+7623 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+7634 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+7635 INFO: Processing standard module hook 'hook-importlib_resources.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+9018 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+9225 INFO: Processing standard module hook 'hook-fsspec.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+9600 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+9600 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+9604 INFO: Processing standard module hook 'hook-setuptools.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+9611 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+9630 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+9630 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+9638 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+9638 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+10025 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+10272 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+10272 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+10684 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+10684 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+11103 INFO: Processing standard module hook 'hook-pkg_resources.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+11218 INFO: Processing pre-safe-import-module hook 'hook-platformdirs.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+11224 INFO: Processing standard module hook 'hook-platformdirs.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+13780 INFO: Processing standard module hook 'hook-pytz.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+14541 INFO: Processing pre-safe-import-module hook 'hook-tensorflow.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/pre_safe_import_module'
+15191 INFO: Processing standard module hook 'hook-jsonschema.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+15559 INFO: Processing standard module hook 'hook-jsonschema_specifications.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+18243 INFO: Processing module hooks (post-graph stage)...
+18254 INFO: Processing standard module hook 'hook-pytest.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+18365 INFO: Processing standard module hook 'hook-pygments.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+18820 INFO: Processing standard module hook 'hook-py.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+19762 INFO: Processing standard module hook 'hook-_tkinter.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+21140 WARNING: Hidden import "importlib_resources.trees" not found!
+21322 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks'
+21389 INFO: Performing binary vs. data reclassification (1104 entries)
+21488 INFO: Looking for ctypes DLLs
+21507 WARNING: Unrecognised line of output '快取產生者: ldconfig (Ubuntu GLIBC 2.39-0ubuntu8.7) stable release version 2.39' from ldconfig
+21520 WARNING: Library msvcrt required via ctypes not found
+21618 WARNING: Library ole32 required via ctypes not found
+21629 WARNING: Library shell32 required via ctypes not found
+21743 WARNING: Library user32 required via ctypes not found
+21753 WARNING: Library gdi32 required via ctypes not found
+21783 INFO: Analyzing run-time hooks ...
+21794 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+21796 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+21797 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+21798 INFO: Including run-time hook 'pyi_rth_setuptools.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+21799 INFO: Including run-time hook 'pyi_rth_pkgres.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+21802 INFO: Including run-time hook 'pyi_rth__tkinter.py' from '/home/hsu/Desktop/SoapVoice/.venv/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+21846 INFO: Creating base_library.zip...
+21860 INFO: Looking for dynamic libraries
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-alderlake.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-cannonlake.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-cascadelake.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-cooperlake.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-haswell.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-icelake.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-ivybridge.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-piledriver.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-sandybridge.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-sapphirerapids.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-skylakex.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-sse42.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-x64.so'.
+22524 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-cpu-zen4.so'.
+22525 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml-rpc.so'.
+22525 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libggml.so'.
+22525 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libllama.so'.
+22525 WARNING: Library not found: could not resolve 'libggml.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libllama.so'.
+22525 WARNING: Library not found: could not resolve 'libllama.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libmtmd.so'.
+22525 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libmtmd.so'.
+22525 WARNING: Library not found: could not resolve 'libggml.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/libmtmd.so'.
+22525 WARNING: Library not found: could not resolve 'libllama.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-cli'.
+22525 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-cli'.
+22525 WARNING: Library not found: could not resolve 'libmtmd.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-cli'.
+22525 WARNING: Library not found: could not resolve 'libggml.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-cli'.
+22525 WARNING: Library not found: could not resolve 'libllama.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-server'.
+22525 WARNING: Library not found: could not resolve 'libggml-base.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-server'.
+22525 WARNING: Library not found: could not resolve 'libmtmd.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-server'.
+22525 WARNING: Library not found: could not resolve 'libggml.so.0', dependency of '/home/hsu/Desktop/SoapVoice/models/llama-cpp/llama-server'.
+22525 WARNING: Library not found: could not resolve 'libtk8.6.so', dependency of '/home/hsu/.local/share/uv/python/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/lib-dynload/_tkinter.cpython-313-x86_64-linux-gnu.so'.
+22556 INFO: Warnings written to /home/hsu/Desktop/SoapVoice/build/soapvoice/warn-soapvoice.txt
+22640 INFO: Graph cross-reference written to /home/hsu/Desktop/SoapVoice/build/soapvoice/xref-soapvoice.html
+22693 INFO: checking PYZ
+22693 INFO: Building PYZ because PYZ-00.toc is non existent
+22693 INFO: Building PYZ (ZlibArchive) /home/hsu/Desktop/SoapVoice/build/soapvoice/PYZ-00.pyz
+23889 INFO: Building PYZ (ZlibArchive) /home/hsu/Desktop/SoapVoice/build/soapvoice/PYZ-00.pyz completed successfully.
+23937 INFO: checking PKG
+23937 INFO: Building PKG because PKG-00.toc is non existent
+23937 INFO: Building PKG (CArchive) SoapVoice.pkg

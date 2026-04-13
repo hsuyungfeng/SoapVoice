@@ -23,7 +23,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['matplotlib', 'scipy', 'torch', 'torchaudio', 'torchvision', 'transformers', 'numba', 'sklearn', 'pandas', 'opentelemetry', 'triton', 'grpc', 'onnxruntime', 'librosa', 'cv2', 'av', 'sounddevice', 'soundfile', 'easyocr', 'shapely', 'imageio', 'skimage', 'opencc', 'soynlp', 'nagisa', 'pydub', 'psutil', 'gevent', 'zope', 'lxml', 'jinja2', 'rich', 'anyio', 'orjson', 'uvicorn', 'websockets', 'fastapi', 'pydantic', 'httpx', 'requests', 'aiohttp', 'chromadb', 'sentence_transformers', 'llama_cpp', 'faster_whisper', 'ctranslate2'],
+    excludes=['matplotlib', 'scipy', 'torch', 'torchaudio', 'torchvision', 'transformers', 'numba', 'sklearn', 'pandas', 'opentelemetry', 'triton', 'grpc', 'onnxruntime', 'librosa', 'cv2', 'av', 'sounddevice', 'soundfile', 'easyocr', 'shapely', 'imageio', 'skimage', 'opencc', 'soynlp', 'nagisa', 'pydub', 'psutil', 'gevent', 'zope', 'lxml', 'jinja2', 'rich', 'anyio', 'orjson', 'uvicorn', 'websockets', 'fastapi', 'pydantic', 'httpx', 'requests', 'aiohttp'],
     noarchive=False,
     optimize=0,
 )
