@@ -1,0 +1,23 @@
+# 09-02 測試日誌 - Windows 安裝程式製作
+
+## 環境限制
+- 作業系統: Linux (非 Windows)
+- Wine 未安裝，且無法自動安裝（需要 sudo 權限）
+- Inno Setup 編譯器 (iscc) 僅限 Windows
+- 目標 EXE 檔案未建置（dist/SoapVoice.exe 僅為虛擬檔案）
+
+## 嘗試的解決方案
+1. 嘗試安裝 Wine (apt-get) - 需要 sudo 密碼，失敗
+2. 嘗試安裝 Wine (snap) - 需要 sudo 密碼，失敗
+3. 下載 Inno Setup 安裝程式 - 下載失敗（檔案大小為 0）
+4. 建立虛擬 dist/SoapVoice.exe 以供編譯參考
+
+## 結論
+無法在 Linux 環境編譯 Windows 安裝程式。Inno Setup 腳本已建立 (installer/soapvoice.iss)，但編譯與測試需在 Windows 環境執行。
+
+建議後續步驟：
+- 在 Windows 機器上安裝 Inno Setup
+- 確保 PyInstaller 成功建置 SoapVoice.exe
+- 執行 iscc installer/soapvoice.iss 編譯安裝程式
+- 測試安裝與解除安裝流程
+
