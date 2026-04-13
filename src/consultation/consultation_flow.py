@@ -15,6 +15,7 @@ from typing import Optional, Dict, Any, List, Callable
 
 from src.asr.stream_transcriber import StreamTranscriber
 from src.asr.whisper_model import WhisperModel
+from src.utils.resource_path import get_user_data_dir
 from src.db.local_database import LocalDatabase
 from src.db.atc_classification import get_atc_by_symptom
 from src.soap.soap_generator import SOAPGenerator, SOAPConfig
@@ -46,8 +47,8 @@ class ConsultationConfig:
     max_tokens: int = 1024
     temperature: float = 0.3
     save_recordings: bool = True
-    recordings_dir: Path = field(default_factory=lambda: Path("data/recordings"))
-    db_path: Path = field(default_factory=lambda: Path("data/local_db/medical.db"))
+    recordings_dir: Path = field(default_factory=lambda: get_user_data_dir() / "recordings")
+    db_path: Path = field(default_factory=lambda: get_user_data_dir() / "local_db" / "medical.db")
 
 
 @dataclass

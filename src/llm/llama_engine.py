@@ -8,17 +8,28 @@ Llama.cpp LLM 推理引擎模組
 import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Any, AsyncGenerator
-from dataclasses import dataclass
+import os
+from dataclasses import dataclass, field
+from src.utils.resource_path import get_resource_path
 
 logger = logging.getLogger(__name__)
+
+
+def _get_default_model_path() -> str:
+    """取得預設模型路徑，優先使用環境變數 LLAMA_MODEL_PATH"""
+    env_path = os.getenv("LLAMA_MODEL_PATH")
+    if env_path:
+        return env_path
+    # 使用資源路徑偵測工具解析預設相對路徑
+    return str(get_resource_path("models/qwen2.5-3b-instruct-q4_k_m.gguf"))
 
 
 @dataclass
 class LlamaConfig:
     """Llama.cpp 模型配置"""
 
-    model_path: str = "models/qwen2.5-7b-q4_k_m.gguf"
-    n_gpu_layers: int = 35
+    model_path: str = field(default_factory=_get_default_model_path)
+    n_gpu_layers: int = 0  # CPU-only for 3b model
     n_ctx: int = 4096
     n_threads: int = 8
     n_threads_batch: int = 8
@@ -26,7 +37,7 @@ class LlamaConfig:
     top_p: float = 0.9
     top_k: int = 40
     repeat_penalty: float = 1.1
-    max_tokens: int = 1024
+    max_tokens: int = 2048
     rope_freq_base: float = 0.0
     rope_freq_scale: float = 0.0
     use_mmap: bool = True
@@ -234,15 +245,16 @@ class LlamaEngine:
             return self.generate(prompt, max_tokens=max_tokens, temperature=temperature)
 
     def _build_prompt(self, prompt: str, system: Optional[str] = None) -> str:
-        """建構完整 prompt
+        """建構完整 prompt (根據模型類型調整)"""
+        # 檢查是否為 Gemma 4
+        is_gemma = "gemma" in self.config.model_path.lower()
 
-        Args:
-            prompt: 使用者 prompt
-            system: 系統提示
+        if is_gemma:
+            if system:
+                return f"<start_of_turn>user\n{system}\n\n{prompt}<end_of_turn>\n<start_of_turn>model\n"
+            return f"<start_of_turn>user\n{prompt}<end_of_turn>\n<start_of_turn>model\n"
 
-        Returns:
-            完整 prompt
-        """
+        # 預設 (Qwen/通用)
         if system:
             return f"【系統】{system}\n\n【使用者】{prompt}\n\n【助理】"
         return f"【使用者】{prompt}\n\n【助理】"

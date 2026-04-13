@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 
 from src.db.local_database import LocalDatabase
+from src.utils.resource_path import get_user_data_dir
 from src.db.atc_classification import (
     get_atc_info,
     get_atc_by_symptom,
@@ -150,7 +151,7 @@ class RealtimeSearch:
     def __init__(
         self,
         db: Optional[LocalDatabase] = None,
-        db_path: str = "data/local_db/medical.db",
+        db_path: Optional[str] = None,
     ):
         """初始化即時搜尋器
 
@@ -159,7 +160,7 @@ class RealtimeSearch:
             db_path: 資料庫路徑
         """
         self._db = db
-        self._db_path = db_path
+        self._db_path = db_path or str(get_user_data_dir() / "local_db" / "medical.db")
         self._cache: Dict[str, List[SearchResult]] = {}
         self._context = SearchContext()
 

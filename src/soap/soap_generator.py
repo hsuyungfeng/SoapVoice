@@ -5,13 +5,31 @@ SOAP 生成模組
 """
 
 import logging
+import os
+import re
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.llm.ollama_engine import OllamaEngine, ModelConfig
+from src.utils.resource_path import get_resource_path
 from src.nlp.soap_classifier import SOAPClassifier
 from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
+
+# 引擎選擇：使用 llama.cpp 或 Ollama
+USE_LLAMA_CPP = os.getenv("USE_LLAMA_CPP", "false").lower() == "true"
+
+if USE_LLAMA_CPP:
+    from src.llm.llama_engine import LlamaEngine as Engine, LlamaConfig as EngineConfig
+    from src.llm.llama_engine import initialize_llama_engine as initialize_engine
+
+    logger = logging.getLogger(__name__)
+    logger.info("使用 llama.cpp 引擎")
+else:
+    from src.llm.ollama_engine import OllamaEngine as Engine, ModelConfig as EngineConfig
+    from src.llm.ollama_engine import initialize_engine
+
+    logger = logging.getLogger(__name__)
+    logger.info("使用 Ollama 引擎")
 
 
 logger = logging.getLogger(__name__)
@@ -30,9 +48,9 @@ class SOAPConfig:
 
     model_id: str = "qwen3.5:9b"
     api_base: str = "http://localhost:11434"
-    max_tokens: int = 512
+    max_tokens: int = 1024
     temperature: float = 0.3
-    num_ctx: int = 4096
+    num_ctx: int = 8192
     max_subjective_length: int = 100  # 字元限制
     enable_rag: bool = True  # 啟用 RAG 病例範本檢索
     rag_top_k: int = 3  # RAG 檢索結果數量
@@ -43,13 +61,9 @@ class SOAPGenerator:
     """SOAP 病歷生成器"""
 
     def __init__(self, config: Optional[SOAPConfig] = None):
-        """初始化 SOAP 生成器
-
-        Args:
-            config: SOAP 生成配置
-        """
+        """初始化 SOAP 生成器"""
         self.config = config or SOAPConfig()
-        self._engine: Optional[OllamaEngine] = None
+        self._engine: Optional[Engine] = None
         self._mapper: MedicalTerminologyMapper = MedicalTerminologyMapper()
 
         # RAG 系統初始化
@@ -66,12 +80,10 @@ class SOAPGenerator:
             from chromadb.config import Settings
             from sentence_transformers import SentenceTransformer
 
-            # 初始化 Chroma 向量資料庫
             self._rag_client = chromadb.PersistentClient(
                 path=str(RAG_DB_PATH), settings=Settings(anonymized_telemetry=False)
             )
 
-            # 取得集合
             try:
                 self._rag_collection = self._rag_client.get_collection("case_templates")
                 logger.info(f"RAG 系統已初始化，病例範本數量: {self._rag_collection.count()}")
@@ -80,176 +92,41 @@ class SOAPGenerator:
                 self._rag_client = None
                 return
 
-            # 初始化嵌入模型
             self._embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
-
-        except ImportError as e:
-            logger.warning(f"RAG 套件未安裝，跳過病例範本檢索: {e}")
-            self._rag_client = None
         except Exception as e:
-            logger.warning(f"RAG 初始化失敗，跳過病例範本檢索: {e}")
+            logger.warning(f"RAG 初始化失敗: {e}")
             self._rag_client = None
 
-    def _search_case_templates(self, query: str) -> List[Dict[str, Any]]:
-        """搜尋相關病例範本
-
-        Args:
-            query: 搜尋查詢文字
-
-        Returns:
-            相關病例範本列表
-        """
-        if not self._rag_client or not self._embedding_model or not self._rag_collection:
-            return []
-
-        try:
-            # 生成嵌入向量
-            query_embedding = self._embedding_model.encode(query)
-
-            # 執行搜尋
-            results = self._rag_collection.query(
-                query_embeddings=[query_embedding.tolist()],
-                n_results=self.config.rag_top_k,
-                include=["documents", "metadatas", "distances"],
-            )
-
-            # 處理結果
-            case_templates = []
-            if results["documents"]:
-                for i in range(len(results["documents"][0])):
-                    document = results["documents"][0][i]
-                    metadata = results["metadatas"][0][i]
-                    distance = results["distances"][0][i]
-
-                    # Chroma 使用餘弦距離 (0-2)，轉換為相似度 (0-1)
-                    # 相似度 = 1 - (distance / 2)
-                    similarity = max(0, 1.0 - distance / 2)
-
-                    # 由於距離值很大，使用相對排名而非絕對閾值
-                    case_templates.append(
-                        {
-                            "content": document[:500],
-                            "specialty": metadata.get("specialty", "一般"),
-                            "source_file": metadata.get("source_name", ""),
-                            "rank": i + 1,
-                            "distance": round(distance, 3),
-                            "similarity": round(similarity, 3),
-                        }
-                    )
-
-            if case_templates:
-                logger.info(f"RAG 檢索找到 {len(case_templates)} 個相關病例範本")
-                for ct in case_templates:
-                    logger.debug(f"  - {ct['specialty']}: 距離={ct['distance']}")
-
-            return case_templates
-
-        except Exception as e:
-            logger.warning(f"RAG 搜尋失敗: {e}")
-            return []
-
-        try:
-            # 生成嵌入向量
-            query_embedding = self._embedding_model.encode([query]).tolist()[0]
-
-            # 執行搜尋
-            results = self._rag_collection.query(
-                query_embeddings=[query_embedding],
-                n_results=self.config.rag_top_k,
-                include=["documents", "metadatas", "distances"],
-            )
-
-            # 處理結果 - Chroma 使用餘弦距離
-            # 距離範圍通常為 0-2，轉換為相似度
-            case_templates = []
-            if results["documents"]:
-                for i in range(len(results["documents"][0])):
-                    document = results["documents"][0][i]
-                    metadata = results["metadatas"][0][i]
-                    distance = results["distances"][0][i]
-
-                    # 轉換距離為相似度 (0=相同, 2=相反)
-                    # 使用 max(0, 1 - distance/2) 確保範圍在 0-1
-                    similarity = max(0, 1.0 - distance / 2)
-
-                    # 使用較低的閾值讓更多結果通過
-                    if similarity >= 0.1:  # 降低閾值
-                        case_templates.append(
-                            {
-                                "content": document[:500],  # 限制長度
-                                "specialty": metadata.get("specialty", "一般"),
-                                "source_file": metadata.get("source_name", ""),
-                                "similarity": round(similarity, 3),
-                            }
-                        )
-
-            if case_templates:
-                logger.info(f"RAG 檢索找到 {len(case_templates)} 個相關病例範本")
-
-            return case_templates
-
-        except Exception as e:
-            logger.warning(f"RAG 搜尋失敗: {e}")
-            return []
-
-        try:
-            # 生成嵌入向量
-            query_embedding = self._embedding_model.encode([query]).tolist()[0]
-
-            # 執行搜尋
-            results = self._rag_collection.query(
-                query_embeddings=[query_embedding],
-                n_results=self.config.rag_top_k,
-                include=["documents", "metadatas", "distances"],
-            )
-
-            # 處理結果
-            case_templates = []
-            if results["documents"]:
-                for i in range(len(results["documents"][0])):
-                    document = results["documents"][0][i]
-                    metadata = results["metadatas"][0][i]
-                    distance = results["distances"][0][i]
-                    similarity = 1.0 - distance
-
-                    if similarity >= self.config.rag_min_similarity:
-                        case_templates.append(
-                            {
-                                "content": document[:500],  # 限制長度
-                                "specialty": metadata.get("specialty", "一般"),
-                                "source_file": metadata.get("source_name", ""),
-                                "similarity": round(similarity, 3),
-                            }
-                        )
-
-            if case_templates:
-                logger.info(f"RAG 檢索找到 {len(case_templates)} 個相關病例範本")
-
-            return case_templates
-
-        except Exception as e:
-            logger.warning(f"RAG 搜尋失敗: {e}")
-            return []
-
-    def initialize(self, engine: Optional[OllamaEngine] = None) -> None:
-        """初始化 LLM 引擎
-
-        Args:
-            engine: 可選的 OllamaEngine 實例
-        """
+    def initialize(self, engine: Optional[Engine] = None) -> None:
+        """初始化 LLM 引擎"""
         if engine:
             self._engine = engine
+            return
+
+        if USE_LLAMA_CPP:
+            # 預設使用 Qwen-7B GGUF，優先使用環境變數
+            env_path = os.getenv("LLAMA_MODEL_PATH")
+            if env_path:
+                model_path = env_path
+            else:
+                model_path = str(get_resource_path("models/Qwen2.5-7B-Instruct-Q4_K_M.gguf"))
+            model_config = EngineConfig(
+                model_path=model_path,
+                n_ctx=self.config.num_ctx,
+                max_tokens=self.config.max_tokens,
+                temperature=self.config.temperature,
+                n_gpu_layers=0,
+                n_threads=int(os.getenv("LLAMA_THREADS", "8")),
+            )
         else:
-            model_config = ModelConfig(
+            model_config = EngineConfig(
                 model_id=self.config.model_id,
                 api_base=self.config.api_base,
                 max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
                 num_ctx=self.config.num_ctx,
             )
-            from src.llm.ollama_engine import initialize_engine
-
-            self._engine = initialize_engine(model_config)
+        self._engine = initialize_engine(model_config)
         logger.info("SOAPGenerator initialized")
 
     def _build_prompt(
@@ -260,84 +137,88 @@ class SOAPGenerator:
         term_mappings: Optional[List[TermMapping]] = None,
         icd10_candidates: Optional[List[str]] = None,
         case_templates: Optional[List[Dict[str, Any]]] = None,
+        medical_orders: Optional[List[str]] = None,
+        drug_recommendations: Optional[List[Dict[str, str]]] = None,
     ) -> str:
-        """建立 SOAP 生成提示詞
+        """建立 SOAP 生成提示詞 (同步自 prompt.md)"""
 
-        Args:
-            transcript: 原始醫療對話記錄
-            patient_context: 病患背景資訊（年齡、性別等）
-            normalized_text: 術語標準化後的文字
-            term_mappings: 術語映射結果列表
-            icd10_candidates: ICD-10 候選碼列表
-            case_templates: 相關病例範本列表（RAG 檢索結果）
+        # 準備上下文
+        term_list = (
+            "\n".join([f"  - {m.original} -> {m.standard}" for m in term_mappings])
+            if term_mappings
+            else "無"
+        )
+        icd_str = ", ".join(list(set(icd10_candidates))) if icd10_candidates else "無"
+        orders_str = ", ".join(medical_orders) if medical_orders else "無"
+        drugs_str = (
+            ", ".join([f"{d['name']} ({d['dosage']})" for d in drug_recommendations])
+            if drug_recommendations
+            else "無"
+        )
 
-        Returns:
-            完整的提示詞
-        """
-        context_str = ""
-        if patient_context:
-            age = patient_context.get("age", "")
-            gender = patient_context.get("gender", "")
-            chief_complaint = patient_context.get("chief_complaint", "")
-            if age or gender:
-                context_str += f"Patient: {age}yo {gender}\n"
-            if chief_complaint:
-                context_str += f"Chief Complaint: {chief_complaint}\n"
+        # 準備病例範本 (RAG)
+        case_templates_str = "無"
+        if case_templates and len(case_templates) > 0:
+            case_templates_str = ""
+            for i, template in enumerate(case_templates[:3]):  # 最多3個
+                case_templates_str += f"\n【參考病例 {i + 1}】\n{template.get('content', '')[:500]}"
 
-        sections: list[str] = []
-        if context_str:
-            sections.append(context_str.rstrip("\n"))
-        if term_mappings:
-            term_lines = [f"  - {m.original} → {m.standard} ({m.category})" for m in term_mappings]
-            sections.append("Pre-identified Medical Terms:\n" + "\n".join(term_lines))
-        if icd10_candidates:
-            sections.append(f"ICD-10 Candidates: {', '.join(icd10_candidates)}")
+        # 使用 prompt.md 定義的系統提示詞
+        prompt = f"""你是專業的醫療記錄助理。請將醫師與病患的語音記錄轉換成標準詳細的 SOAP 格式病歷，並整理聊天摘要。
 
-        if case_templates:
-            template_lines = []
-            for idx, template in enumerate(case_templates, 1):
-                specialty = template.get("specialty", "一般")
-                content = template.get("content", "")[:200]
-                similarity = template.get("similarity", 0)
-                template_lines.append(
-                    f"  [{idx}] {specialty} (相似度: {similarity})\n    {content}..."
-                )
-            sections.append("參考病例範本:\n" + "\n".join(template_lines))
+醫療對話：
+{normalized_text if normalized_text else transcript}
 
-        header = "\n\n".join(sections) + "\n\n" if sections else ""
-        transcript_for_llm = normalized_text if normalized_text else transcript
+術語標準化參考：
+{term_list}
 
-        prompt = f"""你是專業的醫療記錄助理。請將醫師與病患的語音記錄轉換成 SOAP 病歷。
+預期診斷代碼 (ICD-10)：
+{icd_str}
 
-對話：{transcript_for_llm}
+醫囑/處置建議：
+{orders_str}
 
-格式（嚴格按照輸出）：
-S: [主訴-英文專業醫療用語]
-O: [客觀發現-英文]
-A: [評估診斷含ICD-10代碼-英文]
-P: [計畫-英文]
-CONVERSATION_SUMMARY: [繁體中文摘要3-5句話]
-"""
+藥物建議：
+{drugs_str}
+
+參考病例範本：
+{case_templates_str}
+
+請 **嚴格按照以下格式** 輸出，每行開頭必須是 S:、O:、A:、P: 或 CONVERSATION_SUMMARY:
+
+```
+S: [在此填入病人的主訴描述，包含主要症狀、持續時間、嚴重程度]
+
+O: [在此填入客觀發現，包括理學檢查結果、生命徵象、檢驗數據]
+
+A: [在此填入診斷，包含診斷名稱及 ICD-10 代碼，若無 ICD-10 代碼則根據症狀推斷]
+
+P: [在此填入治療計畫，包括用藥、治療處置、後續追蹤]
+
+CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
+```
+
+重要提醒：
+1. 每一行開頭必須是 S:、O:、A:、P: 或 CONVERSATION_SUMMARY:
+2. 冒號後直接寫內容，不要有多餘的文字
+3. Plan 部分要包含具體的處置計畫，不要只寫「觀察」
+4. 若無 ICD-10 代碼，根據症狀推斷可能的代碼
+5. 保持專業英文醫療用語用於 SOAP 部分
+6. 對話摘要使用繁體中文"""
         return prompt
 
     def generate(
         self,
         transcript: str,
         patient_context: Optional[Dict[str, Any]] = None,
+        medical_orders: Optional[List[str]] = None,
+        drug_recommendations: Optional[List[Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
-        """生成 SOAP 病歷
-
-        Args:
-            transcript: 醫療對話記錄
-            patient_context: 病患背景資訊
-
-        Returns:
-            SOAP 病歷字典
-        """
+        """生成 SOAP 病歷"""
         if not self._engine:
             self.initialize()
 
-        # 術語標準化前處理：輔助增強步驟，失敗時 fallback 使用原始 transcript
+        # 術語標準化
         normalized_text = ""
         term_mappings: List[TermMapping] = []
         icd10_candidates: List[str] = []
@@ -346,21 +227,14 @@ CONVERSATION_SUMMARY: [繁體中文摘要3-5句話]
             icd10_candidates = [
                 code for m in term_mappings if m.icd10_candidates for code in m.icd10_candidates
             ]
-            logger.info(
-                "術語標準化完成: %d 個術語, %d 個 ICD-10 候選碼",
-                len(term_mappings),
-                len(icd10_candidates),
-            )
         except Exception as norm_err:
-            logger.warning("術語標準化失敗，使用原始 transcript: %s", norm_err)
+            logger.warning("術語標準化失敗: %s", norm_err)
 
-        # RAG 病例範本檢索
+        # RAG 檢索
         case_templates = []
         if self.config.enable_rag and self._rag_client:
             try:
                 case_templates = self._search_case_templates(transcript)
-                if case_templates:
-                    logger.info(f"RAG 檢索完成，找到 {len(case_templates)} 個相關病例範本")
             except Exception as rag_err:
                 logger.warning(f"RAG 檢索失敗: {rag_err}")
 
@@ -371,11 +245,11 @@ CONVERSATION_SUMMARY: [繁體中文摘要3-5句話]
             term_mappings=term_mappings,
             icd10_candidates=icd10_candidates,
             case_templates=case_templates,
+            medical_orders=medical_orders,
+            drug_recommendations=drug_recommendations,
         )
 
         try:
-            if not self._engine:
-                raise RuntimeError("LLM engine not initialized")
             response = self._engine.generate(
                 prompt=prompt,
                 max_tokens=self.config.max_tokens,
@@ -390,27 +264,14 @@ CONVERSATION_SUMMARY: [繁體中文摘要3-5句話]
                 }
                 for m in term_mappings
             ]
-            # 加入 RAG 病例範本檢索結果
             result["case_templates"] = case_templates
             return result
         except Exception as e:
             logger.error(f"SOAP generation error: {e}")
             raise
 
-    def _parse_response(
-        self,
-        response: str,
-        transcript: str,
-    ) -> Dict[str, Any]:
-        """解析 LLM 回應成結構化 SOAP
-
-        Args:
-            response: LLM 生成的文字
-            transcript: 原始對話記錄
-
-        Returns:
-            SOAP 病歷字典
-        """
+    def _parse_response(self, response: str, transcript: str) -> Dict[str, Any]:
+        """解析 LLM 回應成結構化 SOAP"""
         soap: Dict[str, Any] = {
             "subjective": "",
             "objective": "",
@@ -420,129 +281,81 @@ CONVERSATION_SUMMARY: [繁體中文摘要3-5句話]
             "raw_response": response,
         }
 
-        lines = response.strip().split("\n")
-        soap = {
-            "subjective": "",
-            "objective": "",
-            "assessment": "",
-            "plan": "",
-            "conversation_summary": "",
-            "raw_response": response,
+        # 段落樣式定義 - 簡化格式
+        patterns = {
+            "subjective": r"^S:\s*",
+            "objective": r"^O:\s*",
+            "assessment": r"^A:\s*",
+            "plan": r"^P:\s*",
+            "conversation_summary": r"^CONVERSATION_SUMMARY:\s*",
         }
+
+        lines = response.strip().split("\n")
         current_section = None
 
         for line in lines:
-            line_stripped = line.strip()
-            if not line_stripped:
+            line_s = line.strip()
+            if not line_s:
                 continue
 
-            line_upper = line_stripped.upper()
+            matched = False
+            for section, pattern in patterns.items():
+                if re.match(pattern, line_s, re.I | re.M):
+                    current_section = section
+                    content = re.sub(pattern, "", line_s, flags=re.I).strip()
+                    if content:
+                        soap[current_section] += content + "\n"
+                    matched = True
+                    break
 
-            if line_upper.startswith("S:") or line_upper.startswith("S："):
-                current_section = "subjective"
-                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
-                if content:
-                    soap[current_section] += content + "\n"
-            elif line_upper.startswith("O:") or line_upper.startswith("O："):
-                current_section = "objective"
-                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
-                if content:
-                    soap[current_section] += content + "\n"
-            elif line_upper.startswith("A:") or line_upper.startswith("A："):
-                current_section = "assessment"
-                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
-                if content:
-                    soap[current_section] += content + "\n"
-            elif line_upper.startswith("P:") or line_upper.startswith("P："):
-                current_section = "plan"
-                content = line_stripped[2:].strip() if len(line_stripped) > 2 else ""
-                if content:
-                    soap[current_section] += content + "\n"
-            elif "CONVERSATION_SUMMARY" in line_upper:
-                current_section = "conversation_summary"
-                content = line_stripped.split(":", 1)[1].strip() if ":" in line_stripped else ""
-                if content:
-                    soap[current_section] += content + "\n"
-            elif current_section:
-                soap[current_section] += line_stripped + "\n"
+            if not matched and current_section:
+                if "字元控制" in line_s or "英文專業醫師" in line_s:
+                    continue
+                soap[current_section] += line_s + "\n"
 
-        for key in soap:
+        for key in ["subjective", "objective", "assessment", "plan", "conversation_summary"]:
             soap[key] = soap[key].strip()
-
-        # 計算分類置信度
-        soap["classification_confidence"] = self._calculate_confidence(transcript)
 
         return soap
 
-    def _calculate_confidence(
-        self,
-        transcript: str,
-    ) -> Dict[str, float]:
-        """計算 SOAP 分類置信度
-
-        Args:
-            transcript: 原始對話記錄
-
-        Returns:
-            各分類置信度分數
-        """
-        confidence = {
-            "subjective": 0.0,
-            "objective": 0.0,
-            "assessment": 0.0,
-            "plan": 0.0,
-        }
-
-        transcript_lower = transcript.lower()
-
-        for category, keywords in SOAP_KEYWORDS.items():
-            match_count = sum(1 for kw in keywords if kw.lower() in transcript_lower)
-            # 簡單置信度計算：匹配關鍵字數 / 總關鍵字數
-            confidence[category] = min(match_count / len(keywords) * 2, 1.0)
-
-        return confidence
-
-    def classify_text(self, text: str) -> List[Dict[str, str]]:
-        """將文本分類為 S/O/A/P 候選
-
-        Args:
-            text: 輸入文本（可以是句子或段落）
-
-        Returns:
-            分類結果列表
-        """
-        results = []
-        text_lower = text.lower()
-
-        for category, keywords in SOAP_KEYWORDS.items():
-            matches = [kw for kw in keywords if kw.lower() in text_lower]
-            if matches:
-                results.append(
-                    {
-                        "category": category,
-                        "matched_keywords": matches,
-                        "confidence": len(matches) / len(keywords),
-                    }
-                )
-
-        # 依置信度排序
-        results.sort(key=lambda x: x["confidence"], reverse=True)
-        return results
+    def _search_case_templates(self, query: str) -> List[Dict[str, Any]]:
+        """搜尋相關病例範本 (同前)"""
+        if not self._rag_client or not self._embedding_model or not self._rag_collection:
+            return []
+        try:
+            query_embedding = self._embedding_model.encode(query)
+            results = self._rag_collection.query(
+                query_embeddings=[query_embedding.tolist()],
+                n_results=self.config.rag_top_k,
+            )
+            case_templates = []
+            if results["documents"]:
+                for i in range(len(results["documents"][0])):
+                    # 取更多內容 (前 800 字元)
+                    content = (
+                        results["documents"][0][i][:800]
+                        if len(results["documents"][0][i]) > 800
+                        else results["documents"][0][i]
+                    )
+                    similarity = (
+                        1.0 - (results["distances"][0][i] / 2) if results["distances"] else 0.5
+                    )
+                    case_templates.append(
+                        {
+                            "content": content,
+                            "similarity": similarity,
+                        }
+                    )
+            return case_templates
+        except Exception as e:
+            logger.warning(f"RAG 搜尋失敗: {e}")
+            return []
 
 
-# 全域生成器實例（單例模式）
 _generator: Optional[SOAPGenerator] = None
 
 
 def get_generator(config: Optional[SOAPConfig] = None) -> SOAPGenerator:
-    """獲取全域 SOAP 生成器實例
-
-    Args:
-        config: SOAP 生成配置
-
-    Returns:
-        SOAPGenerator 實例
-    """
     global _generator
     if _generator is None:
         _generator = SOAPGenerator(config)
@@ -550,15 +363,7 @@ def get_generator(config: Optional[SOAPConfig] = None) -> SOAPGenerator:
 
 
 def initialize_generator(config: Optional[SOAPConfig] = None) -> SOAPGenerator:
-    """初始化全域 SOAP 生成器
-
-    Args:
-        config: SOAP 生成配置
-
-    Returns:
-        已初始化的 SOAPGenerator 實例
-    """
     gen = get_generator(config)
-    if not gen._engine:  # pylint: disable=protected-access
+    if not gen._engine:
         gen.initialize()
     return gen

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 from src.consultation.consultation_flow import ConsultationFlow, ConsultationResult
+from src.utils.resource_path import get_user_data_dir
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ class SessionManager:
         Args:
             storage_dir: 會話存儲目錄（可選）
         """
-        self.storage_dir = storage_dir or Path("data/sessions")
+        self.storage_dir = storage_dir or get_user_data_dir() / "sessions"
         self._sessions: Dict[str, Session] = {}
         self._session_timeout = timedelta(hours=24)
 
