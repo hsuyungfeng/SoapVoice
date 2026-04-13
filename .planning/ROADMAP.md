@@ -18,12 +18,13 @@
 
 ## Phase 9: Windows 打包
 **目標:** 創建 Windows 安裝程式/可執行檔打包，支援離線部署。
-**狀態:** 🗺️ 規劃中
-**Plans:** 2 plans
+**狀態:** 🔄 進行中
+**Plans:** 3 plans
 
 Plans:
 - [ ] 09-01-PLAN.md — PyInstaller 打包與資源嵌入
 - [ ] 09-02-PLAN.md — Inno Setup 安裝程式製作
+- [ ] 09-03-PLAN.md — 驗證與 Windows 打包自動化
 
 ---
 
