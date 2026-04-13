@@ -141,6 +141,52 @@ dir dist\SoapVoice.exe
 iscc installer\soapvoice.iss /Q
 ```
 
+## Wine 交叉編譯（Linux 環境）
+
+### 目的
+在 Linux 環境下使用 Wine 進行 Windows 交叉編譯，無需 Windows 作業系統即可產生 `SoapVoice.exe`。
+
+### 前提條件
+- **Wine** 已安裝並可執行 Windows 程式
+- **Wine Python** 環境（可透過 `winetricks python311` 安裝）
+- **Linux 系統**（Ubuntu/Debian/Fedora 等）
+
+### 安裝 Wine
+```bash
+# Ubuntu/Debian
+sudo apt install wine
+# Fedora
+sudo dnf install wine
+```
+
+### 設定 Wine Python 環境
+```bash
+# 安裝 winetricks（若未安裝）
+sudo apt install winetricks
+# 建立 32 位元或 64 位元 Wine prefix（建議 64 位元）
+export WINEPREFIX="$HOME/.wine-soapvoice"
+WINEARCH=win64 wineboot --init
+# 安裝 Python 3.11
+winetricks python311
+```
+
+### 執行交叉編譯腳本
+專案提供 `scripts/wine_package.sh` 腳本：
+```bash
+cd /path/to/SoapVoice
+./scripts/wine_package.sh
+```
+腳本會自動檢查 Wine、安裝 PyInstaller、執行打包。
+
+### 限制與注意事項
+1. **DLL 相依性**：Wine 可能缺少某些 Windows DLL（如 Visual C++ Redistributable），導致打包後的 EXE 無法在真實 Windows 執行。
+2. **效能**：Wine 執行 Python 與 PyInstaller 較慢。
+3. **Inno Setup**：無法透過 Wine 編譯 Inno Setup 安裝腳本，需真實 Windows 環境。
+4. **測試**：產生的 EXE 應在真實 Windows 環境測試，確保功能正常。
+
+### 建議
+若可能，仍建議使用真實 Windows 環境（實體機、虛擬機、CI/CD Windows runner）進行打包，以確保相容性。
+
 ## 目前限制
 - **環境：** 當前在 Linux 環境，無法執行 Windows 專屬編譯器
 - **EXE 建置：** Phase 9 Plan 1 在 Linux 環境未完成 PyInstaller 打包，需 Windows 環境
