@@ -3,186 +3,1084 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoapVoice - SOAP 病歷測試</title>
+    <title>SoapVoice - 測試頁面</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { max-width: 800px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #eee; }
-        h1 { text-align: center; color: #00d9ff; margin-bottom: 20px; }
-        .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #aaa; }
-        textarea { 
-            width: 100%; height: 100px; padding: 12px; 
-            border: 1px solid #333; border-radius: 8px; 
-            background: #16213e; color: #fff; font-size: 16px;
+        :root {
+            --primary: #0f766e;
+            --primary-light: #14b8a6;
+            --primary-dark: #0d5d56;
+            --accent: #f59e0b;
+            --accent-soft: #fbbf24;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --border: #475569;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --glow: 0 0 30px rgba(20, 184, 166, 0.15);
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f35 50%, #0f172a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-soft));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow), var(--glow);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header .icon {
+            font-size: 24px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .test-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: 12px;
+        }
+
+        .test-section h3 {
+            font-size: 16px;
+            color: var(--primary-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            border-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-input);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-light);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .upload-text span {
+            color: var(--primary-light);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .file-path {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .btn-run {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .btn-run:hover {
+            background: var(--accent-soft);
+            transform: translateY(-2px);
+        }
+
+        .full-test-section {
+            grid-column: 1 / -1;
+        }
+
+        .full-test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .full-test-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-source {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .source-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .source-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .source-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+        }
+
         select {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            border: 1px solid #333; border-radius: 8px;
-            background: #16213e; color: #fff; font-size: 14px;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
         }
-        button {
-            width: 100%; padding: 14px; background: #00d9ff;
-            border: none; border-radius: 8px; color: #1a1a2e;
-            font-size: 16px; font-weight: bold; cursor: pointer;
-            transition: background 0.3s;
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
         }
-        button:hover { background: #00a8cc; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        
-        .result { 
-            margin-top: 20px; padding: 20px; 
-            background: #16213e; border-radius: 12px; 
-            border: 1px solid #333;
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
         }
-        .result h3 { color: #00d9ff; margin-bottom: 15px; }
-        .section { margin-bottom: 15px; padding: 12px; background: #0f3460; border-radius: 8px; }
-        .section-label { color: #00d9ff; font-weight: bold; margin-bottom: 5px; }
-        .section-content { color: #ccc; white-space: pre-wrap; line-height: 1.5; }
-        
-        .loading { text-align: center; color: #00d9ff; padding: 20px; }
-        .error { color: #ff6b6b; padding: 15px; background: #2d1b1b; border-radius: 8px; }
-        .history { margin-top: 30px; }
-        .history-item { 
-            padding: 10px; margin-bottom: 10px; 
-            background: #16213e; border-radius: 8px; border-left: 3px solid #00d9ff;
+
+        .radio-option input[type="radio"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            cursor: pointer;
         }
-        .history-input { color: #888; font-size: 12px; }
-        .history-output { color: #ccc; margin-top: 5px; }
-        
-        .auto-mode {
-            display: none; padding: 15px; background: #1a472a;
-            border-radius: 8px; margin-bottom: 15px;
+
+        .radio-option input[type="radio"]:checked {
+            border-color: var(--primary-light);
+            background: var(--primary-light);
         }
-        .auto-mode.active { display: block; }
+
+        .radio-option span {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .result-panel {
+            margin-top: 30px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .result-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .result-header h3 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.running {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-body {
+            padding: 20px;
+        }
+
+        .process-log {
+            background: #0d1117;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .log-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 11px;
+            min-width: 70px;
+        }
+
+        .log-icon {
+            font-size: 14px;
+            min-width: 20px;
+        }
+
+        .log-message {
+            color: var(--text-secondary);
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .log-entry.success .log-message { color: var(--success); }
+        .log-entry.error .log-message { color: var(--error); }
+        .log-entry.process .log-icon { color: var(--primary-light); }
+
+        .soap-result {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .soap-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .soap-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .soap-label {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .soap-label.s { background: #3b82f6; color: white; }
+        .soap-label.o { background: #8b5cf6; color: white; }
+        .soap-label.a { background: #f59e0b; color: #1e293b; }
+        .soap-label.p { background: #10b981; color: white; }
+
+        .soap-text {
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .medical-orders, .drug-recommendations {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(20, 184, 166, 0.1);
+            border-radius: 10px;
+            border: 1px solid var(--primary);
+        }
+
+        .medical-orders h4, .drug-recommendations h4 {
+            font-size: 14px;
+            color: var(--primary-light);
+            margin-bottom: 12px;
+        }
+
+        .order-item, .drug-item {
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 16px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            margin-top: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metadata-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metadata-value {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .no-result {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .no-result-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-input);
+            border-radius: 2px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
     </style>
 </head>
 <body>
-    <h1>🏥 SoapVoice - SOAP 病歷測試</h1>
-    
-    <div class="input-group">
-        <label>選擇模型 (預設 qwen2.5:7b):</label>
-        <select id="modelSelect">
-            <option value="qwen2.5:7b">qwen2.5:7b (推薦 - 完整)</option>
-            <option value="qwen2.5:3b">qwen2.5:3b (快速 - 輕量)</option>
-        </select>
-        
-        <label>輸入對話文字:</label>
-        <textarea id="inputText" placeholder="例如：患者主訴心悸、胸悶兩個禮拜，晚上睡不好覺，有時呼吸喘。醫師問診後建議做心電圖檢查。"></textarea>
-        
-        <button id="submitBtn" onclick="generateSOAP()">生成 SOAP 病歷</button>
+    <div class="container">
+        <header>
+            <div class="logo">🧪</div>
+            <h1>SoapVoice 測試頁面</h1>
+            <p class="subtitle">使用範例檔案進行測試</p>
+        </header>
+
+        <div class="test-grid">
+            <!-- 音訊測試 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🎵</span>
+                    <h2>音訊測試 - Whisper 轉錄</h2>
+                </div>
+                <div class="card-body">
+                    <!-- 上傳音檔 -->
+                    <div class="test-section">
+                        <h3>📤 上傳音檔</h3>
+                        <div class="file-upload-area" onclick="document.getElementById('audioUpload').click()">
+                            <input type="file" id="audioUpload" accept="audio/*" style="display: none;" onchange="handleAudioUpload(this)">
+                            <div class="upload-icon">🎤</div>
+                            <div class="upload-text">點擊上傳音檔<br><span>支援 WAV, MP3, M4A</span></div>
+                        </div>
+                        <div id="uploadedAudioInfo" style="display: none; margin-top: 12px;">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <span class="file-icon">🎵</span>
+                                    <div>
+                                        <div class="file-name" id="uploadedAudioName">-</div>
+                                        <div class="file-path">上傳的音檔</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-run" onclick="runUploadedAudio()">▶ 測試</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 可用音檔 -->
+                    <div class="test-section">
+                        <h3>📁 選擇預設音檔</h3>
+                        <div class="form-group">
+                            <select id="presetAudioSelect" onchange="updatePresetAudio()">
+                                <option value="">-- 選擇音檔 --</option>
+                                <option value="data/recordings/temp.wav">temp.wav (錄音)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="runPresetAudio()" id="btnRunPreset" disabled>
+                            ▶ 使用預設音檔測試
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 圖片測試 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🖼️</span>
+                    <h2>圖片測試 - OCR 識別</h2>
+                </div>
+                <div class="card-body">
+                    <div class="test-section">
+                        <h3>📁 可用圖片</h3>
+                        <div class="file-list" id="imageFileList">
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                <p>尚無測試圖片</p>
+                                <p style="font-size: 12px; margin-top: 8px;">請先上傳圖片至 static/images/ 目錄</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 完整流程測試 -->
+            <div class="card full-test-section">
+                <div class="card-header">
+                    <span class="icon">🔄</span>
+                    <h2>完整流程測試 - 語音轉 SOAP</h2>
+                </div>
+                <div class="card-body">
+                    <div class="full-test-grid">
+                        <div>
+                            <h3 style="color: var(--primary-light); margin-bottom: 16px;">輸入來源</h3>
+                            <div class="input-source">
+                                <button class="source-btn active" id="sourceAudioBtn" onclick="setInputSource('audio')">
+                                    🎵 音檔
+                                </button>
+                                <button class="source-btn" id="sourceTextBtn" onclick="setInputSource('text')">
+                                    📝 文字
+                                </button>
+                            </div>
+
+                            <div id="audioInputSection">
+                                <div class="form-group">
+                                    <label>選擇預設音檔</label>
+                                    <select id="testAudioSelect">
+                                        <option value="">-- 選擇音檔 --</option>
+                                        <option value="data/recordings/temp.wav">temp.wav (錄音)</option>
+                                        <option value="tests/fixtures/sample_zh.wav">sample_zh.wav (範例)</option>
+                                        <option value="tests/fixtures/scenarios/chest_pain.wav">chest_pain.wav (胸痛門診)</option>
+                                        <option value="tests/fixtures/scenarios/diabetes.wav">diabetes.wav (糖尿病)</option>
+                                        <option value="tests/fixtures/scenarios/doctor_patient.wav">doctor_patient.wav (醫病對話)</option>
+                                        <option value="tests/fixtures/scenarios/drug_order.wav">drug_order.wav (用藥指導)</option>
+                                        <option value="tests/fixtures/scenarios/hypertension.wav">hypertension.wav (高血壓)</option>
+                                        <option value="tests/fixtures/scenarios/respiratory.wav">respiratory.wav (呼吸系統)</option>
+                                        <option value="tests/fixtures/scenarios/surgery_record.wav">surgery_record.wav (手術記錄)</option>
+                                        <option value="tests/fixtures/scenarios/wound_care.wav">wound_care.wav (傷口護理)</option>
+                                    </select>
+                                </div>
+                                <p style="color: var(--text-muted); font-size: 12px; margin-top: 8px;">
+                                    或使用上方「📤 上傳音檔」上傳新音檔
+                                </p>
+                            </div>
+
+                            <div id="textInputSection" style="display: none;">
+                                <div class="form-group">
+                                    <label>輸入文字</label>
+                                    <textarea id="testTextInput" placeholder="輸入醫療對話...">患者主訴咳嗽三天，伴隨輕微發燒和喉嚨痛。體溫37.8度，喉嚨輕微紅腫。</textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>選擇 LLM 模型</label>
+                                <select id="testModel">
+                                    <option value="qwen2.5:7b">Qwen2.5 7B</option>
+                                    <option value="qwen2.5:3b">Qwen2.5 3B</option>
+                                    <option value="gemma4:e2b">Gemma 4:2B</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-primary" style="width: 100%;" onclick="runFullTest()">
+                                🚀 執行完整測試
+                            </button>
+                        </div>
+
+                        <div>
+                            <h3 style="color: var(--primary-light); margin-bottom: 16px;">測試結果</h3>
+                            <div id="testResult">
+                                <div class="no-result">
+                                    <div class="no-result-icon">📊</div>
+                                    <p>等待執行測試...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-panel" id="resultPanel" style="display: none;">
+            <div class="result-header">
+                <h3>
+                    <span>📋</span>
+                    <span>測試結果</span>
+                </h3>
+                <span class="status-badge" id="resultStatus">
+                    <span class="spinner" id="resultSpinner"></span>
+                    <span id="statusLabel">處理中</span>
+                </span>
+            </div>
+            <div class="result-body">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="testProgressBar"></div>
+                </div>
+                <div class="process-log" id="testProcessLog"></div>
+                <div id="testSoapResult"></div>
+            </div>
+        </div>
     </div>
-    
-    <div id="result" class="result" style="display: none;"></div>
-    
-    <div class="history">
-        <h3 style="color: #00d9ff;">📜 歷史記錄</h3>
-        <div id="historyList"></div>
-    </div>
-    
+
     <script>
         const API_URL = 'http://' + window.location.host;
-        
-        async function generateSOAP() {
-            const input = document.getElementById('inputText').value.trim();
-            const model = document.getElementById('modelSelect').value;
-            const resultDiv = document.getElementById('result');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (!input) {
-                alert('請輸入對話文字');
-                return;
+        let currentSource = 'audio';
+        let uploadedAudioFile = null;
+
+        function handleAudioUpload(input) {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                uploadedAudioFile = file;
+                document.getElementById('uploadedAudioName').textContent = file.name;
+                document.getElementById('uploadedAudioInfo').style.display = 'block';
             }
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = '生成中...';
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<div class="loading">正在生成 SOAP 病歷...</div>';
-            
+        }
+
+        async function runUploadedAudio() {
+            if (!uploadedAudioFile) return alert('請先上傳音檔');
+
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('testProcessLog').innerHTML = '';
+            document.getElementById('testSoapResult').innerHTML = '';
+
+            updateTestStatus('running', '上傳中');
+            addTestLog('📤', `正在上傳音檔: ${uploadedAudioFile.name}`);
+            updateTestProgress(10);
+
+            const formData = new FormData();
+            formData.append('audio', uploadedAudioFile);
+
             try {
-                const response = await fetch(API_URL + '/api/v1/clinical/soap/generate', {
+                const response = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('轉錄失敗');
+
+                const data = await response.json();
+                addTestLog('✅', '轉錄完成', 'success');
+                addTestLog('📝', `結果: ${data.transcript}`, 'success');
+                updateTestProgress(100);
+                updateTestStatus('success', '完成');
+
+                document.getElementById('testSoapResult').innerHTML = `
+                    <div class="soap-result">
+                        <h4 style="color: var(--primary-light); margin-bottom: 12px;">轉錄文字</h4>
+                        <div class="soap-text">${data.transcript}</div>
+                    </div>
+                `;
+            } catch (err) {
+                addTestLog('❌', `錯誤: ${err.message}`, 'error');
+                updateTestStatus('error', '失敗');
+            }
+        }
+
+        function updatePresetAudio() {
+            const select = document.getElementById('presetAudioSelect');
+            const btn = document.getElementById('btnRunPreset');
+            btn.disabled = !select.value;
+        }
+
+        async function runPresetAudio() {
+            const select = document.getElementById('presetAudioSelect');
+            const filePath = select.value;
+            if (!filePath) return alert('請選擇音檔');
+
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('testProcessLog').innerHTML = '';
+            document.getElementById('testSoapResult').innerHTML = '';
+
+            updateTestStatus('running', '轉錄中');
+            addTestLog('🎤', `開始 Whisper 轉錄 | 檔案: ${select.options[select.selectedIndex].text}`);
+            updateTestProgress(10);
+
+            try {
+                const response = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                    method: 'POST',
+                    body: JSON.stringify({ audio_path: filePath })
+                });
+
+                if (!response.ok) throw new Error('轉錄失敗');
+
+                const data = await response.json();
+                addTestLog('✅', '轉錄完成', 'success');
+                addTestLog('📝', `結果: ${data.transcript}`, 'success');
+                updateTestProgress(100);
+                updateTestStatus('success', '完成');
+
+                document.getElementById('testSoapResult').innerHTML = `
+                    <div class="soap-result">
+                        <h4 style="color: var(--primary-light); margin-bottom: 12px;">轉錄文字</h4>
+                        <div class="soap-text">${data.transcript}</div>
+                    </div>
+                `;
+            } catch (err) {
+                addTestLog('❌', `錯誤: ${err.message}`, 'error');
+                updateTestStatus('error', '失敗');
+            }
+        }
+
+        function setInputSource(source) {
+            currentSource = source;
+            document.getElementById('sourceAudioBtn').classList.toggle('active', source === 'audio');
+            document.getElementById('sourceTextBtn').classList.toggle('active', source === 'text');
+            document.getElementById('audioInputSection').style.display = source === 'audio' ? 'block' : 'none';
+            document.getElementById('textInputSection').style.display = source === 'text' ? 'block' : 'none';
+        }
+
+        function addTestLog(icon, message, type = 'info') {
+            const log = document.getElementById('testProcessLog');
+            const time = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `
+                <span class="log-time">${time}</span>
+                <span class="log-icon">${icon}</span>
+                <span class="log-message">${message}</span>
+            `;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateTestStatus(status, label) {
+            const badge = document.getElementById('resultStatus');
+            const spinner = document.getElementById('resultSpinner');
+            const labelEl = document.getElementById('statusLabel');
+
+            badge.className = `status-badge ${status}`;
+            spinner.style.display = status === 'running' ? 'inline-block' : 'none';
+            labelEl.textContent = label;
+        }
+
+        function updateTestProgress(percent) {
+            document.getElementById('testProgressBar').style.width = percent + '%';
+        }
+
+        async function selectAndRunAudio(filePath, fileName) {
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('testProcessLog').innerHTML = '';
+            document.getElementById('testSoapResult').innerHTML = '';
+
+            updateTestStatus('running', '轉錄中');
+            addTestLog('🎤', `開始 Whisper 轉錄 | 檔案: ${fileName}`);
+            updateTestProgress(10);
+
+            try {
+                const response = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                    method: 'POST',
+                    body: JSON.stringify({ audio_path: filePath })
+                });
+
+                if (!response.ok) throw new Error('轉錄失敗');
+
+                const data = await response.json();
+                addTestLog('✅', `轉錄完成`, 'success');
+                addTestLog('📝', `結果: ${data.transcript}`, 'success');
+                updateTestProgress(100);
+                updateTestStatus('success', '完成');
+
+                document.getElementById('testSoapResult').innerHTML = `
+                    <div class="soap-result">
+                        <h4 style="color: var(--primary-light); margin-bottom: 12px;">轉錄文字</h4>
+                        <div class="soap-text">${data.transcript}</div>
+                    </div>
+                `;
+            } catch (err) {
+                addTestLog('❌', `錯誤: ${err.message}`, 'error');
+                updateTestStatus('error', '失敗');
+            }
+        }
+
+        async function runFullTest() {
+            const model = document.getElementById('testModel').value;
+            let transcript = '';
+
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('testProcessLog').innerHTML = '';
+            document.getElementById('testSoapResult').innerHTML = '';
+
+            updateTestStatus('running', '處理中');
+            updateTestProgress(0);
+
+            try {
+                if (currentSource === 'audio') {
+                    const audioFile = document.getElementById('testAudioSelect').value;
+                    if (!audioFile) return alert('請選擇音檔');
+                    addTestLog('🎤', `正在轉錄音檔: ${audioFile}`);
+                    updateTestProgress(20);
+
+                    // 使用 form encoding 傳遞檔案路徑
+                    const formData = new FormData();
+                    formData.append('audio_path', audioFile);
+
+                    const transcribeRes = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!transcribeRes.ok) throw new Error('轉錄失敗');
+                    const transcribeData = await transcribeRes.json();
+                    transcript = transcribeData.transcript;
+
+                    addTestLog('✅', `轉錄完成: ${transcript.substring(0, 50)}...`, 'success');
+                    updateTestProgress(50);
+                } else {
+                    transcript = document.getElementById('testTextInput').value;
+                    addTestLog('📝', `使用文字輸入: ${transcript.substring(0, 50)}...`);
+                    updateTestProgress(30);
+                }
+
+                addTestLog('🧠', `正在生成 SOAP 病歷 | 模型: ${model}`);
+                updateTestProgress(60);
+
+                // 使用 extended API 完整流程（包含 ICD-10、醫囑、藥物建議、RAG）
+                const soapRes = await fetch(API_URL + '/api/v1/extended/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ transcript: input, model: model })
+                    body: JSON.stringify({
+                        transcript: transcript,
+                        model: model,
+                        include_symptoms: true,
+                        include_icd10: true,
+                        include_orders: true,
+                        include_drugs: true,
+                        output_lang: "zh-TW"
+                    })
                 });
-                
-                if (!response.ok) throw new Error('API 請求失敗');
-                
-                const data = await response.json();
-                displayResult(data, input);
-                
-            } catch (error) {
-                resultDiv.innerHTML = '<div class="error">錯誤: ' + error.message + '</div>';
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '生成 SOAP 病歷';
+
+                if (!soapRes.ok) throw new Error('SOAP 生成失敗');
+
+                const soapData = await soapRes.json();
+                addTestLog('✅', 'SOAP 病歷生成完成', 'success');
+                updateTestProgress(100);
+                updateTestStatus('success', '完成');
+
+                displaySoapResult(soapData);
+
+            } catch (err) {
+                addTestLog('❌', `錯誤: ${err.message}`, 'error');
+                updateTestStatus('error', '失敗');
             }
         }
-        
-        function displayResult(data, input) {
+
+        function displaySoapResult(data) {
             const soap = data.soap;
-            const time = data.processing_time_ms;
-            const model = data.metadata.model_version;
-            
+            const resultDiv = document.getElementById('testSoapResult');
+
             let html = `
-                <h3>📋 SOAP 病歷 (${time}ms | ${model})</h3>
-                <div class="section">
-                    <div class="section-label">S - 主訴 (Subjective)</div>
-                    <div class="section-content">${soap.subjective || '(無)'}</div>
-                </div>
-                <div class="section">
-                    <div class="section-label">O - 客觀發現 (Objective)</div>
-                    <div class="section-content">${soap.objective || '(無)'}</div>
-                </div>
-                <div class="section">
-                    <div class="section-label">A - 評估診斷 (Assessment)</div>
-                    <div class="section-content">${soap.assessment || '(無)'}</div>
-                </div>
-                <div class="section">
-                    <div class="section-label">P - 計畫 (Plan)</div>
-                    <div class="section-content">${soap.plan || '(無)'}</div>
-                </div>
-                <div class="section">
-                    <div class="section-label">📝 對話摘要</div>
-                    <div class="section-content">${soap.conversation_summary || '(無)'}</div>
-                </div>
+                <div class="soap-result">
+                    <div class="soap-section">
+                        <span class="soap-label s">S 主訴</span>
+                        <div class="soap-text">${soap.subjective || '-'}</div>
+                    </div>
+                    <div class="soap-section">
+                        <span class="soap-label o">O 客觀</span>
+                        <div class="soap-text">${soap.objective || '-'}</div>
+                    </div>
+                    <div class="soap-section">
+                        <span class="soap-label a">A 診斷</span>
+                        <div class="soap-text">${soap.assessment || '-'}</div>
+                    </div>
+                    <div class="soap-section">
+                        <span class="soap-label p">P 計畫</span>
+                        <div class="soap-text">${soap.plan || '-'}</div>
+                    </div>
             `;
-            
-            if (data.metadata.normalized_terms && data.metadata.normalized_terms.length > 0) {
-                html += '<div class="section"><div class="section-label">🔑 術語標準化</div><div class="section-content">';
-                data.metadata.normalized_terms.forEach(term => {
-                    html += `• ${term.original} → ${term.standard}<br>`;
+
+            if (soap.medical_orders && soap.medical_orders.length > 0) {
+                html += `<div class="medical-orders"><h4>📋 建議醫囑</h4>`;
+                soap.medical_orders.forEach(order => {
+                    html += `<div class="order-item">${order}</div>`;
                 });
-                html += '</div></div>';
+                html += `</div>`;
             }
-            
-            document.getElementById('result').innerHTML = html;
-            addToHistory(input, soap);
+
+            if (soap.drug_recommendations && soap.drug_recommendations.length > 0) {
+                html += `<div class="drug-recommendations"><h4>💊 建議藥物</h4>`;
+                soap.drug_recommendations.forEach(drug => {
+                    html += `<div class="drug-item"><strong>${drug.name}</strong> - ${drug.indication || '適應症不明'}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            resultDiv.innerHTML = html;
         }
-        
-        function addToHistory(input, soap) {
-            const historyList = document.getElementById('historyList');
-            const item = document.createElement('div');
-            item.className = 'history-item';
-            item.innerHTML = `
-                <div class="history-input">輸入: ${input.substring(0, 50)}...</div>
-                <div class="history-output">
-                    <strong>S:</strong> ${(soap.subjective || '').substring(0, 80)}...<br>
-                    <strong>A:</strong> ${(soap.assessment || '').substring(0, 80)}...
-                </div>
-            `;
-            historyList.insertBefore(item, historyList.firstChild);
-            
-            if (historyList.children.length > 10) {
-                historyList.removeChild(historyList.lastChild);
-            }
-        }
-        
-        // Enter key to submit
-        document.getElementById('inputText').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                generateSOAP();
-            }
-        });
     </script>
 </body>
 </html>

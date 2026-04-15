@@ -1,17 +1,21 @@
 # AGENTS.md — SoapVoice 開發指南
 
 > 醫療語音轉 SOAP 病歷系統（Medical Voice-to-SOAP Conversion System）
-> Python 3.11+ · FastAPI · Ollama/Qwen3.5 · Faster-Whisper · uv 套件管理
+> Python 3.11+ · FastAPI · **Gemma 4:E4B (llama-cpp-python)** · Faster-Whisper · uv 套件管理
+> **Windows CPU 全離線版** — 無需 GPU，無需雲端 API
 
 ## 系統 Pipeline
 
 ```
-語音輸入 → [可選 ASR 引擎] → 術語標準化 → ICD-10 對應 → Qwen3.5 LLM → SOAP 病歷
-                ↓
-        Faster-Whisper (繁體) 或 Qwen3-ASR (簡體→繁體)
+語音輸入 → [ASR 引擎] → 術語標準化 → ICD-10 對應 → Gemma 4:E4B (llama.cpp) → SOAP 病歷
+    ↓                         ↑
+Faster-Whisper medium    Tesseract OCR / Ollama Vision (備援)
+(本地離線 CPU)           (HIS 畫面患者資訊擷取)
+          ↓
+    Desktop GUI 側邊欄 (ttkbootstrap Superhero) 右貼螢幕
 ```
 
-目標：加入 CLI 互動介面，並支援以較小模型生成 SOAP 病歷記錄。
+目標：Windows CPU 完全離線，右側邊欄 GUI，零延遲 SOAP 生成。
 
 ---
 
@@ -56,20 +60,26 @@ src/
 │   ├── rest.py                # REST 端點（/clinical/normalize, /icd10, /soap/generate）
 │   └── websocket.py           # WebSocket 端點（即時語音串流轉錄）
 ├── asr/
-│   ├── whisper_model.py       # Faster-Whisper ASR 包裝
-│   ├── qwen3asr_model.py      # Qwen3-ASR 包裝
+│   ├── whisper_model.py       # Faster-Whisper ASR 包裝（CPU 優化，medium 模型）
+│   ├── qwen3asr_model.py      # Qwen3-ASR 包裝（備用）
 │   ├── asr_factory.py         # ASR 引擎工廠 + ChineseConverter（opencc 簡→繁）
 │   ├── stream_transcriber.py  # 串流轉錄邏輯
 │   └── vocabulary.py          # 醫療詞彙表
 ├── nlp/
 │   ├── terminology_mapper.py  # 口語中文→標準醫療英文（80+ 術語映射）
 │   ├── icd10_classifier.py    # 症狀→ICD-10 代碼映射（50+ 症狀）
-│   └── soap_classifier.py     # 關鍵字規則 S/O/A/P 分類
+│   ├── soap_classifier.py     # 關鍵字規則 S/O/A/P 分類
+│   └── ocr_parser.py          # HIS 畫面截圖 OCR（Tesseract 主力 + Ollama Vision 備援）
 ├── soap/
 │   └── soap_generator.py      # LLM SOAP 病歷生成（整合術語標準化 + ICD-10）
 ├── llm/
-│   ├── ollama_engine.py       # Ollama API 推理引擎（主要使用）
-│   └── vllm_engine.py         # vLLM 推理引擎（備用）
+│   ├── ollama_engine.py       # Ollama API 推理引擎
+│   └── llama_engine.py        # llama-cpp-python 推理引擎（Windows 離線主力）
+├── gui/
+│   ├── desktop_app.py         # 桌面側邊欄 GUI（ttkbootstrap Superhero 主題，右貼螢幕）
+│   └── config_manager.py      # GUI 設定管理
+├── phase8/
+│   └── capture_ocr.py         # 截圖 + OCR 整合（Tesseract 主力，EasyOCR 備援）
 └── security/
     └── auth.py                # API Key + JWT 認證模組
 ```
@@ -189,5 +199,20 @@ def get_soap_generator() -> SOAPGenerator:
 3. **SOAP_KEYWORDS 單一來源**：定義在 `soap_classifier.py`，`soap_generator.py` 引用之
 4. **術語標準化已整合至 SOAP 生成流程**：LLM prompt 自動含標準術語 + ICD-10 候選碼
 5. **ASR 引擎可切換**：透過 `asr_backend` 參數選擇 whisper 或 qwen3asr
-6. **Ollama 為主要 LLM 後端**（非 vLLM），模型：qwen3.5:9b（主力）/ qwen3.5:27b（備用）
-7. **語音與逐字稿須保存**：每次錄音須儲存原始音檔（WAV/PCM）與 ASR 逐字稿至 `data/recordings/` 目錄
+6. **主力 LLM：Gemma 4:E4B**（`llama-cpp-python 0.3.20`），使用 `<start_of_turn>` 控制標記；Ollama 為補充後端
+7. **OCR 優先順序**：Tesseract-OCR → Ollama Vision (gemma4:e2b) → 純截圖
+8. **GUI 架構：雙階段側邊欄**
+   - `ttk.Window` + `superhero` 主題（`ttkbootstrap`）
+   - **緊湊模式** `420×240`：控制列（錄音/停止/處理），停靠於螢幕右上角
+   - **展開模式** `420×900`：LLM 完成後自動展開，顯示患者卡片與完整 SOAP 病歷
+   - 使用 `ttk.Labelframe`（小寫 f）搭配 `bootstyle=` 參數
+9. **語音與逐字稿須保存**：每次錄音須儲存原始音檔（WAV/PCM）與 ASR 逐字稿至 `data/recordings/` 目錄
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` to keep the graph current

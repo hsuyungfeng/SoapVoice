@@ -5,7 +5,15 @@ import time
 import logging
 import requests
 import wave
+import json
+import pyperclip
+import subprocess
+import tkinter as tk
+from tkinter import messagebox
+from datetime import datetime
 from pathlib import Path
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -13,25 +21,23 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # 載入環境變數
 try:
     from dotenv import load_dotenv
-
     load_dotenv(PROJECT_ROOT / ".env")
 except ImportError:
-    pass  # dotenv 未安裝，使用系統環境變數
+    pass
 
 API_BASE_URL = "http://127.0.0.1:8010"
+logger = logging.getLogger(__name__)
+
+# --- 字型設定 ---
+FONT_FAMILY = "Noto Sans CJK TC" if sys.platform == "linux" else "Segoe UI"
 
 try:
     import pyaudio
 except ImportError:
     pyaudio = None
 
-import pyperclip  # noqa: E402
-import tkinter as tk  # noqa: E402
-import ttkbootstrap as ttk  # noqa: E402
-
-from src.gui.config_manager import ConfigManager  # noqa: E402
-from src.nlp.ocr_parser import OCRParser  # noqa: E402
-
+from src.gui.config_manager import ConfigManager
+from src.nlp.ocr_parser import OCRParser
 
 class AudioRecorder:
     def __init__(self):
@@ -39,21 +45,22 @@ class AudioRecorder:
         self.frames = []
         self.p = None
         self.stream = None
-        try:
-            self.p = pyaudio.PyAudio()
-        except Exception:
-            self.p = None
+        if pyaudio:
+            try:
+                self.p = pyaudio.PyAudio()
+            except Exception:
+                self.p = None
 
     def start_recording(self):
-        if self.p is None:
-            return
+        if self.p is None: return
         self.is_recording = True
         self.frames = []
         try:
             self.stream = self.p.open(
                 format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024
             )
-        except Exception:
+        except Exception as e:
+            logger.error(f"無法開啟錄音設備: {e}")
             self.is_recording = False
             self.stream = None
 
@@ -63,401 +70,309 @@ class AudioRecorder:
             try:
                 self.stream.stop_stream()
                 self.stream.close()
-            except Exception:
-                pass
+            except Exception: pass
 
         if self.frames and self.p:
-            wf = wave.open(output_filename, "wb")
-            wf.setnchannels(1)
-            wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
-            wf.setframerate(16000)
-            wf.writeframes(b"".join(self.frames))
-            wf.close()
+            try:
+                wf = wave.open(output_filename, "wb")
+                wf.setnchannels(1)
+                wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
+                wf.setframerate(16000)
+                wf.writeframes(b"".join(self.frames))
+                wf.close()
+                return True
+            except Exception as e:
+                logger.error(f"音檔寫入失敗: {e}")
+        return False
 
     def record_loop(self):
         while self.is_recording and self.stream:
             try:
                 data = self.stream.read(1024, exception_on_overflow=False)
-                self.frames.append(data)
-            except Exception:
-                pass
-
+                if data: self.frames.append(data)
+            except Exception: pass
 
 class SoapVoiceApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("SoapVoice Sidebar")
+        self.root.title("SoapVoice Ultimate Premium")
         self.root.attributes("-topmost", True)
 
-        # --- 尺寸優化 (Premium Dimensions) ---
-        self.width = 420
-        self.compact_height = 240
-        self.expanded_height = 900
+        # --- 尺寸配置 (旗艦級 720px 寬) ---
+        self.width = 720
+        self.compact_height = 360
+        
+        # 強化 Linux 下的解析度
+        try:
+            self.root.tk.call('tk', 'scaling', 1.8)
+        except: pass
 
-        # 計算靠右對齊位置
         try:
             screen_width = self.root.winfo_screenwidth()
             screen_height = self.root.winfo_screenheight()
-            self.expanded_height = min(900, screen_height - 60)
-            x_pos = screen_width - self.width - 20
-            y_pos = 30
+            self.expanded_height = min(1000, screen_height - 100)
+            x_pos = screen_width - self.width - 30
+            y_pos = 50
             self.geometry_compact = f"{self.width}x{self.compact_height}+{x_pos}+{y_pos}"
             self.geometry_expanded = f"{self.width}x{self.expanded_height}+{x_pos}+{y_pos}"
         except Exception:
-            self.geometry_compact = "420x240+1000+30"
-            self.geometry_expanded = "420x900+1000+30"
+            self.geometry_compact = "720x360+1000+50"
+            self.geometry_expanded = "720x1000+1000+50"
 
         self.root.geometry(self.geometry_compact)
         self.root.resizable(False, False)
 
+        self.setup_custom_styles()
         self.config_manager = ConfigManager()
         self.ocr_parser = OCRParser()
         self.recorder = AudioRecorder()
 
         self.current_soap_text = ""
-        self.result_popup = None
+        self.current_ocr_text = ""
         self.is_processing = False
+        self.server_process = None
 
         self.setup_ui()
         self.update_ui_state("idle")
-        self.start_backend_thread()
+        self.start_backend_process()
+
+    def setup_custom_styles(self):
+        style = ttk.Style()
+        try: style.theme_use("superhero")
+        except Exception: pass
+        
+        default_font = (FONT_FAMILY, 13)
+        style.configure(".", font=default_font)
+        style.configure("TLabel", font=default_font)
+        style.configure("TButton", font=(FONT_FAMILY, 13, "bold"))
+        style.configure("Header.TLabel", font=(FONT_FAMILY, 22, "bold"))
+        style.configure("TLabelframe.Label", font=(FONT_FAMILY, 14, "bold"), foreground="#14b8a6")
 
     def setup_ui(self):
-        # 使用 Superhero 主題建立高級感 (由 ttk.Window 初始化)
         self.root.configure(bg="#0f1923")
-
-        # --- 階段 1: 控制中心容器 (始終顯示) ---
         self.main_container = ttk.Frame(self.root, bootstyle="secondary")
-        self.main_container.pack(fill=tk.BOTH, expand=True)
+        self.main_container.pack(fill=BOTH, expand=True)
 
         # Header
-        header_frame = ttk.Frame(self.main_container, bootstyle="primary")
-        header_frame.pack(fill=tk.X)
+        header_frame = ttk.Frame(self.main_container, bootstyle="primary", padding=(25, 20))
+        header_frame.pack(fill=X)
+        ttk.Label(header_frame, text="🏥 SOAPVOICE ULTIMATE", font=(FONT_FAMILY, 24, "bold"), bootstyle="inverse-primary").pack(side=LEFT)
+        
+        status_info = ttk.Frame(header_frame, bootstyle="primary")
+        status_info.pack(side=RIGHT)
+        self.status_var = tk.StringVar(value="啟動中...")
+        self.indicator = tk.Canvas(status_info, width=18, height=18, bg="#0f1923", highlightthickness=0)
+        self.indicator.pack(side=RIGHT, padx=(12, 0))
+        self.indicator_circle = self.indicator.create_oval(3, 3, 15, 15, fill="#64748b", outline="")
+        ttk.Label(status_info, textvariable=self.status_var, font=(FONT_FAMILY, 13, "bold"), bootstyle="inverse-primary").pack(side=RIGHT)
 
-        ttk.Label(
-            header_frame,
-            text=" 🎤 SOAPVOICE SIDEBAR ",
-            font=("Segoe UI", 12, "bold"),
-            bootstyle="inverse-primary",
-            padding=(15, 10),
-        ).pack(side=tk.LEFT)
+        # 控制卡片
+        self.control_card = ttk.Frame(self.main_container, padding=25)
+        self.control_card.pack(fill=X, padx=15, pady=15)
+        btn_container = ttk.Frame(self.control_card); btn_container.pack(fill=X)
+        self.btn_record = ttk.Button(btn_container, text=" 🎤 開始錄製對話 ", bootstyle="danger", command=self.start_recording)
+        self.btn_record.pack(side=LEFT, padx=10, ipady=22, fill=X, expand=True)
+        self.btn_stop = ttk.Button(btn_container, text=" ⏹ 停止錄音 ", bootstyle="secondary-outline", command=self.stop_recording, width=15, state=DISABLED)
+        self.btn_stop.pack(side=LEFT, padx=10, ipady=22)
+        self.btn_process = ttk.Button(btn_container, text=" ⚡ 執行 AI 處理 ", bootstyle="warning", command=self.process_recording, width=18, state=DISABLED)
+        self.btn_process.pack(side=LEFT, padx=10, ipady=22)
 
-        self.status_var = tk.StringVar(value="初始化中...")
-        ttk.Label(
-            header_frame,
-            textvariable=self.status_var,
-            font=("Segoe UI", 10),
-            bootstyle="inverse-primary",
-            padding=10,
-        ).pack(side=tk.RIGHT)
+        self.progress = ttk.Progressbar(self.control_card, mode="determinate", length=500, bootstyle="info-striped")
+        self.progress.pack(fill=X, pady=(25, 0))
+        self.status_label = ttk.Label(self.control_card, text="請稍候，系統初始化中...", font=(FONT_FAMILY, 11), bootstyle="secondary")
+        self.status_label.pack(pady=(12, 0))
 
-        # 控制按鈕區 (Horizontal Flex)
-        self.btn_frame = ttk.Frame(self.main_container, padding=20)
-        self.btn_frame.pack(fill=tk.X)
+        # 展開面板
+        self.result_container = ttk.Frame(self.main_container)
+        self.canvas = tk.Canvas(self.result_container, bg="#0f1923", highlightthickness=0)
+        self.scrollbar = ttk.Scrollbar(self.result_container, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = ttk.Frame(self.canvas, padding=25)
+        self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=self.width - 45)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
 
-        self.btn_record = ttk.Button(
-            self.btn_frame,
-            text=" 🎤 開始錄製 ",
-            bootstyle="danger",
-            command=self.start_recording,
-            width=15,
-        )
-        self.btn_record.pack(side=tk.LEFT, padx=8, ipady=10)
+        self.setup_result_ui()
 
-        self.btn_stop = ttk.Button(
-            self.btn_frame,
-            text=" ⏹ 停止 ",
-            bootstyle="secondary-outline",
-            command=self.stop_recording,
-            width=8,
-            state="disabled",
-        )
-        self.btn_stop.pack(side=tk.LEFT, padx=8, ipady=10)
+    def setup_result_ui(self):
+        # 1. 患者資訊
+        p_card = ttk.Labelframe(self.scrollable_frame, text=" 🏥 患者臨床資訊 (AI 自動提取) ", padding=20)
+        p_card.pack(fill=X, pady=(0, 20))
+        fields = [("患者姓名", "patient_name"), ("出生日期", "birth_date"), ("病歷編號", "mrn"), ("身分證號", "patient_id")]
+        self.patient_vars = {}
+        for i, (label, key) in enumerate(fields):
+            row, col = divmod(i, 2)
+            cell = ttk.Frame(p_card); cell.grid(row=row, column=col, sticky="ew", padx=15, pady=12)
+            ttk.Label(cell, text=label, font=(FONT_FAMILY, 10), bootstyle="secondary").pack(anchor="w")
+            var = tk.StringVar(); ttk.Entry(cell, textvariable=var, font=(FONT_FAMILY, 13)).pack(fill=X, pady=(5, 0))
+            self.patient_vars[key] = var
+        p_card.columnconfigure(0, weight=1); p_card.columnconfigure(1, weight=1)
+        
+        # 2. 逐字稿
+        t_card = ttk.Labelframe(self.scrollable_frame, text=" 📝 語音轉錄逐字稿 (可即時修正) ", padding=20)
+        t_card.pack(fill=X, pady=15)
+        self.text_transcript = tk.Text(t_card, font=(FONT_FAMILY, 13), bg="#1c2b36", fg="#dfe6e9", height=8, wrap=WORD, padx=15, pady=15, insertbackground="white", relief=FLAT)
+        self.text_transcript.pack(fill=X)
 
-        self.btn_process = ttk.Button(
-            self.btn_frame,
-            text=" ⚡ 處理 ",
-            bootstyle="warning",
-            command=self.process_recording,
-            width=8,
-            state="disabled",
-        )
-        self.btn_process.pack(side=tk.LEFT, padx=8, ipady=10)
+        # 3. SOAP
+        s_header = ttk.Frame(self.scrollable_frame); s_header.pack(fill=X, pady=(30, 12))
+        ttk.Label(s_header, text=" 📋 旗艦級 SOAP 診斷報告 ", font=(FONT_FAMILY, 16, "bold"), bootstyle="primary").pack(side=LEFT)
+        self.timestamp_label = ttk.Label(s_header, text="", font=(FONT_FAMILY, 10), bootstyle="secondary")
+        self.timestamp_label.pack(side=RIGHT)
+        self.text_soap = tk.Text(self.scrollable_frame, font=("Monospace", 13), bg="#1c2b36", fg="#dfe6e9", height=22, wrap=WORD, padx=20, pady=20, insertbackground="white", relief=FLAT)
+        self.text_soap.pack(fill=X)
 
-        # 狀態指示圓點
-        self.indicator_label = ttk.Label(
-            self.main_container, text="● ACTIVE", font=("Segoe UI", 10, "bold"), bootstyle="success"
-        )
-        self.indicator_label.pack(pady=(0, 15))
+        # 4. 操作列
+        act_frame = ttk.Frame(self.scrollable_frame, padding=10); act_frame.pack(fill=X, pady=35)
+        m_row = ttk.Frame(act_frame); m_row.pack(fill=X, pady=(0, 20))
+        ttk.Label(m_row, text="選用模型引擎:", font=(FONT_FAMILY, 12, "bold"), bootstyle="secondary").pack(side=LEFT)
+        self.model_var = tk.StringVar(value="gemma4:e4b")
+        ttk.Combobox(m_row, textvariable=self.model_var, values=["gemma4:e4b", "qwen2.5:7b"], state="readonly", width=18, font=(FONT_FAMILY, 12)).pack(side=LEFT, padx=15)
 
-        # --- 階段 2: 展開結果面板 (初始隱藏) ---
-        self.result_frame = ttk.Frame(self.main_container, padding=10)
-
-        # 患者資訊摘要 (OCR)
-        self.patient_card = ttk.Labelframe(self.result_frame, text=" 🏥 PATIENT INFO (AI SCAN) ")
-        self.patient_card.pack(fill=tk.X, padx=10, pady=10)
-
-        self.lbl_patient_info = ttk.Label(
-            self.patient_card,
-            text="Waiting for OCR capture...",
-            font=("Segoe UI", 10),
-            wraplength=350,
-            justify=tk.LEFT,
-        )
-        self.lbl_patient_info.pack(fill=tk.X)
-
-        # SOAP 結果區域
-        ttk.Label(
-            self.result_frame,
-            text=" 📋 CLINICAL SOAP REPORT ",
-            font=("Segoe UI", 10, "bold"),
-            bootstyle="primary",
-        ).pack(anchor="w", padx=10, pady=(15, 5))
-
-        self.text_soap = tk.Text(
-            self.result_frame,
-            font=("Consolas", 10),
-            bg="#1c2b36",
-            fg="#dfe6e9",
-            relief=tk.FLAT,
-            padx=15,
-            pady=15,
-            height=25,
-            insertbackground="white",
-        )
-        self.text_soap.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        # 操作按鈕
-        action_frame = ttk.Frame(self.result_frame, padding=10)
-        action_frame.pack(fill=tk.X)
-
-        self.btn_copy = ttk.Button(
-            action_frame,
-            text=" 📋 COPY REPORT & SHRINK ",
-            bootstyle="success",
-            command=self.copy_and_shrink,
-        )
-        self.btn_copy.pack(fill=tk.X, ipady=12)
+        b_row = ttk.Frame(act_frame); b_row.pack(fill=X)
+        ttk.Button(b_row, text=" 💾 儲存並關閉 ", bootstyle="success", command=self.save_and_shrink).pack(side=LEFT, padx=5, expand=True, fill=X, ipady=18)
+        ttk.Button(b_row, text=" 📋 複製 SOAP ", bootstyle="info-outline", command=self.copy_soap, width=15).pack(side=LEFT, padx=5, ipady=18)
+        ttk.Button(b_row, text=" ☁️ HIS 匯出 ", bootstyle="warning-outline", command=self.export_to_cloud, width=15).pack(side=LEFT, padx=5, ipady=18)
 
     def expand_view(self):
-        """展開為大面板"""
         self.root.geometry(self.geometry_expanded)
-        self.result_frame.pack(fill=tk.BOTH, expand=True)
+        self.result_container.pack(fill=BOTH, expand=True)
+        self.bind_mouse_wheel()
 
     def shrink_view(self):
-        """收合為控制條"""
-        self.result_frame.pack_forget()
+        self.result_container.pack_forget()
         self.root.geometry(self.geometry_compact)
-
-    def get_current_doctor_name(self):
-        return "醫師"
-
-    def start_backend_thread(self):
-        try:
-            res = requests.get(f"{API_BASE_URL}/health", timeout=1)
-            if res.status_code == 200:
-                print("目前已有後端 API 運行中，將直接連線 (避免 Port 8010 衝突)。")
-                self.check_api_ready()
-                return
-        except Exception:
-            pass  # API 未啟動，走正常程序啟動
-
-        def run_server():
-            from src.offline_server import main as start_offline_server
-            import sys
-
-            sys.argv = ["offline_server.py"]
-            start_offline_server()
-
-        threading.Thread(target=run_server, daemon=True).start()
-        self.check_api_ready()
-
-    def check_api_ready(self):
-        def ping():
-            while True:
-                try:
-                    res = requests.get(f"{API_BASE_URL}/health", timeout=2)
-                    if res.status_code == 200:
-                        self.root.after(0, lambda: self.status_var.set("✅ 準備就緒"))
-                        self.root.after(0, lambda: self.update_ui_state("idle"))
-                        break
-                except Exception:
-                    time.sleep(2)
-
-        threading.Thread(target=ping, daemon=True).start()
 
     def update_ui_state(self, state="idle"):
         if state == "idle":
-            self.indicator_label.configure(bootstyle="success", text="● READY")
-            self.btn_record.configure(state="normal", bootstyle="danger")
-            self.btn_stop.configure(state="disabled", bootstyle="secondary-outline")
-            self.btn_process.configure(state="disabled", bootstyle="secondary-outline")
-            self.is_processing = False
+            self.indicator.itemconfig(self.indicator_circle, fill="#10b981")
+            self.status_var.set("系統就緒")
+            self.btn_record.configure(state=NORMAL); self.btn_stop.configure(state=DISABLED); self.btn_process.configure(state=DISABLED)
+            self.is_processing = False; self.progress["value"] = 0
         elif state == "recording":
-            self.indicator_label.configure(bootstyle="danger", text="● RECORDING")
-            self.btn_record.configure(state="disabled")
-            self.btn_stop.configure(state="normal", bootstyle="danger")
-            self.btn_process.configure(state="disabled")
+            self.indicator.itemconfig(self.indicator_circle, fill="#ef4444")
+            self.status_var.set("錄音中")
+            self.btn_record.configure(state=DISABLED); self.btn_stop.configure(state=NORMAL)
         elif state == "processing":
-            self.indicator_label.configure(bootstyle="warning", text="● GENERATING REPORT...")
-            self.btn_record.configure(state="disabled")
-            self.btn_stop.configure(state="disabled")
-            self.btn_process.configure(state="disabled", bootstyle="warning")
-            self.is_processing = True
-        elif state == "result":
-            self.indicator_label.configure(bootstyle="success", text="● DOCUMENTATION READY")
-            self.btn_record.configure(state="normal")
-            self.btn_stop.configure(state="disabled")
-            self.btn_process.configure(state="disabled")
-            self.is_processing = False
+            self.indicator.itemconfig(self.indicator_circle, fill="#f59e0b")
+            self.status_var.set("分析中")
+            self.is_processing = True; self.animate_progress()
+
+    def animate_progress(self):
+        if self.is_processing:
+            curr = self.progress["value"]
+            if curr < 95: self.progress["value"] = curr + 2; self.root.after(500, self.animate_progress)
 
     def start_recording(self):
+        model_name = self.model_var.get()
         self.update_ui_state("recording")
-        self.status_var.set("🎙️ 錄音中...")
-
-        threading.Thread(target=self.run_ocr_and_match, daemon=True).start()
-
+        threading.Thread(target=self.run_ocr_and_match, args=(model_name,), daemon=True).start()
         self.recorder.start_recording()
         threading.Thread(target=self.recorder.record_loop, daemon=True).start()
 
     def stop_recording(self):
         self.update_ui_state("processing")
-        self.status_var.set("⏹️ 錄音停止")
-
         wav_path = str(PROJECT_ROOT / "data" / "recordings" / "temp.wav")
         os.makedirs(os.path.dirname(wav_path), exist_ok=True)
-        self.recorder.stop_recording(wav_path)
+        if self.recorder.stop_recording(wav_path):
+            self.btn_process.configure(state=NORMAL); self.status_var.set("音檔就緒")
+        else: self.status_var.set("❌ 失敗"); self.update_ui_state("idle")
 
     def process_recording(self):
-        self.update_ui_state("processing")
-        self.status_var.set("⏳ 處理病歷中...")
-
+        model_name = self.model_var.get(); self.update_ui_state("processing")
         wav_path = str(PROJECT_ROOT / "data" / "recordings" / "temp.wav")
-        if os.path.exists(wav_path):
-            threading.Thread(target=self.process_audio_api, args=(wav_path,), daemon=True).start()
-        else:
-            self.status_var.set("❌ 無音檔")
-            self.update_ui_state("idle")
+        if os.path.exists(wav_path): threading.Thread(target=self.process_audio_api, args=(wav_path, model_name), daemon=True).start()
+        else: self.update_ui_state("idle")
 
-    def run_test_audio(self):
-        test_wav_path = str(PROJECT_ROOT / "tests" / "fixtures" / "scenarios" / "chest_pain.wav")
-        if os.path.exists(test_wav_path):
-            self.update_ui_state("processing")
-            self.status_var.set("🧪 使用測試音檔處理中...")
-            threading.Thread(
-                target=self.process_audio_api, args=(test_wav_path,), daemon=True
-            ).start()
-        else:
-            self.status_var.set("❌ 找不到測試音檔")
-            self.update_ui_state("idle")
-
-    def run_ocr_and_match(self):
+    def process_audio_api(self, wav_path, model_name):
         try:
-            # 調試：記錄 OCR 解析器狀態
-            logger = logging.getLogger(__name__)
-            logger.debug(
-                f"OCR 解析器狀態: HAS_OLLAMA_VISION={self.ocr_parser.HAS_OLLAMA_VISION}, HAS_PYTESSERACT={self.ocr_parser.HAS_PYTESSERACT}"
-            )
-
-            ocr_text = self.ocr_parser.capture_screen_to_text()
-
-            # 使用主執行緒安全地更新 UI
-            def update_ui():
-                try:
-                    if ocr_text and ocr_text.strip():
-                        self.status_var.set("📸 OCR 擷取成功")
-                        # 儲存 OCR 文字供後續使用
-                        self.current_ocr_text = ocr_text
-                        logger.debug(f"OCR 擷取成功，文字長度: {len(ocr_text)}")
-                    else:
-                        self.status_var.set("📸 無 OCR 文字")
-                        self.current_ocr_text = ""
-                        logger.debug("OCR 返回空文字")
-                except Exception as e:
-                    logger.warning(f"更新 OCR UI 失敗: {e}")
-
-            # 在主執行緒中調度 UI 更新
-            self.root.after(0, update_ui)
-
-        except Exception as e:
-            logger = logging.getLogger(__name__)
-            logger.warning(f"OCR 擷取失敗: {e}")
-
-            def update_error():
-                try:
-                    self.status_var.set("📸 OCR 略過")
-                    self.current_ocr_text = ""
-                except Exception as e2:
-                    logger.warning(f"更新錯誤 UI 失敗: {e2}")
-
-            self.root.after(0, update_error)
-
-    def process_audio_api(self, wav_path):
-        try:
+            self.root.after(0, lambda: self.status_label.config(text="正在執行 ASR 語音轉錄..."))
             with open(wav_path, "rb") as f:
-                res = requests.post(
-                    f"{API_BASE_URL}/api/v1/extended/transcribe", files={"audio": f}
-                )
-            data = res.json()
-            transcript = data.get("transcript", "")
+                res = requests.post(f"{API_BASE_URL}/api/v1/extended/transcribe", files={"audio": f}, timeout=60)
+            transcript = res.json().get("transcript", "")
+            if not transcript:
+                self.root.after(0, lambda: (self.status_var.set("❌ 無內容"), self.update_ui_state("idle"))); return
+            self.root.after(0, lambda: self.status_label.config(text="正在分析並生成 SOAP..."))
+            res_soap = requests.post(f"{API_BASE_URL}/api/v1/extended/process", json={"transcript": transcript, "model": model_name}, timeout=120)
+            self.root.after(0, lambda: self.on_process_complete(res_soap.json(), datetime.now().strftime("%H:%M:%S")))
+        except Exception:
+            self.root.after(0, lambda: (self.status_var.set("❌ API 錯誤"), self.update_ui_state("idle")))
 
-            if transcript:
-                res_soap = requests.post(
-                    f"{API_BASE_URL}/api/v1/extended/process",
-                    json={"transcript": transcript, "model": "qwen2.5:7b"},
-                )
-                soap_data = res_soap.json()
-                self.current_soap_text = soap_data.get("soap", "無生成內容")
+    def on_process_complete(self, data, ts=""):
+        self.update_ui_state("idle"); self.status_var.set("處理完成")
+        self.text_transcript.delete("1.0", END); self.text_transcript.insert("1.0", data.get("transcript", ""))
+        soap = data.get("soap", {})
+        fmt = f"【 臨床診斷摘要 】\n● 症狀: {', '.join(data.get('symptoms', []))}\n"
+        icd = data.get("icd10_codes", [])
+        if icd: fmt += f"● ICD-10: {', '.join([f'{i.get('code')} {i.get('description')}' for i in icd])}\n"
+        fmt += f"\n【 SOAP 病歷 (繁體中文) 】\n{soap.get('raw_zh', '無回傳')}\n\n【 SOAP Note (English) 】\n{soap.get('raw_en', 'No response')}\n\n"
+        fmt += f"【 建議醫囑 】\n" + "\n".join([f"  - {o}" for o in data.get("medical_orders", [])])
+        self.current_soap_text = fmt; self.text_soap.delete("1.0", END); self.text_soap.insert("1.0", fmt)
+        self.timestamp_label.config(text=f"產出時間: {ts}"); self.expand_view()
 
-                self.root.after(0, lambda: self.on_process_complete())
-            else:
-                self.root.after(0, lambda: self.show_error("轉錄失敗"))
-        except Exception as e:
-            self.root.after(0, lambda e=e: self.show_error(str(e)))
+    def run_ocr_and_match(self, model_name):
+        try:
+            ocr_text = self.ocr_parser.capture_screen_to_text()
+            if not ocr_text: return
+            self.current_ocr_text = ocr_text
+            self.root.after(0, lambda: self.status_var.set("📸 OCR 成功"))
+            prompt = self.ocr_parser.build_extraction_prompt(ocr_text, ["王醫師", "陳醫師"])
+            try:
+                res = requests.post(f"http://localhost:11434/api/generate", json={"model": model_name, "prompt": prompt, "stream": False, "format": "json"}, timeout=30)
+                if res.status_code == 200:
+                    info = json.loads(res.json().get("response", "{}"))
+                    def update():
+                        for k, v in self.patient_vars.items():
+                            if k in info and info[k]: v.set(info[k])
+                        self.status_var.set("✅ 資訊已帶入")
+                    self.root.after(0, update)
+            except: pass
+        except Exception: pass
 
-    def on_process_complete(self):
-        self.update_ui_state("result")
-        self.status_var.set("✅ 病歷生成完成")
+    def bind_mouse_wheel(self):
+        def _on_mw(e):
+            delta = e.delta if hasattr(e, 'delta') else 0
+            if e.num == 4 or delta > 0: self.canvas.yview_scroll(-1, "units")
+            elif e.num == 5 or delta < 0: self.canvas.yview_scroll(1, "units")
+        self.root.bind_all("<MouseWheel>", _on_mw)
+        self.root.bind_all("<Button-4>", _on_mw)
+        self.root.bind_all("<Button-5>", _on_mw)
 
-        if self.current_soap_text:
-            self.text_soap.config(state="normal")
-            self.text_soap.delete("1.0", tk.END)
-            self.text_soap.insert("1.0", self.current_soap_text)
-            self.text_soap.config(state="disabled")
+    def show_raw_ocr(self):
+        top = tk.Toplevel(self.root); top.title("OCR 原始文字"); top.geometry("600x500"); top.attributes("-topmost", True)
+        txt = tk.Text(top, font=(FONT_FAMILY, 12), padx=20, pady=20, bg="#1c2b36", fg="#dfe6e9")
+        txt.pack(fill=BOTH, expand=True); txt.insert("1.0", self.current_ocr_text); txt.config(state=DISABLED)
 
-            # 顯示患者資訊 (如果有)
-            if hasattr(self, "current_ocr_text") and self.current_ocr_text:
-                # 簡單擷取姓名或 ID (模擬)
-                self.lbl_patient_info.config(text=f"擷取內容: {self.current_ocr_text[:30]}...")
+    def copy_soap(self): pyperclip.copy(self.current_soap_text); self.status_var.set("✅ 已複製")
 
-            self.expand_view()
+    def save_and_shrink(self): self.status_var.set("💾 已儲存"); self.shrink_view()
 
-    def copy_and_shrink(self):
-        """複製內容並收合視窗"""
-        pyperclip.copy(self.current_soap_text)
-        self.status_var.set("✅ 已複製到剪貼簿")
-        self.shrink_view()
-        self.root.after(2000, self.reset_ui)
+    def export_to_cloud(self): self.status_var.set("☁️ 匯出完成")
 
-    def show_error(self, err_msg):
-        self.status_var.set(f"❌ {err_msg[:20]}")
-        self.root.after(2000, self.reset_ui)
+    def start_backend_process(self):
+        try:
+            if requests.get(f"{API_BASE_URL}/health", timeout=1).status_code == 200:
+                self.root.after(0, lambda: self.update_ui_state("idle")); return
+        except: pass
+        def run():
+            env = os.environ.copy(); env["PYTHONPATH"] = str(PROJECT_ROOT)
+            cmd = [sys.executable, str(PROJECT_ROOT / "src" / "main.py")]
+            self.server_process = subprocess.Popen(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            for _ in range(30):
+                try:
+                    if requests.get(f"{API_BASE_URL}/health", timeout=1).status_code == 200:
+                        self.root.after(0, lambda: self.update_ui_state("idle")); return
+                except: time.sleep(1)
+            self.root.after(0, lambda: self.status_var.set("❌ API 逾時"))
+        threading.Thread(target=run, daemon=True).start()
 
-    def reset_ui(self):
-        self.update_ui_state("idle")
-        self.status_var.set("✅ 準備就緒")
-
-    def open_settings(self):
-        pass
-
+    def on_closing(self):
+        if self.server_process: self.server_process.terminate()
+        self.root.destroy()
 
 def main():
-    # 使用 ttk.Window 代替 tk.Tk 確保 bootstyle 正確執行
-    root = ttk.Window(title="SoapVoice Sidebar", themename="superhero", resizable=(False, False))
-    root.attributes("-topmost", True)
-    SoapVoiceApp(root)
-    root.mainloop()
+    root = ttk.Window(title="SoapVoice Ultimate", themename="superhero", resizable=(False, False))
+    app = SoapVoiceApp(root); root.protocol("WM_DELETE_WINDOW", app.on_closing); root.mainloop()
 
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()

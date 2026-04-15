@@ -3,69 +3,47 @@
 ## 專案概述
 
 **專案名稱**: SoapVoice - 醫療語音轉 SOAP 病歷系統
-**當前焦點**: 功能測試階段（functional-testing） - 端到端流程驗證
+**當前焦點**: 功能驗證與優化階段（Verification & Optimization）
 
 ## 當前位置
 
-**Phase**: 09-windows (Windows 打包) ⚠️ 部分完成
-**狀態**: ⚠️ 部分完成
+**Phase**: 08-voice-recording 🔄 進行中
+**狀態**: 🟢 良好 - 核心 Pipeline 於 CPU 離線模式下運作正常
 
 ## 進度
 
 - Phase 1-7: ✅ 完成
 - Phase 7.1: ✅ 完成（Vision OCR + 統一模型策略 + llama.cpp 包裝）
+- Phase 8.0: ✅ 完成（NLP 提取與擴展 API 修復）
 
 ## 最近更新
 
+- **2026-04-15**: NLP 提取與擴展功能修復 (Session 3)
+  - ✅ **修復症狀提取**：增加口語化同義詞支援（如「肚子痛」、「想吐」）。
+  - ✅ **修復 ICD-10 分類**：完善關鍵字映射，提高自動診斷準確率。
+  - ✅ **完善醫囑與藥物建議**：建立完整的醫學知識字典，提供針對性建議。
+  - ✅ **優化 GUI SOAP 顯示**：結構化展示臨床摘要、雙語 SOAP、醫囑與用藥。
+  - ✅ **驗證 CPU 離線模式**：Gemma 4 (llama.cpp) 於 CPU 環境穩定運作，耗時符合預期。
+
 - **2026-04-13**: Windows 打包階段部分完成 (Phase 9)
-  - ✅ 資源路徑偵測工具實作完成 (Plan 1)
-  - ✅ PyInstaller spec 檔案配置完成 (Plan 1)
-  - ✅ 自動化打包腳本與使用者指南建立 (Plan 2)
-  - ✅ Inno Setup 安裝腳本建立完成 (Plan 2)
-  - ✅ Wine 交叉編譯替代方案提供 (Plan 3)
-  - ⚠️ EXE 打包測試需 Windows 環境或 Wine 設定（使用者可執行）
-  - ⚠️ Inno Setup 編譯需 Windows 環境
-
-- **2026-04-13**: 功能測試階段完成
-  - ✅ 錄音功能測試通過
-  - ✅ ASR 轉錄測試通過
-  - ✅ 術語標準化與 ICD-10 分類測試通過
-  - ✅ SOAP 生成測試通過
-
-- **2026-04-13**: p8-voice-recorder 檢查點測試完成
-  - ✅ 後端啟動問題已解決（環境變數載入順序修正）
-  - ✅ CPU Whisper 轉錄功能正常
-  - ✅ SOAP 病歷生成功能正常
-  - ⚠️ 症狀提取與 ICD-10 分類模組未返回結果（空陣列）
-  - ⚠️ 醫囑與藥物建議模組未返回結果（空陣列）
-  - 🔄 轉移至功能測試階段（functional-testing）
-
-- 2026-04-07: Phase 7.1 完成
-  - 更新 OCRParser 支援多模型輪詢
-  - 測試統一模型策略
-  - 下載 llama.cpp b7725
-  - 包裝 Windows x64 可執行檔
+  - ✅ 資源路徑偵測工具實作完成
+  - ✅ PyInstaller spec 檔案配置完成
+  - ✅ 自動化打包腳本與使用者指南建立
+  - ✅ Inno Setup 安裝腳本建立完成
+  - ⚠️ 需在 Windows 環境進行最終編譯驗證
 
 ## 模型分布
 
 | 模型 | 大小 | 用途 |
 |------|------|------|
-| qwen2.5-3b-instruct-q4_k_m.gguf | 2GB | 離線 LLM |
-| models/windows/*.exe | - | Windows 執行檔 |
-| models/llama-cpp/* | - | Linux 執行檔 |
+| gemma-4-E4B-it-Q4_K_M.gguf | 5.3GB | 離線 LLM (llama.cpp) |
+| qwen2.5-3b-instruct-q4_k_m.gguf | 2.1GB | 備用 LLM |
+| models/whisper/medium.pt | - | Faster-Whisper ASR |
 
 ## 會話連續性
 
-**上次工作**: 2026-04-13
-**停止位置**: Phase 9 Plan 3 完成（Wine 交叉編譯替代方案）
-**恢復於**: 2026-04-13
-**狀態**: 部分完成 - Wine 交叉編譯腳本與文件就緒，EXE 打包與安裝程式編譯需 Windows 環境或 Wine 設定
-**下一步**: 使用者安裝 Wine 並執行交叉編譯，或在 Windows 環境完成打包
-
----
-
-## 相關檔案
-
-- `.planning/phases/p7.1-vision-ocr/.continue-here.md` - Phase 7.1 完成記錄
-- `.planning/phases/p7-gui-optimization/.continue-here.md` - Phase 7 詳細資訊
-- `.planning/phases/p4-windows-exe/.continue-here.md` - Phase 4 完成記錄
+**上次工作**: 2026-04-15
+**停止位置**: 完成 NLP 擴展功能修復與 GUI 顯示優化
+**下一步**: 
+1. 繼續 ASR 優化 (Faster-Whisper 模型預加載)
+2. 進行 Windows 最終打包與 PyInstaller 資源路徑驗證

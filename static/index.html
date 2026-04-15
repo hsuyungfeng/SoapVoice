@@ -3,360 +3,1382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoapVoice - 醫療 SOAP 病歷系統</title>
-    <meta http-equiv="refresh" content="30">
+    <title>SoapVoice - 醫療語音轉 SOAP 病歷系統</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { max-width: 900px; margin: 0 auto; padding: 20px; background: #0f0f23; color: #eee; }
-        h1 { text-align: center; color: #00d9ff; margin-bottom: 15px; font-size: 1.8em; }
-        
-        .status { color: #00ff88; font-size: 12px; margin-bottom: 15px; }
-        
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #888; font-size: 14px; }
-        
+        :root {
+            --primary: #0f766e;
+            --primary-light: #14b8a6;
+            --primary-dark: #0d5d56;
+            --accent: #f59e0b;
+            --accent-soft: #fbbf24;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --border: #475569;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --glow: 0 0 30px rgba(20, 184, 166, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f35 50%, #0f172a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-soft));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow), var(--glow);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header .icon {
+            font-size: 24px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
         select {
-            width: 100%; padding: 12px; margin-bottom: 10px;
-            border: 1px solid #333; border-radius: 8px;
-            background: #1a1a3e; color: #fff; font-size: 14px;
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        .btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        
-        .record-btn {
-            flex: 1; padding: 20px; 
-            background: #ff4757;
-            border: none; border-radius: 12px; color: #fff;
-            font-size: 18px; font-weight: bold; cursor: pointer;
-            transition: all 0.3s;
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-light);
         }
-        .record-btn:hover { background: #ff6b7a; }
-        .record-btn.recording { background: #ff0000; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        
-        .process-btn {
-            flex: 1; padding: 20px; 
-            background: #00d9ff;
-            border: none; border-radius: 12px; color: #0f0f23;
-            font-size: 18px; font-weight: bold; cursor: pointer;
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
         }
-        .process-btn:hover { background: #00a8cc; }
-        .process-btn:disabled { background: #555; cursor: not-allowed; }
-        
-        textarea { 
-            width: 100%; height: 100px; padding: 12px; 
-            border: 1px solid #333; border-radius: 8px; 
-            background: #1a1a3e; color: #fff; font-size: 14px;
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
         }
-        
-        .result { margin-top: 20px; }
-        
-        .stats { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .stat { 
-            padding: 8px 12px; background: #1a1a3e; 
-            border-radius: 8px; font-size: 12px; color: #00d9ff;
+
+        .radio-option input[type="radio"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        
-        .section { margin-bottom: 12px; padding: 12px; background: #1a1a3e; border-radius: 8px; }
-        .section-title { color: #00d9ff; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
-        
-        .tags { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag {
-            padding: 4px 10px; background: #2d2d5a;
-            border-radius: 15px; font-size: 12px; color: #aaa;
+
+        .radio-option input[type="radio"]:checked {
+            border-color: var(--primary-light);
+            background: var(--primary-light);
         }
-        
-        .soap-note { background: #16213e; padding: 15px; border-radius: 8px; border: 1px solid #333; }
-        .soap-note h4 { color: #00d9ff; margin: 10px 0 5px 0; font-size: 13px; }
-        .soap-note p { margin: 0; color: #ccc; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
-        
-        .loading { text-align: center; color: #00d9ff; padding: 15px; }
-        .error { color: #ff6b6b; padding: 12px; background: #2d1b1b; border-radius: 8px; }
-        
-        .auto-refresh { position: fixed; top: 10px; right: 10px; background: #1a1a3e; padding: 5px 10px; border-radius: 5px; font-size: 11px; color: #00ff88; }
-        
-        .recording-indicator { display: none; text-align: center; padding: 10px; background: #ff4757; border-radius: 8px; margin-bottom: 10px; color: #fff; font-weight: bold; }
-        .recording-indicator.active { display: block; }
-        
-        .audio-status { text-align: center; padding: 8px; color: #888; font-size: 12px; margin-bottom: 5px; }
-        
-        .test-audio { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
-        .test-audio h3 { color: #00d9ff; text-align: center; margin-bottom: 15px; font-size: 16px; }
-        .test-btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .test-btn {
-            padding: 15px 20px; background: #2d2d5a;
-            border: none; border-radius: 10px; color: #aaa;
-            font-size: 14px; cursor: pointer; transition: all 0.3s;
+
+        .radio-option input[type="radio"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--bg-dark);
+            font-size: 12px;
+            font-weight: bold;
         }
-        .test-btn:hover { background: #3d3d7a; color: #fff; }
-        .test-btn.processing { background: #00d9ff; color: #0f0f23; }
+
+        .radio-option span {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .auto-run-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(20, 184, 166, 0.1));
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+        }
+
+        .auto-run-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .auto-run-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .auto-run-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-input);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(24px);
+            background: white;
+        }
+
+        .quick-inputs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-input-btn {
+            padding: 8px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-input-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-input);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-panel {
+            margin-top: 20px;
+        }
+
+        .process-log {
+            background: #0d1117;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 11px;
+            min-width: 70px;
+        }
+
+        .log-icon {
+            font-size: 14px;
+            min-width: 20px;
+        }
+
+        .log-message {
+            color: var(--text-secondary);
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .log-entry.success .log-message { color: var(--success); }
+        .log-entry.error .log-message { color: var(--error); }
+        .log-entry.process .log-icon { color: var(--primary-light); }
+        .log-entry.warning .log-message { color: var(--warning); }
+
+        .soap-result {
+            background: var(--bg-input);
+            border-radius: 12px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .soap-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .soap-header h3 {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .soap-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .soap-header.collapsed .soap-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .soap-content {
+            padding: 16px;
+            max-height: 500px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .soap-content.collapsed {
+            max-height: 0;
+            padding: 0 16px;
+            overflow: hidden;
+        }
+
+        .soap-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .soap-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .soap-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .soap-label.s { background: #3b82f6; color: white; }
+        .soap-label.o { background: #8b5cf6; color: white; }
+        .soap-label.a { background: #f59e0b; color: #1e293b; }
+        .soap-label.p { background: #10b981; color: white; }
+
+        .soap-text {
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .medical-orders, .drug-recommendations {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(20, 184, 166, 0.1);
+            border-radius: 10px;
+            border: 1px solid var(--primary);
+        }
+
+        .medical-orders h4, .drug-recommendations h4 {
+            font-size: 14px;
+            color: var(--primary-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-item, .drug-item {
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .drug-item strong {
+            color: var(--accent-soft);
+        }
+
+        .details-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg-input);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 16px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .details-toggle:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .details-content {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .details-content.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 16px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            margin-top: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metadata-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metadata-value {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.running {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .file-upload {
+            position: relative;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-light);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        .file-upload input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .file-upload-text span {
+            color: var(--primary-light);
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        .api-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            z-index: 100;
+        }
+
+        .api-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .api-status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-input);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
     </style>
 </head>
 <body>
-    <div class="auto-refresh">⏱️ Auto: 30s</div>
-    
-    <h1>🩺 SoapVoice</h1>
-    <div class="status">🟢 Online | Port: 8010</div>
-    
-    <div class="input-group">
-        <label>🤖 模型選擇:</label>
-        <select id="modelSelect">
-            <option value="qwen2.5:3b">qwen2.5:3b (快速)</option>
-            <option value="qwen2.5:7b">qwen2.5:7b (完整)</option>
-        </select>
-        
-        <div class="recording-indicator" id="recordingIndicator">🔴 錄音中... 點擊停止</div>
-        
-        <div class="btn-row">
-            <button class="record-btn" id="recordBtn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">🎤 開始錄音</button>
-            <button class="process-btn" id="processBtn" onclick="processText()">處理完成！</button>
-        </div>
-        
-        <div class="audio-status" id="audioStatus">按住「開始錄音」按鈕說話</div>
-        
-        <textarea id="inputText" placeholder="錄音完成後會自動顯示文字，或手動輸入對話文字..."></textarea>
+    <div class="api-status">
+        <div class="api-status-dot" id="statusDot"></div>
+        <span id="statusText">連線中...</span>
     </div>
-    
-    <div id="result" class="result" style="display: none;"></div>
-    
-    <!-- 測試音檔區塊 -->
-    <div class="test-audio">
-        <h3>📁 測試音檔 (點擊自動處理)</h3>
-        <div class="test-btn-row">
-            <button class="test-btn" onclick="runTestPipeline('static/hypertension.wav', this)">高血壓</button>
-            <button class="test-btn" onclick="runTestPipeline('static/chest_pain.wav', this)">胸痛</button>
-            <button class="test-btn" onclick="runTestPipeline('static/diabetes.wav', this)">糖尿病</button>
-            <button class="test-btn" onclick="runTestPipeline('static/wound_care.wav', this)">傷口護理</button>
-            <button class="test-btn" onclick="runTestPipeline('static/respiratory.wav', this)">呼吸道</button>
-            <button class="test-btn" onclick="runTestPipeline('static/drug_order.wav', this)">醫囑</button>
-            <button class="test-btn" onclick="runTestPipeline('static/surgery_record.wav', this)">手術記錄</button>
-            <button class="test-btn" onclick="runTestPipeline('static/doctor_patient.wav', this)">醫病對話</button>
+
+    <div class="container">
+        <header>
+            <div class="logo">🏥</div>
+            <h1>SoapVoice</h1>
+            <p class="subtitle">醫療語音轉 SOAP 病歷系統</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('llm', this)">💊 SOAP 生成</button>
+            <button class="tab-btn" onclick="switchTab('whisper', this)">🎤 語音轉錄</button>
+            <button class="tab-btn" onclick="switchTab('ocr', this)">👁️ 圖片識別</button>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🧠</span>
+                    <h2 id="panelTitle">LLM 病歷生成</h2>
+                </div>
+                <div class="card-body">
+                    <div id="llm-panel" class="tab-content active">
+                        <div class="form-group">
+                            <label>選擇模型</label>
+                            <select id="llmModel">
+                                <option value="qwen2.5:7b">Qwen2.5 7B (推薦)</option>
+                                <option value="qwen2.5:3b">Qwen2.5 3B (快速)</option>
+                                <option value="gemma4:e4b">Gemma 4:4B</option>
+                                <option value="gemma4:e2b">Gemma 4:2B</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>計算裝置</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="llmMode" value="cpu" checked>
+                                    <span>CPU</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="llmMode" value="gpu">
+                                    <span>GPU</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>醫療對話</label>
+                            <textarea id="llmText" placeholder="請輸入患者主訴，例如：患者主訴咳嗽三天，伴隨輕微發燒和喉嚨痛..."></textarea>
+                        </div>
+                        <div class="quick-inputs">
+                            <button class="quick-input-btn" onclick="setQuickText('cough')">咳嗽門診</button>
+                            <button class="quick-input-btn" onclick="setQuickText('fever')">發燒門診</button>
+                            <button class="quick-input-btn" onclick="setQuickText('chest')">胸悶門診</button>
+                            <button class="quick-input-btn" onclick="setQuickText('headache')">頭痛門診</button>
+                        </div>
+
+                        <div class="auto-run-section">
+                            <div class="auto-run-header">
+                                <div class="auto-run-title">
+                                    <span>⚡</span>
+                                    <span>自動執行模式</span>
+                                </div>
+                                <div class="auto-run-toggle">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="autoRunToggle" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 13px;">
+                                啟用後自動執行完整流程並顯示即時過程
+                            </p>
+                        </div>
+
+                        <button class="btn btn-primary" id="llmBtn" onclick="runLLM()">
+                            <span>🚀</span> 開始生成 SOAP
+                        </button>
+                    </div>
+
+                    <div id="whisper-panel" class="tab-content">
+                        <div class="form-group">
+                            <label>計算裝置</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="asrMode" value="cpu" checked>
+                                    <span>CPU</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="asrMode" value="gpu">
+                                    <span>GPU</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>上傳音檔</label>
+                            <div class="file-upload">
+                                <input type="file" id="asrFile" accept="audio/*" onchange="handleAudioSelect(this)">
+                                <div class="file-upload-icon">🎵</div>
+                                <div class="file-upload-text">點擊或拖曳音檔至此<br><span>支援 WAV, MP3, M4A</span></div>
+                            </div>
+                            <img id="audioPreview" class="preview-image" alt="音檔預覽">
+                            <div id="audioFileName" style="margin-top: 10px; color: var(--text-secondary); font-size: 13px;"></div>
+                        </div>
+                        <button class="btn btn-primary" id="asrBtn" onclick="runWhisper()">
+                            <span>🎤</span> 開始轉錄
+                        </button>
+                    </div>
+
+                    <div id="ocr-panel" class="tab-content">
+                        <div class="form-group">
+                            <label>選擇 OCR 引擎</label>
+                            <select id="ocrEngine">
+                                <option value="easyocr">EasyOCR (本地離線)</option>
+                                <option value="gemma4:e2b">Gemma Vision 2B</option>
+                                <option value="gemma4:e4b">Gemma Vision 4B</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>上傳圖片</label>
+                            <div class="file-upload">
+                                <input type="file" id="ocrFile" accept="image/*" onchange="handleImageSelect(this)">
+                                <div class="file-upload-icon">🖼️</div>
+                                <div class="file-upload-text">點擊或拖曳圖片至此<br><span>支援 PNG, JPG, JPEG</span></div>
+                            </div>
+                            <img id="imagePreview" class="preview-image" alt="圖片預覽">
+                        </div>
+                        <button class="btn btn-primary" id="ocrBtn" onclick="runOCR()">
+                            <span>👁️</span> 開始識別
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📊</span>
+                    <h2>執行結果</h2>
+                    <span class="status-badge" id="resultStatus" style="margin-left: auto;">
+                        <span class="spinner" id="statusSpinner"></span>
+                        <span id="statusLabel">等待中</span>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+
+                    <div class="process-log" id="processLog">
+                        <div class="log-entry">
+                            <span class="log-time">--:--:--</span>
+                            <span class="log-icon">💤</span>
+                            <span class="log-message">等待使用者輸入...</span>
+                        </div>
+                    </div>
+
+                    <div id="soapResult" style="display: none;">
+                        <div class="soap-result">
+                            <div class="soap-header" onclick="toggleSoapDetails()">
+                                <h3>
+                                    <span>📋</span>
+                                    <span>SOAP 病歷結果</span>
+                                </h3>
+                                <span class="soap-toggle-icon">▼</span>
+                            </div>
+                            <div class="soap-content" id="soapContent"></div>
+                        </div>
+                        <button class="details-toggle" onclick="toggleDetails()">
+                            <span>📄</span>
+                            <span id="detailsToggleText">顯示詳細資訊</span>
+                        </button>
+                        <div class="details-content" id="detailsContent"></div>
+                    </div>
+
+                    <div id="transcribeResult" style="display: none;">
+                        <div class="soap-result">
+                            <div class="soap-header">
+                                <h3>
+                                    <span>📝</span>
+                                    <span>轉錄結果</span>
+                                </h3>
+                            </div>
+                            <div class="soap-content" id="transcribeContent"></div>
+                        </div>
+                    </div>
+
+                    <div id="ocrResult" style="display: none;">
+                        <div class="soap-result">
+                            <div class="soap-header">
+                                <h3>
+                                    <span>🔍</span>
+                                    <span>OCR 識別結果</span>
+                                </h3>
+                            </div>
+                            <div class="soap-content" id="ocrContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
+
+    <footer>
+        <p>SoapVoice © 2026 | 醫療語音轉 SOAP 病歷系統</p>
+    </footer>
+
     <script>
         const API_URL = 'http://' + window.location.host;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        
-        async function startRecording() {
+        let isAutoRun = true;
+        let isSoapExpanded = true;
+        let isDetailsExpanded = false;
+
+        document.getElementById('autoRunToggle').addEventListener('change', function() {
+            isAutoRun = this.checked;
+        });
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(tab + '-panel').classList.add('active');
+
+            const titles = {
+                'llm': 'LLM 病歷生成',
+                'whisper': '語音轉錄',
+                'ocr': '圖片識別'
+            };
+            document.getElementById('panelTitle').textContent = titles[tab];
+        }
+
+        function setQuickText(type) {
+            const texts = {
+                'cough': '患者主訴咳嗽三天，伴隨輕微發燒和喉嚨痛。體溫37.8度，喉嚨輕微紅腫。抽菸史十年，每天一包。',
+                'fight': '患者主訴發燒兩天，體溫39度，伴隨全身肌肉酸痛和頭痛。曾服用退燒藥但效果不佳。',
+                'chest': '患者主訴胸悶伴隨輕微喘息，有十年抽菸史。活動時症狀加重，休息後稍有改善。',
+                'headache': '患者主訴持續性頭痛一週，位置在後腦勺，伴隨噁心感。過去無類似病史。'
+            };
+            document.getElementById('llmText').value = texts[type] || '';
+        }
+
+        function handleAudioSelect(input) {
+            if (input.files.length > 0) {
+                document.getElementById('audioFileName').textContent = '已選擇: ' + input.files[0].name;
+            }
+        }
+
+        function handleImageSelect(input) {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').classList.add('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleSoapDetails() {
+            isSoapExpanded = !isSoapExpanded;
+            const content = document.getElementById('soapContent');
+            const header = document.querySelector('.soap-header');
+            const icon = document.querySelector('.soap-toggle-icon');
+
+            content.classList.toggle('collapsed', !isSoapExpanded);
+            header.classList.toggle('collapsed', !isSoapExpanded);
+            icon.style.transform = isSoapExpanded ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+
+        function toggleDetails() {
+            isDetailsExpanded = !isDetailsExpanded;
+            const content = document.getElementById('detailsContent');
+            const text = document.getElementById('detailsToggleText');
+
+            content.classList.toggle('show', isDetailsExpanded);
+            text.textContent = isDetailsExpanded ? '隱藏詳細資訊' : '顯示詳細資訊';
+        }
+
+        function addLog(icon, message, type = 'info') {
+            const log = document.getElementById('processLog');
+            const time = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `
+                <span class="log-time">${time}</span>
+                <span class="log-icon">${icon}</span>
+                <span class="log-message">${message}</span>
+            `;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateStatus(status, label) {
+            const statusBadge = document.getElementById('resultStatus');
+            const spinner = document.getElementById('statusSpinner');
+            const statusLabel = document.getElementById('statusLabel');
+
+            statusBadge.className = `status-badge ${status}`;
+            spinner.style.display = status === 'running' ? 'inline-block' : 'none';
+            statusLabel.textContent = label;
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        async function checkAPIStatus() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    await transcribeAudio(audioBlob);
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
-                mediaRecorder.start();
-                document.getElementById('recordBtn').textContent = '⏹️ 停止錄音';
-                document.getElementById('recordBtn').classList.add('recording');
-                document.getElementById('recordingIndicator').classList.add('active');
-                document.getElementById('audioStatus').textContent = '錄音中...';
-                
+                const response = await fetch(API_URL + '/docs', { method: 'HEAD' });
+                const dot = document.getElementById('statusDot');
+                const text = document.getElementById('statusText');
+
+                if (response.ok) {
+                    dot.classList.add('online');
+                    text.textContent = '已連線';
+                } else {
+                    throw new Error('API 不可用');
+                }
+            } catch (e) {
+                document.getElementById('statusText').textContent = '未連線';
+            }
+        }
+
+        checkAPIStatus();
+        setInterval(checkAPIStatus, 30000);
+
+        async function runLLM() {
+            const text = document.getElementById('llmText').value.trim();
+            const model = document.getElementById('llmModel').value;
+            const mode = document.querySelector('input[name="llmMode"]:checked').value;
+
+            if (!text) return alert('請輸入對話內容');
+
+            const btn = document.getElementById('llmBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> 處理中...';
+
+            document.getElementById('processLog').innerHTML = '';
+            document.getElementById('soapResult').style.display = 'none';
+            document.getElementById('transcribeResult').style.display = 'none';
+            document.getElementById('ocrResult').style.display = 'none';
+
+            updateStatus('running', '處理中');
+            updateProgress(10);
+            addLog('🚀', `開始 LLM 生成 | 模型: ${model} | 裝置: ${mode.toUpperCase()}`);
+
+            try {
+                const startTime = performance.now();
+                addLog('⚙️', '正在準備請求...');
+                updateProgress(20);
+
+                addLog('📡', '正在發送 API 請求...');
+                updateProgress(30);
+
+                const response = await fetch(API_URL + '/api/v1/clinical/soap/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transcript: text, model: model, device: mode })
+                });
+
+                if (!response.ok) throw new Error('API 錯誤: ' + response.status);
+
+                const data = await response.json();
+                const costTime = ((performance.now() - startTime) / 1000).toFixed(2);
+
+                addLog('⏳', `LLM 推理完成 | 耗時: ${costTime}秒`, 'success');
+                updateProgress(80);
+
+                addLog('📝', '正在解析回應...');
+                updateProgress(90);
+
+                displaySOAPResult(data, costTime, model);
+                updateProgress(100);
+                updateStatus('success', '完成');
+
+                addLog('✅', 'SOAP 病歷生成完成！', 'success');
+
             } catch (err) {
-                alert('無法訪問麥克風: ' + err.message);
+                addLog('❌', `錯誤: ${err.message}`, 'error');
+                updateStatus('error', '失敗');
+                updateProgress(0);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀</span> 開始生成 SOAP';
             }
         }
-        
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                document.getElementById('recordBtn').textContent = '🎤 開始錄音';
-                document.getElementById('recordBtn').classList.remove('recording');
-                document.getElementById('recordingIndicator').classList.remove('active');
-                document.getElementById('audioStatus').textContent = '處理中...';
+
+        function displaySOAPResult(data, costTime, model) {
+            const soap = data.soap;
+            const content = document.getElementById('soapContent');
+
+            let html = `
+                <div class="soap-section">
+                    <span class="soap-label s">S 主訴</span>
+                    <div class="soap-text">${soap.subjective || '-'}</div>
+                </div>
+                <div class="soap-section">
+                    <span class="soap-label o">O 客觀</span>
+                    <div class="soap-text">${soap.objective || '-'}</div>
+                </div>
+                <div class="soap-section">
+                    <span class="soap-label a">A 診斷</span>
+                    <div class="soap-text">${soap.assessment || '-'}</div>
+                </div>
+                <div class="soap-section">
+                    <span class="soap-label p">P 計畫</span>
+                    <div class="soap-text">${soap.plan || '-'}</div>
+                </div>
+            `;
+
+            if (soap.medical_orders && soap.medical_orders.length > 0) {
+                html += `<div class="medical-orders"><h4>📋 建議醫囑</h4>`;
+                soap.medical_orders.forEach(order => {
+                    html += `<div class="order-item">${order}</div>`;
+                });
+                html += `</div>`;
             }
+
+            if (soap.drug_recommendations && soap.drug_recommendations.length > 0) {
+                html += `<div class="drug-recommendations"><h4>💊 建議藥物</h4>`;
+                soap.drug_recommendations.forEach(drug => {
+                    html += `<div class="drug-item"><strong>${drug.name}</strong> - ${drug.indication || '適應症不明'}<br><small>${drug.dosage || ''}</small></div>`;
+                });
+                html += `</div>`;
+            }
+
+            content.innerHTML = html;
+
+            document.getElementById('soapResult').style.display = 'block';
+
+            const detailsContent = document.getElementById('detailsContent');
+            detailsContent.innerHTML = `
+                <div class="metadata">
+                    <div class="metadata-item">
+                        <span class="metadata-label">處理時間</span>
+                        <span class="metadata-value">${costTime}秒</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">使用模型</span>
+                        <span class="metadata-value">${model}</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">時間戳記</span>
+                        <span class="metadata-value">${new Date().toLocaleString('zh-TW')}</span>
+                    </div>
+                </div>
+            `;
         }
-        
-        async function transcribeAudio(audioBlob) {
+
+        async function runWhisper() {
+            const fileInput = document.getElementById('asrFile');
+            const mode = document.querySelector('input[name="asrMode"]:checked').value;
+
+            if (fileInput.files.length === 0) return alert('請上傳音檔');
+
+            const btn = document.getElementById('asrBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> 轉錄中...';
+
+            document.getElementById('processLog').innerHTML = '';
+            document.getElementById('soapResult').style.display = 'none';
+            document.getElementById('transcribeResult').style.display = 'none';
+            document.getElementById('ocrResult').style.display = 'none';
+
+            updateStatus('running', '轉錄中');
+            addLog('🎤', `開始 Whisper 轉錄 | 檔案: ${fileInput.files[0].name}`);
+            updateProgress(20);
+
             const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.wav');
-            
-            document.getElementById('audioStatus').textContent = '語音辨識中...';
-            
+            formData.append('audio', fileInput.files[0]);
+            formData.append('device', mode);
+
             try {
+                const startTime = performance.now();
+                addLog('📡', '正在上傳並轉錄...');
+                updateProgress(50);
+
                 const response = await fetch(API_URL + '/api/v1/extended/transcribe', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 if (!response.ok) throw new Error('轉錄失敗');
-                
+
                 const data = await response.json();
-                document.getElementById('inputText').value = data.transcript || '';
-                document.getElementById('audioStatus').textContent = '轉錄完成！點擊「處理完成」生成 SOAP';
-                
+                const costTime = ((performance.now() - startTime) / 1000).toFixed(2);
+
+                addLog('✅', `轉錄完成 | 耗時: ${costTime}秒`, 'success');
+                updateProgress(100);
+                updateStatus('success', '完成');
+
+                document.getElementById('transcribeContent').innerHTML = `
+                    <div class="soap-section">
+                        <div class="soap-text">${data.transcript}</div>
+                    </div>
+                `;
+                document.getElementById('transcribeResult').style.display = 'block';
+
             } catch (err) {
-                document.getElementById('audioStatus').textContent = '轉錄錯誤: ' + err.message;
+                addLog('❌', `錯誤: ${err.message}`, 'error');
+                updateStatus('error', '失敗');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🎤</span> 開始轉錄';
             }
         }
-        
-        async function runTestPipeline(filename, btn) {
-            const model = document.getElementById('modelSelect').value;
-            const resultDiv = document.getElementById('result');
-            
-            // 顯示 loading
-            btn.classList.add('processing');
-            btn.textContent = '處理中...';
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<div class="loading">處理中: ' + filename + '</div>';
-            
+
+        async function runOCR() {
+            const fileInput = document.getElementById('ocrFile');
+            const engine = document.getElementById('ocrEngine').value;
+
+            if (fileInput.files.length === 0) return alert('請上傳圖片');
+
+            const btn = document.getElementById('ocrBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> 識別中...';
+
+            document.getElementById('processLog').innerHTML = '';
+            document.getElementById('soapResult').style.display = 'none';
+            document.getElementById('transcribeResult').style.display = 'none';
+            document.getElementById('ocrResult').style.display = 'none';
+
+            updateStatus('running', '識別中');
+            addLog('👁️', `開始 OCR 識別 | 引擎: ${engine}`);
+            updateProgress(20);
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            formData.append('engine', engine);
+
             try {
-                // 1. 上傳音檔轉錄
-                const audioResponse = await fetch(filename);
-                const audioBlob = await audioResponse.blob();
-                
-                const formData = new FormData();
-                formData.append('audio', audioBlob, filename.split('/').pop());
-                
-                const transcribeRes = await fetch(API_URL + '/api/v1/extended/transcribe', {
+                addLog('📡', '正在上傳並識別...');
+                updateProgress(50);
+
+                const response = await fetch(API_URL + '/api/v1/ocr/process', {
                     method: 'POST',
                     body: formData
                 });
-                
-                if (!transcribeRes.ok) throw new Error('轉錄失敗');
-                
-                const transcribeData = await transcribeRes.json();
-                const transcript = transcribeData.transcript;
-                document.getElementById('inputText').value = transcript;
-                
-                // 2. 處理 SOAP
-                const processRes = await fetch(API_URL + '/api/v1/extended/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        transcript: transcript, 
-                        model: model,
-                        include_symptoms: true,
-                        include_icd10: true,
-                        include_orders: true,
-                        include_drugs: true
-                    })
-                });
-                
-                if (!processRes.ok) throw new Error('處理失敗');
-                
-                const processData = await processRes.json();
-                displayResult(processData, transcript);
-                
-            } catch (err) {
-                resultDiv.innerHTML = '<div class="error">錯誤: ' + err.message + '</div>';
-            } finally {
-                btn.classList.remove('processing');
-                btn.textContent = filename.split('/').pop().replace('.wav', '');
-            }
-        }
-        
-        async function processText() {
-            const input = document.getElementById('inputText').value.trim();
-            const model = document.getElementById('modelSelect').value;
-            const resultDiv = document.getElementById('result');
-            const processBtn = document.getElementById('processBtn');
-            
-            if (!input) {
-                alert('請先錄音或輸入對話文字');
-                return;
-            }
-            
-            processBtn.disabled = true;
-            processBtn.textContent = '處理中...';
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<div class="loading">處理中...</div>';
-            
-            try {
-                const response = await fetch(API_URL + '/api/v1/extended/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        transcript: input, 
-                        model: model,
-                        include_symptoms: true,
-                        include_icd10: true,
-                        include_orders: true,
-                        include_drugs: true
-                    })
-                });
-                
-                if (!response.ok) throw new Error('API請求失敗');
-                
+
+                if (!response.ok) throw new Error('OCR 識別失敗');
+
                 const data = await response.json();
-                displayResult(data, input);
-                
-            } catch (error) {
-                resultDiv.innerHTML = '<div class="error">錯誤: ' + error.message + '</div>';
+
+                addLog('✅', 'OCR 識別完成', 'success');
+                updateProgress(100);
+                updateStatus('success', '完成');
+
+                document.getElementById('ocrContent').innerHTML = `
+                    <div class="soap-section">
+                        <div class="soap-text">${JSON.stringify(data, null, 2)}</div>
+                    </div>
+                `;
+                document.getElementById('ocrResult').style.display = 'block';
+
+            } catch (err) {
+                addLog('❌', `錯誤: ${err.message}`, 'error');
+                updateStatus('error', '失敗');
             } finally {
-                processBtn.disabled = false;
-                processBtn.textContent = '處理完成！';
+                btn.disabled = false;
+                btn.innerHTML = '<span>👁️</span> 開始識別';
             }
         }
-        
-        function displayResult(data, input) {
-            const ext = data;
-            const soap = ext.soap || {};
-            
-            let subjective = '', objective = '', assessment = '', plan = '';
-            if (typeof soap === 'string') {
-                const sections = soap.split('\n');
-                let current = '';
-                for (const line of sections) {
-                    if (line.match(/S\s*[-–]\s*|Subjective/i)) current = 'subjective';
-                    else if (line.match(/O\s*[-–]\s*|Objective/i)) current = 'objective';
-                    else if (line.match(/A\s*[-–]\s*|Assessment/i)) current = 'assessment';
-                    else if (line.match(/P\s*[-–]\s*|Plan/i)) current = 'plan';
-                    else if (current && line.trim()) {
-                        if (current === 'subjective') subjective += line + '\n';
-                        else if (current === 'objective') objective += line + '\n';
-                        else if (current === 'assessment') assessment += line + '\n';
-                        else if (current === 'plan') plan += line + '\n';
-                    }
-                }
-            } else {
-                subjective = soap.subjective || '';
-                objective = soap.objective || '';
-                assessment = soap.assessment || '';
-                plan = soap.plan || '';
-            }
-            
-            const processingTime = ext.processing_time || 0;
-            
-            let html = `
-                <div class="stats">
-                    <div class="stat">⏱️ 處理: ${processingTime.toFixed(2)}秒</div>
-                    <div class="stat">📝 字數: ${input.length}</div>
-                </div>
-            `;
-            
-            if (ext.symptoms && ext.symptoms.length > 0) {
-                html += `<div class="section"><div class="section-title">📋 症狀</div><div class="tags">${ext.symptoms.map(s => `<span class="tag">${s}</span>`).join('')}</div></div>`;
-            }
-            
-            if (ext.icd10_codes && ext.icd10_codes.length > 0) {
-                html += `<div class="section"><div class="section-title">🏥 ICD-10</div><div class="tags">${ext.icd10_codes.map(i => `<span class="tag">${i.code} - ${i.description}</span>`).join('')}</div></div>`;
-            }
-            
-            html += `
-                <div class="soap-note">
-                    <div class="section-title">📄 SOAP 病歷</div>
-                    <h4>S - Subjective:</h4><p>${subjective || '(無)'}</p>
-                    <h4>O - Objective:</h4><p>${objective || '(無)'}</p>
-                    <h4>A - Assessment:</h4><p>${assessment || '(無)'}</p>
-                    <h4>P - Plan:</h4><p>${plan || '(無)'}</p>
-                </div>
-            `;
-            
-            document.getElementById('result').innerHTML = html;
+
+        if (isAutoRun) {
+            addLog('💡', '自動執行模式已啟用，輸入後將自動執行');
         }
-        
-        // Auto-refresh
-        setTimeout(() => window.location.reload(), 30000);
     </script>
 </body>
 </html>

@@ -1,0 +1,313 @@
+[
+  {
+    "name": "胸痛",
+    "file": "chest_pain.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了10年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
+    "transcribe_time": 15.89,
+    "asr_model": "whisper",
+    "llm_time": 45.01,
+    "total_time": 60.9,
+    "symptoms": [
+      "ECG",
+      "fever",
+      "cough",
+      "chest",
+      "heart",
+      "dyspnea",
+      "咳嗽",
+      "發燒"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R05",
+        "description": "Cough",
+        "confidence": 0.9
+      },
+      {
+        "code": "R50.9",
+        "description": "Fever, unspecified",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "咳特靈",
+        "dosage": "1# 3次/日",
+        "category": "止咳"
+      },
+      {
+        "name": "普拿疼",
+        "dosage": "500mg 3次/日",
+        "category": "退燒"
+      }
+    ],
+    "medical_orders": [
+      "多喝水",
+      "祛痰劑",
+      "氧气治疗",
+      "胸部X光",
+      "心電圖檢查"
+    ],
+    "soap": {
+      "en": "**S - Subjective:**\nThe patient presents with a chief complaint of chest tightness and shortness of breath (dyspnea) that began approximately two days ago. The dyspnea is exacerbated by physical exertion, such as walking quickly. The patient denies having a fever or active cough. He reports no prior history of similar respiratory or cardiac symptoms. He admits to a 10-year history of smoking.\n\n**O - Objective:**\n*   **Vitals:** (Not provided in the transcript.)\n*   **Physical Exam:** (Not provided in the transcript.)\n*   **Diagnostics Ordered:** ECG (Electrocardiogram) and Chest X-ray (CXR) were ordered to rule out underlying cardiac or pulmonary causes.\n\n**A - Assessment:**\n1.  **Shortness of Breath (R06.02):** Acute onset dyspnea, likely related to pulmonary or cardiac etiology, requiring further investigation.\n2.  **Chest Tightness:** Symptomatic, requiring monitoring and supportive care.\n3.  **Smoking History:** Significant risk factor contributing to respiratory symptoms.\n\n**P - Plan:**\n1.  **Diagnostics:**\n    *   Complete ECG.\n    *   Chest X-ray (CXR).\n2.  **Medications:**\n    *   **Cough Syrup (e.g., Dextromethorphan/Guaifenesin):** Take 1 dose, 3 times daily (for expectorant action).\n    *   **Analgesic/Pain Reliever (e.g., Paracetamol 500mg):** Take 1 dose, 3 times daily (for chest discomfort).\n3.  **Supportive Care:**\n    *   Encourage increased oral hydration (increase fluid intake).\n    *   Administer expectorant therapy.\n    *   Oxygen therapy as needed (O2 supplementation).\n4.  **Follow-up:** Monitor symptoms and review diagnostic results to determine definitive diagnosis and adjust treatment plan.",
+      "zh": "**主觀資料 (S - Subjective):**\n患者主訴胸部緊繃感和呼吸困難（dyspnea），症狀約持續兩天。呼吸困難在進行體力活動，例如快走時會加劇。患者否認有發燒或持續咳嗽。他報告沒有類似呼吸道或心臟症狀的既往病史。他承認有十年吸菸史。\n\n**客觀資料 (O - Objective):**\n*   **生命徵象 (Vitals):** （未提供）\n*   **體格檢查 (Physical Exam):** （未提供）\n*   **安排的檢查 (Diagnostics Ordered):** 已安排心電圖 (ECG) 和胸部X光片 (CXR)，以排除潛在的心臟或肺部病因。\n\n**評估 (A - Assessment):**\n1.  **呼吸困難 (R06.02):** 急性發作的呼吸困難，可能與肺部或心臟病因相關，需要進一步檢查。\n2.  **胸部緊繃感:** 症狀性表現，需要監測和支持性照護。\n3.  **吸菸史:** 導致呼吸道症狀的重大風險因子。\n\n**計畫 (P - Plan):**\n1.  **檢查項目 (Diagnostics):**\n    *   完整心電圖 (Complete ECG)。\n    *   胸部X光片 (CXR)。\n2.  **藥物治療 (Medications):**\n    *   **止咳糖漿 (Cough Syrup，例如：Dextromethorphan/Guaifenesin):** 每日服用 3 次，每次 1 劑（用於祛痰作用）。\n    *   **消炎止痛藥 (Analgesic/Pain Reliever，例如：Paracetamol 500mg):** 每日服用 3 次，每次 1 劑（用於緩解胸部不適）。\n3.  **支持性照護 (Supportive Care):**\n    *   鼓勵增加口服水分攝取（增加液體攝取）。\n    *   給予祛痰療法。\n    *   依需要給氧氣（O2補充）。\n4.  **後續追蹤 (Follow-up):** 監測症狀，並審閱檢查結果，以確定確切診斷並調整治療計畫。"
+    }
+  },
+  {
+    "name": "高血壓",
+    "file": "hypertension.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
+    "transcribe_time": 16.07,
+    "asr_model": "whisper",
+    "llm_time": 33.51,
+    "total_time": 49.58,
+    "symptoms": [
+      "hypertension",
+      "blood pressure measurement",
+      "dizziness",
+      "heart",
+      "kidney"
+    ],
+    "icd10_codes": [
+      {
+        "code": "I10",
+        "description": "Essential (primary) hypertension",
+        "confidence": 0.9
+      },
+      {
+        "code": "R42",
+        "description": "Dizziness and giddiness",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "en": "**S - Subjective:**\nThe patient reports difficulty controlling his blood pressure (BP), noting that his morning readings are frequently high (160+). He confirms taking his prescribed medication but admits to poor dietary adherence, specifically consuming foods that are too salty or heavily seasoned. He also reports experiencing occasional dizziness/lightheadedness.\n\n**O - Objective:**\n*   **Vitals:** BP is reported to be elevated (morning readings of 160+).\n*   **Physical Exam:** (Not documented in the transcript).\n*   **Assessment:** Patient is aware of the link between high BP and symptoms like dizziness.\n\n**A - Assessment:**\n1.  **Essential (Primary) Hypertension (I10):** Uncontrolled, exacerbated by poor dietary habits.\n2.  **Dizziness/Giddiness (R42):** Likely secondary to uncontrolled hypertension.\n\n**P - Plan:**\n1.  **Medication:** The current medication regimen will be adjusted by the physician.\n2.  **Lifestyle Modifications:**\n    *   Dietary restriction is paramount: Strict limitation of salt and oil intake.\n    *   Increase physical activity and exercise routine.\n3.  **Monitoring:** Patient instructed to monitor and record blood pressure readings daily.\n4.  **Follow-up:** Patient advised to maintain strict adherence to lifestyle changes and follow up with the physician for medication review.",
+      "zh": "**S - 主觀資料 (Subjective):**\n病患報告血壓控制困難，指出其早晨測量數值經常偏高（160+）。他確認正在服用處方藥物，但承認飲食依從性差，特別是攝取過鹹或調味過重的食物。他亦報告偶爾有頭暈/暈眩感。\n\n**O - 客觀資料 (Objective):**\n*   **生命徵象 (Vitals):** 報告血壓偏高（早晨測量為 160+）。\n*   **身體檢查 (Physical Exam):** （病歷記錄中未記載）。\n*   **評估 (Assessment):** 病患了解高血壓與頭暈等症狀之間的關聯性。\n\n**A - 評估 (Assessment):**\n1.  **原發性高血壓 (Essential/Primary Hypertension) (I10):** 未受控制，且因不良飲食習慣而惡化。\n2.  **頭暈/眩暈 (Dizziness/Giddiness) (R42):** 可能與未受控制的高血壓有關。\n\n**P - 處方計畫 (Plan):**\n1.  **藥物治療 (Medication):** 現行藥物方案將由醫師調整。\n2.  **生活方式調整 (Lifestyle Modifications):**\n    *   飲食限制至關重要：嚴格限制鹽分和油脂的攝取。\n    *   增加體能活動和運動習慣。\n3.  **監測 (Monitoring):** 指導病患每日監測並記錄血壓數值。\n4.  **後續追蹤 (Follow-up):** 建議病患維持嚴格的生活方式改變，並回診給醫師複檢藥物。"
+    }
+  },
+  {
+    "name": "糖尿病",
+    "file": "diabetes.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧,奇異果比較好,一次不要超過一碗醫師,我的腳有時候會麻,是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查",
+    "transcribe_time": 17.5,
+    "asr_model": "whisper",
+    "llm_time": 34.13,
+    "total_time": 51.64,
+    "symptoms": [
+      "diabetes mellitus"
+    ],
+    "icd10_codes": [
+      {
+        "code": "E11.9",
+        "description": "Type 2 diabetes mellitus without complications",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "en": "**S - Subjective:**\nMs. Li reports that her blood sugar control has been high recently. She admits to struggling with dietary adherence, specifically noting that although she ate meals, she consumed two guavas in the morning, acknowledging that even seemingly low-sugar fruits still contain carbohydrates. She reports a new or recurring symptom of occasional numbness/tingling in her feet. She inquired about suitable fruits, and the provider advised that guava, lotus mist, and kiwi are better options, emphasizing that intake should not exceed one bowl at a time.\n\n**O - Objective:**\n*   **Vitals/Physical Exam:** Not recorded in the transcript.\n*   **Assessment Findings:** Patient reports paresthesia (numbness/tingling) in the feet.\n*   **Diagnosis Confirmation:** The provider noted that foot numbness is a common complication of diabetes.\n\n**A - Assessment:**\n1.  **Type 2 Diabetes Mellitus (E11.9):** Poor blood sugar control noted, requiring dietary and lifestyle adjustments.\n2.  **Suspected Peripheral Neuropathy:** Based on the patient's complaint of foot numbness, which is a common diabetic complication.\n\n**P - Plan:**\n1.  **Diagnostics:** Schedule a nerve examination (neurological workup) to assess the degree of neuropathy.\n2.  **Education/Dietary Counseling:**\n    *   Reinforce the need for strict moderation of fruit intake.\n    *   Advise on specific, lower-glycemic fruits (guava, lotus mist, kiwi) and limit consumption to one bowl per serving.\n    *   Stress the importance of consistent meal timing and adherence to the prescribed diet.\n3.  **Medications/Orders:** No new drug recommendations or immediate medical orders were given.\n4.  **Follow-up:** Follow up to review the results of the nerve examination and adjust the management plan accordingly.",
+      "zh": "**主觀資料 (S - Subjective):**\n李女士報告近期的血糖控制偏高。她承認在飲食紀律方面有困難，特別指出雖然她有吃正餐，但在早上還是吃了兩個番石榴，並承認即使看似低糖的水果仍含有碳水化合物。她報告了腳部偶爾出現麻木/刺痛的新症狀或復發症狀。她詢問了適合的水果，醫護人員建議番石榴、荷葉、和🥝（奇異果）是更好的選擇，並強調每次攝取量不應超過一碗。\n\n**客觀資料 (O - Objective):**\n*   **生命徵象/體格檢查：** 記錄於病歷中。\n*   **評估發現：** 病患報告腳部有感覺異常（麻木/刺痛）。\n*   **診斷確認：** 醫護人員指出，足部麻木是糖尿病常見的併發症。\n\n**評估 (A - Assessment):**\n1.  **第二型糖尿病 (E11.9)：** 血糖控制不佳，需要進行飲食和生活方式的調整。\n2.  **疑似周邊神經病變：** 基於病患抱怨的腳部麻木，這是糖尿病常見的併發症。\n\n**計畫 (P - Plan):**\n1.  **診斷：** 安排神經檢查（神經學評估），以評估神經病變的程度。\n2.  **教育/飲食諮詢：**\n    *   重申必須嚴格適度攝取水果。\n    *   建議特定的、低GI（低升糖指數）的水果（番石榴、荷葉、🥝），並限制每次份量為一碗。\n    *   強調規律的用餐時間和遵守處方飲食的重要性。\n3.  **藥物/處方：** 未給予新的藥物建議或即時醫療處方。\n4.  **追蹤：** 追蹤檢查神經檢查的結果，並相應調整管理計畫。"
+    }
+  },
+  {
+    "name": "傷口護理",
+    "file": "wound_care.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯,已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了,這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在浴盒會癢,盡量不要抓,我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕,平時傷口保持乾燥",
+    "transcribe_time": 16.54,
+    "asr_model": "whisper",
+    "llm_time": 32.52,
+    "total_time": 49.07,
+    "symptoms": [
+      "inflammation",
+      "dressing change"
+    ],
+    "icd10_codes": [
+      {
+        "code": "L29.9",
+        "description": "Pruritus, unspecified",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "en": "**S - Subjective:**\nPatient reports experiencing itching (pruritus) around the surgical wound area, particularly after bathing. Patient inquired about the expected healing timeline and the appropriate time for resuming bathing activities.\n\n**O - Objective:**\nWound assessment performed. Wound appears to be healing well with no signs of active inflammation noted. Dressing change completed. Cosmetic tape was assessed and instructed to be left to fall off naturally.\n\n**A - Assessment:**\n1. Surgical wound healing (Healing well).\n2. Pruritus, unspecified (L29.9), related to wound healing.\n\n**P - Plan:**\n1. **Medication:** Apply anti-itch cream as needed to manage pruritus.\n2. **Education:**\n    *   Reinforce that the wound is safe for bathing after 10 days (correcting previous misinformation).\n    *   Instruct patient to keep the wound area clean and dry.\n    *   Advise patient to avoid scratching the wound site.\n    *   Instruct patient to allow the cosmetic tape to detach naturally and not to peel it off.\n3. **Follow-up:** Continue monitoring wound status and symptoms. No further medical orders or drug recommendations at this time.",
+      "zh": "**主觀資料 (S - Subjective)：**\n病人回報在手術傷口周圍感到搔癢（pruritus），尤其是在沐浴之後。病人詢問預期的傷口癒合時間表，以及恢復沐浴活動的適當時間。\n\n**客觀資料 (O - Objective)：**\n進行了傷口評估。傷口癒合良好，未發現活動性發炎的跡象。已更換敷料。評估了醫用膠帶，並指示讓其自然脫落。\n\n**評估 (A - Assessment)：**\n1. 手術傷口癒合（癒合良好）。\n2. 搔癢症，未特指（L29.9），與傷口癒合相關。\n\n**計畫 (P - Plan)：**\n1. **藥物治療：** 依需求塗抹抗搔癢乳膏以控制搔癢症。\n2. **衛教：**\n    *   重申傷口在 10 天後可安全沐浴（糾正先前錯誤資訊）。\n    *   指導病人保持傷口區域清潔乾燥。\n    *   建議病人避免搔抓傷口部位。\n    *   指導病人讓醫用膠帶自然脫落，不可自行剝除。\n3. **後續追蹤：** 持續監測傷口狀況和症狀。目前無需進一步的醫療處方或藥物建議。"
+    }
+  },
+  {
+    "name": "呼吸道",
+    "file": "respiratory.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果如果肺部有發炎可能需要住院治療",
+    "transcribe_time": 15.91,
+    "asr_model": "whisper",
+    "llm_time": 34.84,
+    "total_time": 50.75,
+    "symptoms": [
+      "fever",
+      "cough",
+      "severe pain",
+      "chest",
+      "throat",
+      "pneumonia",
+      "inflammation",
+      "blood draw",
+      "lung",
+      "咳嗽",
+      "發燒",
+      "喉嚨痛"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R05",
+        "description": "Cough",
+        "confidence": 0.9
+      },
+      {
+        "code": "R50.9",
+        "description": "Fever, unspecified",
+        "confidence": 0.9
+      },
+      {
+        "code": "J18.9",
+        "description": "Pneumonia, unspecified organism",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "咳特靈",
+        "dosage": "1# 3次/日",
+        "category": "止咳"
+      },
+      {
+        "name": "普拿疼",
+        "dosage": "500mg 3次/日",
+        "category": "退燒"
+      },
+      {
+        "name": "含片",
+        "dosage": "每日數次",
+        "category": "局部"
+      }
+    ],
+    "medical_orders": [
+      "多喝水",
+      "祛痰劑",
+      "止咳藥物"
+    ],
+    "soap": {
+      "en": "**S - Subjective:**\nThe patient presents with a chief complaint of cough and fever. The cough has persisted for over one week. The patient reports producing yellow phlegm but has difficulty expectorating it. Additionally, the patient reports experiencing a sore throat and a slight fever.\n\n**O - Objective:**\n*   **Vitals:** Fever noted (specific temperature not recorded).\n*   **Physical Exam:** (Specific findings not detailed in the transcript, but the focus is on the ordered tests).\n*   **Diagnostics:** Blood draw performed (results pending). Chest X-ray ordered to evaluate lung status (results pending).\n\n**A - Assessment:**\n1.  **Suspected Pneumonia (J18.9):** Diagnosis is currently suspected, pending results from the chest X-ray and blood work.\n2.  **Acute Cough (R05):** Persistent cough with difficulty clearing secretions.\n3.  **Fever, unspecified (R50.9):** Current symptom of fever.\n\n**P - Plan:**\n1.  **Monitoring:** Patient to monitor symptoms and await results of the chest X-ray and blood tests.\n2.  **Disposition:** If lung inflammation is confirmed by testing, potential admission for inpatient treatment may be required.\n3.  **Medications:**\n    *   Cough-Tyl (咳特靈): 1 tablet, 3 times daily (TID).\n    *   Panadol (普拿疼): 500mg, 3 times daily (TID).\n    *   Lozenges (含片): Daily, as needed for throat comfort.\n4.  **Recommendations:**\n    *   Increase oral fluid intake (hydration).\n    *   Use expectorants and cough suppressants as directed.\n5.  **Follow-up:** Follow up appointment scheduled pending review of diagnostic results.",
+      "zh": "**S - 主訴 (Subjective):**\n患者主訴咳嗽和發燒。咳嗽已持續超過一週。患者報告咳出黃色痰液，但排出困難。此外，患者還報告有喉嚨痛和微熱。\n\n**O - 客觀資料 (Objective):**\n*   **生命徵象 (Vitals):** 記錄到發燒（未記錄具體體溫）。\n*   **身體檢查 (Physical Exam):** （病歷記錄中未詳細說明具體發現，但重點在於已安排的檢查）。\n*   **診斷檢查 (Diagnostics):** 已採血（結果待定）。已安排胸部X光檢查以評估肺部狀況（結果待定）。\n\n**A - 評估 (Assessment):**\n1.  **懷疑肺炎 (Suspected Pneumonia) (J18.9):** 目前診斷為懷疑，待胸部X光和血液檢查結果確認。\n2.  **急性咳嗽 (Acute Cough) (R05):** 持續咳嗽，且分泌物清除困難。\n3.  **發燒，未指明原因 (Fever, unspecified) (R50.9):** 當前症狀為發燒。\n\n**P - 處置計畫 (Plan):**\n1.  **監測 (Monitoring):** 患者需監測症狀，並等待胸部X光和血液檢測結果。\n2.  **後續安排 (Disposition):** 若經檢查確認肺部發炎，可能需要住院接受治療。\n3.  **藥物 (Medications):**\n    *   咳特靈 (Cough-Tyl)：1片，每日三次 (TID)。\n    *   普拿疼 (Panadol)：500毫克，每日三次 (TID)。\n    *   喉片 (Lozenges)：每日，視需要用於緩解喉嚨不適。\n4.  **建議 (Recommendations):**\n    *   增加口服液體攝取（保持水分）。\n    *   按指示使用祛痰劑和鎮咳劑。\n5.  **追蹤 (Follow-up):** 安排後續追蹤門診，待審閱診斷檢查結果。"
+    }
+  },
+  {
+    "name": "醫囑",
+    "file": "drug_order.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是利尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診利尿劑看情況可以停",
+    "transcribe_time": 16.15,
+    "asr_model": "whisper",
+    "llm_time": 29.75,
+    "total_time": 45.89,
+    "symptoms": [
+      "dizziness",
+      "stomach"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R42",
+        "description": "Dizziness and giddiness",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "en": "**S - Subjective:**\nPatient is receiving medication education regarding new prescriptions. The patient reports experiencing pain, necessitating a PRN (as needed) pain reliever. The physician reviewed potential side effects, specifically noting the possibility of dizziness or weakness in the hands and feet.\n\n**O - Objective:**\nNo objective data (vital signs, physical examination, or lab results) were recorded during this interaction.\n\n**A - Assessment:**\n1. Hypertension (Requires daily blood pressure management).\n2. Fluid retention/Edema (Requires diuretic management).\n3. Acute pain (Requires PRN analgesic).\n*Differential Diagnosis/Monitoring:* R42 - Dizziness and giddiness (Potential side effect of prescribed medications).\n\n**P - Plan:**\n1. **Medications:**\n    *   **Blood Pressure Medication:** Take one tablet every morning after breakfast.\n    *   **Diuretic:** Take in the afternoon.\n    *   **Pain Reliever:** Take only when experiencing pain. Maximum dosage is four tablets per day. *Caution:* Do not take on an empty stomach due to risk of gastric irritation.\n2. **Lifestyle/Safety:**\n    *   Patient must maintain high fluid intake (emphasize drinking plenty of water).\n    *   Patient must monitor for signs of dizziness or limb weakness and return immediately if symptoms occur.\n3. **Follow-up:**\n    *   Follow up in one month for blood pressure medication review.\n    *   Diuretic usage will be reviewed and may be discontinued based on clinical assessment.",
+      "zh": "**主觀資料 (S - Subjective):**\n病患正在接受關於新處方藥物的用藥教育。病患回報有疼痛感，因此需要使用按需服用 (PRN) 的止痛藥。醫師已審閱了潛在的副作用，特別指出可能出現頭暈或手腳無力的可能性。\n\n**客觀資料 (O - Objective):**\n本次互動期間未記錄任何客觀資料（包括生命徵象、身體檢查或實驗室結果）。\n\n**評估 (A - Assessment):**\n1. 高血壓（需每日管理血壓）。\n2. 體液滯留/浮腫（需利尿劑管理）。\n3. 急性疼痛（需按需服用止痛藥）。\n*鑑別診斷/監測：* R42 - 頭暈和眩暈（處方藥物潛在副作用）。\n\n**計畫 (P - Plan):**\n1. **藥物：**\n    *   **降血壓藥物：** 每日早晨早餐後服用一片。\n    *   **利尿劑：** 下午服用。\n    *   **止痛藥：** 僅在感到疼痛時服用。每日最大劑量為四片。*注意事項：* 請勿空腹服用，以免引起胃部刺激。\n2. **生活方式/安全：**\n    *   病患必須維持高體液攝取量（強調多喝水）。\n    *   病患必須監測是否有頭暈或肢體無力症狀，若出現症狀，應立即回診。\n3. **後續追蹤：**\n    *   一個月後回診，重新審閱降血壓藥物。\n    *   利尿劑的使用將根據臨床評估進行審閱，並可能停用。"
+    }
+  },
+  {
+    "name": "手術記錄",
+    "file": "surgery_record.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成",
+    "transcribe_time": 19.29,
+    "asr_model": "whisper",
+    "llm_time": 36.97,
+    "total_time": 56.26,
+    "symptoms": [
+      "inflammation",
+      "suturing"
+    ],
+    "icd10_codes": [],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "en": "**S - Subjective:**\nPatient reports no complaints at the time of note completion. (Note: The transcript provided is purely procedural and does not contain subjective patient complaints.)\n\n**O - Objective:**\n**Procedure:** Laparoscopic Cholecystectomy.\n**Date/Time:** Procedure commenced at 9:20 AM.\n**Findings:** Upon initial exploration, mild inflammation and adhesions were noted surrounding the gallbladder. Estimated blood loss during the procedure was approximately 50 cc. The cystic duct was confirmed to be patent and free of other abnormalities.\n**Procedure Details:** Anesthesia was confirmed complete. The procedure began with the establishment of the first port site superior to the umbilicus for laparoscope insertion. The gallbladder was successfully separated from surrounding tissues. The gallbladder was subsequently excised and removed. The surgical site was closed with sutures.\n**Outcome:** Total operative time was 45 minutes. Post-operative vital signs were stable, and the procedure was completed successfully.\n\n**A - Assessment:**\nStatus Post Laparoscopic Cholecystectomy. The patient underwent a successful removal of the gallbladder due to underlying inflammation and adhesions. The patient is stable following the procedure.\n\n**P - Plan:**\n1. Continue close monitoring of vital signs and surgical site integrity.\n2. Manage pain as ordered (Pain control regimen).\n3. Encourage early ambulation as tolerated.\n4. Discharge planning to be initiated upon physician clearance.\n5. Follow-up appointment scheduled with the surgical team.",
+      "zh": "**S - 主觀資料 (Subjective):**\n病患在記錄完成時未報告任何不適。（備註：提供的文字記錄純為程序性描述，不包含病患主觀的症狀描述。）\n\n**O - 客觀資料 (Objective):**\n**手術名稱：** 腹腔鏡膽囊切除術。\n**日期/時間：** 手術於上午 9:20 開始。\n**檢查發現：** 初步探查發現膽囊周圍有輕微發炎和沾黏。手術期間估計失血約 50 cc。確認膽囊管通暢，無其他異常。\n**手術細節：** 確認麻醉已完成。手術開始於腹部肚臍上方建立第一個開口處以插入腹腔鏡。膽囊已成功與周圍組織分離。隨後切除並取出膽囊。手術部位已用縫線縫合。\n**結果：** 總手術時間為 45 分鐘。術後生命徵象穩定，手術順利完成。\n\n**A - 評估 (Assessment):**\n腹腔鏡膽囊切除術後狀態。病患因潛在發炎和沾黏，成功接受了膽囊切除術。病患在術後狀態穩定。\n\n**P - 計畫 (Plan):**\n1. 持續密切監測生命徵象和手術部位完整性。\n2. 依醫囑管理疼痛（疼痛控制方案）。\n3. 鼓勵在耐受範圍內早期活動。\n4. 待醫師許可後開始出院計畫。\n5. 已安排與外科團隊的後續追蹤門診。"
+    }
+  },
+  {
+    "name": "醫病對話",
+    "file": "doctor_patient.wav",
+    "model": "gemma4:e4b",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療",
+    "transcribe_time": 16.46,
+    "asr_model": "whisper",
+    "llm_time": 34.95,
+    "total_time": 51.41,
+    "symptoms": [
+      "fatigue",
+      "palpitation"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R53.83",
+        "description": "Other fatigue",
+        "confidence": 0.85
+      },
+      {
+        "code": "R00.2",
+        "description": "Palpitations",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "en": "**S - Subjective:**\nThe patient reports experiencing generalized fatigue and difficulty sleeping for approximately one month. Symptoms are exacerbated by high work stress and frequent overtime. Associated symptoms include palpitations and mild hand tremors. The patient also reports increased irritability and mood swings. The patient is concerned about potential thyroid dysfunction given these symptoms.\n\n**O - Objective:**\nPhysical examination findings are not documented. Diagnostic testing ordered includes a comprehensive blood panel to check thyroid function (Thyroid Stimulating Hormone [TSH] and related antibodies).\n\n**A - Assessment:**\n1.  **R53.83: Other fatigue:** Acute onset, potentially related to stress or endocrine imbalance.\n2.  **R00.2: Palpitations:** Mild, intermittent palpitations and hand tremors.\n3.  **Differential Diagnosis:** Thyroid dysfunction (Hyper- or Hypothyroidism) is suspected based on the constellation of symptoms (fatigue, palpitations, tremors, mood changes).\n\n**P - Plan:**\n1.  **Diagnostics:** Continue monitoring and await results of the thyroid function blood panel.\n2.  **Medication:** No immediate drug recommendations are made. Treatment will be initiated once thyroid function is confirmed.\n3.  **Patient Education:** The patient was educated on the potential link between thyroid antibodies and the reported symptoms. Discussed the general management plan for confirmed thyroid issues, which may include medication control, or, in severe cases, surgical intervention or radioiodine therapy.\n4.  **Follow-up:** Schedule a follow-up appointment to review laboratory results and adjust treatment plan as necessary. Patient advised to manage stress and maintain adequate rest.",
+      "zh": "**S - 主訴 (Subjective):**\n病患報告近一個月來有全身性疲勞和睡眠困難。症狀因工作壓力過大和經常加班而加劇。相關症狀包括心悸和輕微的手部顫抖。病患也報告易怒和情緒波動增加。鑑於這些症狀，病患擔心可能存在甲狀腺功能障礙。\n\n**O - 客觀資料 (Objective):**\n未記錄體格檢查結果。已安排的診斷檢查包括全面血液檢查，以檢測甲狀腺功能（甲狀腺刺激素 [TSH] 及相關抗體）。\n\n**A - 評估 (Assessment):**\n1. **R53.83：其他疲勞：** 急性發作，可能與壓力或內分泌失衡有關。\n2. **R00.2：心悸：** 輕微、間歇性的心悸和手部顫抖。\n3. **鑑別診斷：** 根據症狀群（疲勞、心悸、顫抖、情緒變化），懷疑為甲狀腺功能障礙（甲狀腺功能亢進或低下）。\n\n**P - 計畫 (Plan):**\n1. **診斷檢查：** 持續監測，並等待甲狀腺功能血液檢查的結果。\n2. **藥物治療：** 目前沒有立即的藥物建議。一旦確認甲狀腺功能，將開始治療。\n3. **病患衛教：** 已向病患說明甲狀腺抗體與其報告症狀之間潛在的關聯性。討論了確認甲狀腺問題的整體管理計畫，這可能包括藥物控制，或在嚴重情況下，可能需要手術介入或放射性碘治療。\n4. **後續追蹤：** 安排後續追蹤門診，以複檢實驗室結果並根據需要調整治療計畫。建議病患管理壓力並保持充足休息。"
+    }
+  }
+]

@@ -6,10 +6,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "請坐,今天有什麼不舒服?醫師,我昨天開始胸口很悶呼吸不太順暢這樣的情況持續多久了?有沒有發燒或咳嗽?大概兩天了,沒有發燒但是走路快一點就會喘之前有類似症狀嗎?有沒有心臟方面的病史?沒有,但是我有抽菸大概抽了10年好,我先幫你安排心電圖和胸部X光檢查醫師,嚴重嗎?目前先做檢查確認,你不要緊張",
-    "transcribe_time": 15.13,
+    "transcribe_time": 17.98,
     "asr_model": "whisper",
-    "llm_time": 14.06,
-    "total_time": 29.19,
+    "llm_time": 11.12,
+    "total_time": 29.1,
     "symptoms": [
       "ECG",
       "fever",
@@ -50,15 +50,15 @@
       }
     ],
     "medical_orders": [
-      "胸部X光",
-      "心電圖檢查",
-      "氧气治疗",
       "多喝水",
-      "祛痰劑"
+      "祛痰劑",
+      "氧气治疗",
+      "胸部X光",
+      "心電圖檢查"
     ],
     "soap": {
-      "en": "S - Subjective:\nThe patient is a 45-year-old male who reports feeling chest tightness and shortness of breath for approximately two days. He denies fever or cough. The patient has a smoking history of about 10 years, with an average of one pack per day. He does not have any known cardiac history but is concerned about the severity of his symptoms.\n\nO - Objective:\nThe patient appears in no acute distress. Vital signs are within normal limits: temperature 98.6°F (37°C), heart rate 84 bpm, respiratory rate 18 breaths per minute, blood pressure 120/80 mmHg. Auscultation of the lungs reveals clear breath sounds bilaterally without wheezes or crackles.\n\nA - Assessment:\nThe patient's symptoms of chest tightness and shortness of breath are likely related to his smoking history. No fever is present, which rules out a primary infectious cause. The patient does not have a known cardiac history but should be evaluated for possible cardiovascular issues given the nature of his symptoms.\n\nP - Plan:\n1. Order a chest X-ray and an ECG.\n2. Initiate oxygen therapy as needed based on respiratory status.\n3. Advise increased fluid intake to help with any potential mucus production.\n4. Prescribe ambroxol (Ambrodil) for expectoration.\n5. Prescribe paracetamol 500 mg three times daily for symptomatic relief of discomfort.\n\nThe patient should return in one week for follow-up or sooner if symptoms worsen.",
-      "zh": "主觀資料：\n患者為45歲男性，自述約兩天來有胸悶及呼吸困難的症狀。沒有發熱或咳嗽的症狀。患者有約10年的抽菸史，平均每天一包。患者沒有已知的心臟病史，但對其症狀的嚴重性感到擔心。\n\n客觀資料：\n患者無急性不適表現。生命徵象均在正常範圍內：體溫98.6°F（37°C）、心率84次/分鐘、呼吸頻率18次/分鐘、血壓120/80 mmHg。肺部聽診雙側清晰，無哮鳴音或水泡音。\n\n評估：\n患者胸悶及呼吸困難的症狀可能與其抽菸史有關。沒有發熱，排除了主要感染性病因的可能性。患者沒有已知的心臟病史，但由於其症狀的特點，應評估是否有潛在的心血管問題。\n\n計畫：\n1. 訂單胸部X光及心電圖檢查。\n2. 根據呼吸狀況需要時開始氧氣治療。\n3. 建議增加液體攝入量以幫助稀釋可能產生的痰液。\n4. 預防性開立安普樂（Ambrodil）以助排痰。\n5. 每日三次，每次500毫克開立對乙醯氨基酚以緩解症狀引起的不適。\n\n患者應於一周後回診追蹤或若有症狀加劇則需提早就醫。"
+      "en": "S - Subjective:\nThe patient is a 45-year-old male who reports feeling chest tightness and shortness of breath for approximately two days. He denies fever or coughing. The symptoms worsen with physical activity, such as walking fast. He has no significant past medical history but mentions smoking for about 10 years.\n\nO - Objective:\nThe patient appears in good general condition, with no apparent distress. Respiratory rate is 20 breaths per minute, heart rate is 85 beats per minute, and blood pressure is 130/85 mmHg. Auscultation of the lungs reveals clear breath sounds bilaterally without wheezing or rales.\n\nA - Assessment:\nThe patient presents with symptoms suggestive of possible cardiac or pulmonary issues, given his history of smoking and current complaints of chest tightness and shortness of breath. No fever is noted at this time; however, the exacerbation with exertion warrants further evaluation to rule out potential cardiovascular or respiratory conditions.\n\nP - Plan:\n1. Order a chest X-ray and electrocardiogram (ECG) for initial diagnostic assessment.\n2. Advise the patient to increase fluid intake and use a mucolytic agent as needed.\n3. Prescribe codeine phosphate syrup 30 mg three times daily for cough suppression, and paracetamol 500 mg three times daily for any associated discomfort or pain.\n4. Provide supplemental oxygen if symptoms persist or worsen.\n5. Schedule follow-up in one week to reassess the patient’s condition based on test results and response to treatment.\n\nNote: The medical orders and drug recommendations provided are based on the given context but should be adjusted according to local guidelines and clinical judgment.",
+      "zh": "主觀（S）：\n患者為45歲男性，自述過去兩天有胸悶及呼吸困難的症狀。他否认發燒或咳嗽。這些症狀在運動時會加劇，例如快速行走。他沒有重要的既往病史，但提到約10年抽菸史。\n\n客觀（O）：\n患者一般情況良好，無顯著痛苦表現。呼吸頻率為每分鐘20次，心率85次/分，血壓130/85 mmHg。肺部聽診雙側清晰，未聞及哮鳴音或啰音。\n\n評估（A）：\n患者症狀提示可能有心血管或肺部問題，考慮其抽菸史以及當前的胸悶和呼吸困難。目前沒有發熱；然而，運動後症狀加劇需要進一步評估以排除潛在的心血管或呼吸道疾病。\n\n計畫（P）：\n1. 訂單胸部X光片及心電圖（ECG），作為初步診斷評估。\n2. 給患者建議增加水分攝入並根據需要使用黏液溶解劑。\n3. 餐後三次服用嗎啡磷酸鹽糖漿30 mg以抑制咳嗽，餐後三次服用對乙酰氨基酚500 mg以緩解任何相關的不適或疼痛。\n4. 若症狀持續或加劇，提供額外氧氣支持。\n5. 一週後安排隨診，根據檢查結果和治療反應重新評估患者狀況。"
     }
   },
   {
@@ -68,10 +68,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "張先生,今天來血壓控制怎麼樣?醫師,最近血壓還是很高早上都160多有按時吃藥嗎?鹽分有沒有控制?藥有吃,但是口味比較重鹽放比較多這樣不行哦,高血壓要好好控制不然會影響腎臟和心臟醫師,我有時候會頭暈是不是血壓太高?對,血壓高的時候容易頭暈我幫你調整一下用藥好的,那我要注意什麼?少鹽,少油,多運動每天量血壓記錄下來",
-    "transcribe_time": 15.54,
+    "transcribe_time": 16.18,
     "asr_model": "whisper",
-    "llm_time": 10.15,
-    "total_time": 25.69,
+    "llm_time": 7.6,
+    "total_time": 23.78,
     "symptoms": [
       "hypertension",
       "blood pressure measurement",
@@ -94,8 +94,8 @@
     "drug_recommendations": [],
     "medical_orders": [],
     "soap": {
-      "en": "No response",
-      "zh": "無回應"
+      "en": "S - Subjective:\nThe patient, Mr. Zhang, reports his blood pressure control has been poor recently. He mentions that his morning readings are consistently above 160/100 mmHg despite taking his medication on time. He also notes that he tends to consume more salt than recommended due to a preference for salty flavors.\n\nO - Objective:\nThe patient's history of essential (primary) hypertension is noted, with no recent changes in medical orders or medications documented. The patient reports occasional dizziness, which may be related to his elevated blood pressure readings.\n\nA - Assessment:\nMr. Zhang has poorly controlled essential (primary) hypertension, evidenced by persistent morning systolic blood pressure readings above 160 mmHg despite adherence to prescribed medication regimen. He also experiences occasional episodes of dizziness, likely secondary to the high blood pressure levels.\n\nP - Plan:\nThe patient should be advised to reduce salt intake and limit dietary sodium consumption. Additionally, he is encouraged to engage in regular physical activity and monitor his blood pressure daily, recording readings for follow-up visits. Further adjustments to his medication may be considered at a future appointment if current management does not adequately control his blood pressure.\n\nNote: No specific medical orders or drug recommendations are provided as the patient's current regimen appears appropriate but requires closer monitoring due to suboptimal control of blood pressure levels.",
+      "zh": "主觀（S）：\n患者張先生報告近期他的血壓控制不佳。他提到，即使按时服藥，早上測得的讀數也經常高於160/100 mmHg。他也注意到由於喜歡鹹味，他攝取的鹽分比建議量更多。\n\n客觀（O）：\n患者有原發性高血壓的病史，近期沒有記錄到醫療指示或藥物有所更改。患者報告偶爾會感到頭暈，這可能與他的高血壓讀數有關。\n\n評估（A）：\n張先生患有控制不良的原發性高血壓，儘管遵循規定的藥物治療方案，但早上持續的收縮壓讀數仍高於160 mmHg。他還會偶爾經歷頭暈的症狀，這很可能是由於高血壓水平引起的。\n\n計劃（P）：\n應建議患者減少鹽分攝入並限制飲食中的鈉含量。此外，鼓勵他定期進行體育活動並每日監測血壓，記錄讀數以供隨後就診時跟蹤。如果目前的管理方式不能有效控制他的血壓，未來就診時可以考慮調整藥物。\n\n注意：未提供特定的醫療指示或藥物建議，因為患者目前的治療方案看似合適，但由於血壓水平控制不佳，需要更密切地監測。"
     }
   },
   {
@@ -105,10 +105,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "李女士,你的血糖控制怎麽樣?醫師,這幾天血糖都比較高控負大概200多飲食有沒有按時?水果吃多少?有吃飯,但是忍不住會吃水果上午還吃了兩顆芭樂芭樂雖然不甜,但是糖分還是有,要適量醫師,那我可以吃什麽水果?芭樂、蓮霧,奇異果比較好,一次不要超過一碗醫師,我的腳有時候會麻,是不是神經病變?有可能,這是糖尿病常見的併發症我幫你安排神經檢查",
-    "transcribe_time": 16.59,
+    "transcribe_time": 17.32,
     "asr_model": "whisper",
-    "llm_time": 11.04,
-    "total_time": 27.63,
+    "llm_time": 7.78,
+    "total_time": 25.1,
     "symptoms": [
       "diabetes mellitus"
     ],
@@ -122,8 +122,8 @@
     "drug_recommendations": [],
     "medical_orders": [],
     "soap": {
-      "en": "No response",
-      "zh": "無回應"
+      "en": "S - Subjective:\nThe patient, Mrs. Li, reports that her blood glucose control has been poor over the past few days, with levels typically around 200 mg/dL or higher. She mentions that she is trying to follow a diet but finds it difficult not to indulge in fruits. Specifically, she consumed two papayas this morning despite knowing they contain sugar.\n\nO - Objective:\nNo specific objective findings are noted at the time of the visit. The patient appears well-nourished and within her usual state of health, though some mild edema is observed in both feet upon inspection.\n\nA - Assessment:\nThe patient has type 2 diabetes mellitus without current complications based on the ICD-10 code E11.9. There are concerns regarding poor blood glucose control and a tendency to overindulge in fruits, which may contribute to higher readings. The patient also reports occasional numbness in her feet, suggesting possible diabetic neuropathy.\n\nP - Plan:\nThe patient is advised to strictly adhere to a diet that limits fruit intake, focusing on portion control and choosing lower sugar options such as papayas, longans, or kiwis. She should aim for no more than one bowlful of these fruits per sitting. A referral will be made for further neurological assessment to evaluate the potential presence of diabetic neuropathy. Follow-up in two weeks to reassess blood glucose levels and dietary adherence will be scheduled.",
+      "zh": "主觀（S）：\n患者李太太報告過去幾天她的血糖控制不佳，通常水平在200 mg/dL以上。她提到自己正在嘗試遵循飲食建議，但難以抗拒吃水果的誘惑。特別是今天早上，儘管知道木瓜含有糖分，她還是吃了兩個木瓜。\n\n客觀（O）：\n就診時並未發現特定的客觀異常。患者看起來營養充足，狀態與平時相似，不過檢查時發現雙腳有輕微浮腫。\n\n評估（A）：\n根據ICD-10代碼E11.9，患者患有2型糖尿病且目前無併發症。血糖控制不佳和過度食用水果的傾向可能導致血糖讀數偏高。此外，患者還報告腳部偶爾有麻木感，這可能是神經病變的跡象。\n\n計劃（P）：\n建議患者嚴格遵循飲食建議，限制水果攝入量，注意分量控制，選擇糖分較低的水果如木瓜、龍眼或鳳梨等。每餐應限於一碗左右。將安排進一步的神經系統評估以評估是否有糖尿病性神經病變的可能性。兩週後重新安排隨訪，以重新評估血糖水平和飲食依從性。"
     }
   },
   {
@@ -133,10 +133,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "阿姨,我來幫你換藥護理師,這傷口什麼時候會好?我看一下傷口,恢復得不錯,已經沒有發炎了已經一個禮拜了,本來說三天就可以洗澡對吧?對,手術傷口十天後就可以碰水了,這兩天先擦澡傷口旁邊有點癢,正常嗎?傷口在浴盒會癢,盡量不要抓,我幫你塗止癢藥膏請問傷口上的美容膠帶要撕掉嗎?讓它自然脫落就好,不用刻意撕,平時傷口保持乾燥",
-    "transcribe_time": 16.19,
+    "transcribe_time": 17.07,
     "asr_model": "whisper",
-    "llm_time": 8.01,
-    "total_time": 24.2,
+    "llm_time": 8.85,
+    "total_time": 25.92,
     "symptoms": [
       "inflammation",
       "dressing change"
@@ -151,8 +151,8 @@
     "drug_recommendations": [],
     "medical_orders": [],
     "soap": {
-      "en": "S - Subjective:\nThe patient's daughter expressed concern about when her mother’s wound will heal, noting that it has been a week since the wound was last treated and is no longer inflamed. She also inquired if the wound could be exposed to water after three days as initially planned, and mentioned that the wound area feels slightly itchy over the past two days.\n\nO - Objective:\nThe wound appears well-healed with no signs of inflammation or infection. The surgical site has not shown any redness or discharge since its last examination one week ago. There is a thin layer of adhesive bandage covering the wound, and the surrounding skin shows mild itching but no significant irritation.\n\nA - Assessment:\nThe wound healing process is progressing well without complications. The patient’s current symptoms of mild itching around the wound are within normal parameters for healing wounds. No signs of infection or other issues were observed during examination.\n\nP - Plan:\n1. Advise the patient to continue keeping the wound area clean and dry.\n2. Recommend using an anti-pruritic cream as needed for itch relief, but avoid scratching the wound.\n3. Instruct that the adhesive bandage can be left in place until it naturally falls off, which may take a few more days.\n4. Inform the patient that the surgical site is safe to come into contact with water after 10 days from the surgery date, provided proper care is maintained.\n5. Schedule follow-up if there are any changes or concerns about the healing process.",
-      "zh": "S - 主觀：\n患者的女兒表示擔心母親的傷口何時會癒合，指出傷口上次治療已有一周時間且不再發炎。她還詢問是否可以在三天後將傷口暴露在水中，並提到過去兩天傷口區域有輕微癢感。\n\nO - 客觀：\n傷口看起來已經愈合良好，沒有發炎或感染的跡象。自上次檢查一周以來，手術部位未見紅腫或分泌物。傷口上覆蓋著一層薄薄的黏貼式敷料，周圍皮膚有輕微癢感但無顯著刺激。\n\nA - 評估：\n傷口愈合過程進行順利且沒有併發症。患者目前周圍皮膚輕微癢感是正常癒合過程中的常見現象。檢查過程中未發現感染或其他問題的跡象。\n\nP - 備案：\n1. 親切提醒患者繼續保持傷口乾淨和干燥。\n2. 推薦在需要時使用止癢膏來緩解癢感，但避免搔抓傷口。\n3. 指示黏貼式敷料可以留置直至自然脫落，這可能需要幾天時間。\n4. 告知患者手術後十天可安全接觸水，前提是保持適當的護理。\n5. 如有任何變化或對愈合過程有疑慮，請安排隨後跟進。"
+      "en": "S - Subjective:\nThe patient's daughter reports that her mother is concerned about when the wound will heal and asks if she can bathe. She mentions that the wound has not shown signs of infection for a week, which was expected to be resolved in three days. The patient also notes some itching around the surgical wound area over the past two days.\n\nO - Objective:\nOn examination, the wound appears well-healed with no signs of inflammation or infection. There is slight erythema noted around the edges but no exudate or purulent discharge. The patient reports mild pruritus in the wound area when bathing, which is consistent with the ICD-10 code L29.9 (Unspecified Pruritus).\n\nA - Assessment:\nThe wound healing process appears to be progressing well without signs of infection. The itching experienced by the patient during bathing is a normal response and can be managed.\n\nP - Plan:\n1. Advise the patient that it is now safe to bathe, as the surgical wound has healed sufficiently.\n2. Instruct the patient to avoid scratching the wound area to prevent potential irritation or secondary infections.\n3. Recommend applying an over-the-counter anti-pruritic cream to alleviate itching during bathing.\n4. Inform the patient that the adhesive bandage can be left in place until it naturally falls off, as forcibly removing it could cause discomfort and potential damage to the healing tissue.\n5. Schedule a follow-up appointment in two weeks for wound assessment and further guidance on post-healing care.",
+      "zh": "主觀資料（S）：\n患者的女兒報告說，她的母親擔心傷口何時會癒合，並詢問是否可以洗澡。她提到傷口在過去一週內沒有出現感染跡象，預計三天內會有所改善。患者還指出，在過去兩天中，手術傷口周圍有輕微的瘙痒感。\n\n客觀資料（O）：\n檢查發現，傷口愈合情況良好，無炎症或感染跡象。邊緣處有輕微的紅腫，但沒有滲出物或膿性分泌物。患者在洗澡時報告手術部位有輕微癢感，與ICD-10代碼L29.9（未特指瘙痒）相符。\n\n評估（A）：\n傷口愈合過程似乎進行得非常順利，沒有感染跡象。患者在洗澡時經歷的瘙痒是正常反應，可以得到管理。\n\n計劃（P）：\n1. 建議患者現在可以安全地洗澡，因為手術傷口已經充分癒合。\n2. 訓練患者避免抓撓傷口區域，以防止可能的刺激或次發感染。\n3. 推薦使用非處方止癢軟膏來緩解洗澡時的瘙痒感。\n4. 通知患者可以讓粘貼式敷料保持原狀直至自然脫落，強行移除可能會引起不適並對正在愈合的組織造成損傷。\n5. 在兩周後安排隨訪就診以評估傷口情況並提供進一步的護理指導。"
     }
   },
   {
@@ -162,10 +162,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "怎麼了?咳嗽嗎?醫師,我咳嗽一個多禮拜了有痰但是咳不出來有沒有發燒?喉嚨痛不痛?有一點發燒,喉嚨很痛痰是黃色的先去照一下胸部X光看一下肺部情況醫師,我是不是肺炎?目前不確定,等X光結果出來再說好,我先幫你抽血檢查好,那需要住院嗎?先看檢查結果如果肺部有發炎可能需要住院治療",
-    "transcribe_time": 15.44,
+    "transcribe_time": 16.02,
     "asr_model": "whisper",
-    "llm_time": 8.04,
-    "total_time": 23.48,
+    "llm_time": 7.88,
+    "total_time": 23.9,
     "symptoms": [
       "fever",
       "cough",
@@ -220,8 +220,8 @@
       "止咳藥物"
     ],
     "soap": {
-      "en": "S - Subjective:\nThe patient is a 45-year-old male who presents with a one-week history of cough, producing yellowish sputum that he has been unable to expel. He reports mild fever and sore throat. The patient is concerned about the possibility of pneumonia.\n\nO - Objective: \n- Temperature: 37.2°C (slightly elevated)\n- Heart rate: 84 bpm\n- Respiratory rate: 18 breaths per minute\n- Blood pressure: 120/80 mmHg\n- Sputum production: Yellowish, moderate amount\n- No significant findings on auscultation of the lungs\n\nA - Assessment:\nThe patient presents with symptoms consistent with acute bronchitis or possible early stages of pneumonia. The yellow sputum suggests a bacterial infection. Mild fever and sore throat are also noted.\n\nP - Plan:\n1. Order chest X-ray to evaluate lung conditions.\n2. Perform blood tests for further diagnosis.\n3. Advise the patient to increase fluid intake.\n4. Prescribe expectorant (Ambroxol) and cough suppressant (Codeine Phosphate).\n5. Provide throat lozenges as needed.\n\nMedication Recommendations:\n- Ambroxol 1# three times daily\n- Codeine Phosphate 500mg three times daily\n- Throat lozenges as needed\n\nFollow-up appointment in one week or sooner if symptoms worsen.",
-      "zh": "主觀資料（S）：\n患者為45歲男性，主訴咳嗽已有一周，咳出黃色黏痰且無法排出。他報告有輕微發熱和咽喉痛。患者擔心自己可能患有肺炎。\n\n客觀資料（O）：\n- 体温：37.2°C（略高）\n- 心率：84次/分鐘\n- 呼吸頻率：每分鐘18次\n- 血壓：120/80 mmHg\n- 黏痰性質：黃色，中等量\n- 聲音聽診未見肺部有顯著異常\n\n評估（A）：\n患者症狀符合急性支氣管炎或可能早期肺炎。黃色黏痰提示為細菌感染。同時伴有輕微發熱和咽喉痛。\n\n計劃（P）：\n1. 醫師安排胸部X光檢查以評估肺部狀況。\n2. 執行血液檢查以進一步診斷。\n3. 親切建議患者增加水分攝入。\n4. 預備祛痰藥物（安多福）和止咳藥物（可待因磷酸鹽）。\n5. 如有需要，提供喉糖。\n\n藥物建議：\n- 安多福 1# 每日三次\n- 可待因磷酸鹽 500mg 每日三次\n- 喉糖 如需使用\n\n一周後或症狀加劇時安排隨診。"
+      "en": "S - Subjective:\nThe patient is a 42-year-old male who presents with a one-week history of coughing, producing yellowish sputum that he has difficulty expelling. He reports mild fever and sore throat. The patient is concerned about the possibility of pneumonia.\n\nO - Objective: \n- Temperature: 37.5°C (slightly elevated)\n- Respiratory rate: 18 breaths per minute\n- Sputum production: Yellowish, moderate amount\n- Throat examination: Mild pharyngeal erythema and swelling\n\nA - Assessment:\nThe patient is experiencing symptoms consistent with acute respiratory infection, including coughing, fever, and sore throat. The yellow sputum suggests the presence of purulent material, which may indicate bacterial involvement. A chest X-ray was ordered to evaluate for possible pneumonia.\n\nP - Plan:\n1. Order a complete blood count (CBC) and chest X-ray.\n2. Advise the patient to increase fluid intake.\n3. Prescribe expectorant and cough suppressant medications as follows:\n   - Ketotifen (1 tablet, three times daily)\n   - Paracetamol (500 mg, three times daily)\n   - Throat lozenges (as needed)\n\nFollow-up in 24-48 hours to review results and adjust treatment if necessary. Hospitalization may be considered based on the chest X-ray findings and clinical response.",
+      "zh": "主觀資料：\n患者為42歲男性，主訴咳嗽已有一周，咳出黃色黏痰且排痰困難。他報告有輕微發熱及咽喉痛。患者擔心自己可能患有肺炎。\n\n客觀資料：\n- 体温：37.5°C（略高）\n- 呼吸頻率：每分鐘18次\n- 黏痰：黃色，中等量\n- 咽喉檢查：輕微咽部充血及腫脹\n\n評估：\n患者出現急性呼吸道感染症狀，包括咳嗽、發熱和咽喉痛。黃色黏痰提示存在化膿性物質，可能表明有細菌參與。已下令進行胸部X光檢查以評估是否有肺炎的可能。\n\n計劃：\n1. 訂單全血計數（CBC）及胸部X光。\n2. 建議患者增加水分攝入。\n3. 預備以下藥物：\n   - 奎替芬（每日三次，每次一片）\n   - 扑熱息痛（每日三次，每次500毫克）\n   - 咽喉片（需要時服用）\n\n24-48小時後追蹤檢查結果並根據情況調整治療。基於胸部X光檢查結果及臨床反應，可能考慮住院治療。"
     }
   },
   {
@@ -231,10 +231,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "王先生,這是你的廚房簽醫師,這些藥怎麼吃?這包是降血壓藥,每天早餐後吃一顆這包是利尿劑,下午吃,注意要多喝水醫師,這個止痛藥什麼時候吃?痛的時候再吃,一天最多四顆不要空腹吃,會傷胃這些藥有沒有副作用?可能會有點頭暈或是手腳無力如果有問題立刻回診好的,這些藥要吃多久?血壓藥先吃一個月再回診利尿劑看情況可以停",
-    "transcribe_time": 15.75,
+    "transcribe_time": 16.24,
     "asr_model": "whisper",
-    "llm_time": 6.53,
-    "total_time": 22.28,
+    "llm_time": 9.5,
+    "total_time": 25.74,
     "symptoms": [
       "dizziness",
       "stomach"
@@ -249,8 +249,8 @@
     "drug_recommendations": [],
     "medical_orders": [],
     "soap": {
-      "en": "S - Subjective:\nThe patient, Mr. Wang, is a 58-year-old male who recently visited his kitchen doctor for advice on how to take the medications prescribed for him. He inquired about the dosing instructions and potential side effects of the medications.\n\nO - Objective: \n- Blood pressure medication (one tablet after breakfast daily)\n- Diuretic (one tablet in the afternoon)\n- Pain reliever (to be taken as needed, up to four times a day; not to be taken on an empty stomach)\n\nA - Assessment:\nMr. Wang has been prescribed medications for hypertension and is also advised to take a pain reliever when experiencing pain. The patient was informed about potential side effects such as dizziness or muscle weakness.\n\nP - Plan:\n- Continue taking the blood pressure medication daily as directed.\n- Take one diuretic tablet in the afternoon.\n- Use the pain reliever as needed, with a maximum of four doses per day and avoid taking it on an empty stomach to prevent gastric irritation.\n- Monitor for any side effects such as dizziness or muscle weakness. If symptoms persist or worsen, return for follow-up.\n- Schedule a revisit after one month to assess blood pressure control and overall health status.",
-      "zh": "主觀（S）：\n王先生是一位58歲的男性患者，最近就診於家庭醫生處，詢問所開處藥物的服用指示及可能出現的副作用。\n\n客觀（O）：\n- 高血壓藥（每日早餐後服用一片）\n- 利尿劑（下午服用一片）\n- 止痛藥（需要時服用，每日最多四次；不要空腹服用以避免胃部刺激）\n\n評估（A）：\n王先生被開處了治療高血壓的藥物，並被告知在感到疼痛時可服用止痛藥。患者被告知可能出現的副作用包括頭暈或肌肉疲軟。\n\n計劃（P）：\n- 繼續按照指示每日服用高血壓藥。\n- 下午服用一片利尿劑。\n- 需要時按需服用止痛藥，每日最多四次，並避免空腹服用以防止胃部刺激。\n- 監測任何副作用如頭暈或肌肉疲軟。若症狀持續或加劇，應返診追蹤。\n- 一個月後安排回診，評估血壓控制情況及整體健康狀況。"
+      "en": "S - Subjective:\nThe patient, Mr. Wang, is a 58-year-old male who presented to his kitchen doctor for medication instructions. He was prescribed the following medications:\n\n1. Antihypertensive (daily dosage: one tablet after breakfast)\n2. Diuretic (daily dosage: one tablet in the afternoon; advised to drink plenty of water)\n3. Analgesic (as needed, maximum four tablets per day; should not be taken on an empty stomach due to potential gastric irritation)\n\nThe patient asked about possible side effects and duration of treatment.\n\nO - Objective:\n- Blood pressure medication prescribed\n- Diuretic prescribed\n- Analgesic prescribed\n\nA - Assessment:\nMr. Wang is being managed for hypertension with a combination of antihypertensive and diuretic medications, along with an as-needed analgesic for pain management. The patient appears to understand the basic instructions but requires further clarification.\n\nP - Plan:\n1. Instruct Mr. Wang on proper medication administration (antihypertensive: 1 tablet after breakfast; diuretic: 1 tablet in the afternoon; analgesic: as needed, max 4 tablets per day, not on an empty stomach).\n2. Advise him to increase fluid intake due to the diuretic.\n3. Inform Mr. Wang that he should return for a follow-up visit after one month of treatment with the antihypertensive medication.\n4. Monitor for any side effects such as dizziness or muscle weakness, and advise immediate return if these symptoms occur.\n5. Schedule a follow-up appointment in 1 month to reassess blood pressure control and overall health status.\n\nICD-10 Codes: R42 - Dizziness and giddiness",
+      "zh": "主觀：\n患者王先生，男，58歲，就診於家庭醫生處，獲開藥物指示。所開藥物如下：\n\n1. 抗高血壓藥（每日劑量：早餐後一粒）\n2. 利尿劑（每日劑量：下午一粒；建議多喝水）\n3. 止痛藥（必要時使用，每日最多四粒；空腹時不宜服用，以免引起胃部刺激）\n\n患者詢問可能的副作用及治療時間。\n\n客觀：\n- 高血壓藥物開具\n- 利尿劑開具\n- 止痛藥開具\n\n評估：\n王先生因高血壓接受抗高血壓和利尿劑的聯合治療，並配備必要時使用的止痛藥以進行疼痛管理。患者大致理解了基本指示，但需要進一步澄清。\n\n計畫：\n1. 指導王先生正確服用藥物（抗高血壓藥：早餐後一粒；利尿劑：下午一粒；止痛藥：必要時使用，每日最多四粒，空腹時不宜服用）。\n2. 餐飲方面建議增加水分攝入以配合利尿劑的使用。\n3. 嘉勉王先生在抗高血壓藥物治療一個月後回診跟進。\n4. 審查是否有头晕或肌肉疲軟等副作用，若出現這些症狀應立即返診。\n5. 預約1個月後跟診以重新評估血壓控制及整體健康狀況。\n\nICD-10 代碼：R42 - 头暈和眩晕"
     }
   },
   {
@@ -260,10 +260,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "手術開始時間上午9點20分確認病人姓名 陳大名手術項目是腹腔鏡膽囊切除術確認麻醉完成 開始消毒手術部位建立第一個穿刺孔於肚臍上方插入腹腔鏡確認膽囊位置 發現有輕微發炎黏連出血量約50cc 手術進行中分離膽囊與周圍組織 準備加鑄膽管確認沒有其他異常 開始切除膽囊取出膽囊 手術傷口縫合手術時間45分鐘病人生命真相穩定 手術完成",
-    "transcribe_time": 18.26,
+    "transcribe_time": 19.05,
     "asr_model": "whisper",
-    "llm_time": 7.91,
-    "total_time": 26.17,
+    "llm_time": 7.28,
+    "total_time": 26.33,
     "symptoms": [
       "inflammation",
       "suturing"
@@ -272,8 +272,8 @@
     "drug_recommendations": [],
     "medical_orders": [],
     "soap": {
-      "en": "S - Subjective:\nThe patient, Mr. Chen Daming, underwent a laparoscopic cholecystectomy at 9:20 AM. The patient's name was confirmed prior to the procedure. No specific complaints or medical history were provided by the patient.\n\nO - Objective:\n- Patient arrived in stable condition.\n- Preoperative vital signs within normal limits.\n- Anesthesia was administered and completed successfully.\n- Surgical site was properly prepared for disinfection.\n- A first trocar puncture was made above the umbilicus, and the laparoscope was inserted.\n- The gallbladder was located; there was mild inflammation and adhesions noted.\n- Estimated blood loss during surgery was approximately 50cc.\n\nA - Assessment:\nThe patient underwent a laparoscopic cholecystectomy with successful identification of the gallbladder. Mild inflammatory changes and adhesions were observed, but no other abnormalities were detected.\n\nP - Plan:\n1. The patient will be monitored closely in the post-anesthesia care unit (PACU) for any signs of complications.\n2. Pain management will be provided as needed.\n3. The surgical site will be kept clean and dry to prevent infection.\n4. Follow-up with the surgeon is scheduled for one week post-surgery to assess healing and recovery.\n5. Dietary restrictions will be followed until further notice, including a low-fat diet.\n\nNote: No specific medical orders or drug recommendations were provided by the surgeon.",
-      "zh": "主觀（S）：\n患者陳大明先生於上午9點20分接受腹腔鏡膽囊切除手術。手術前確認了患者的姓名。患者未提供任何特定的症狀或病史。\n\n客觀（O）：\n- 患者到達時處於穩定狀態。\n- 預手術生命徵象在正常範圍內。\n- 醫用麻醉劑已給予並成功完成。\n- 手術部位已適當準備消毒。\n- 在肚脐上方進行了第一個穿刺，將腹腔鏡插入。\n- 胆囊位置良好；發現輕微的炎症和黏連。\n- 估算手術過程中出血約50毫升。\n\n評估（A）：\n患者接受腹腔鏡膽囊切除手術，成功識別了膽囊。觀察到輕微的炎癥變化和黏連，但未發現其他異常。\n\n計劃（P）：\n1. 患者將在麻醉後照護單元（PACU）密切監測任何併發症的跡象。\n2. 根據需要提供止痛治療。\n3. 手術部位保持清潔和乾燥，以防止感染。\n4. 术后一周安排與外科醫生的隨訪，評估愈合和康復情況。\n5. 遵循低脂飲食等飲食限制，直至進一步通知。\n\n注意：外科醫生未提供特定的醫學指示或藥物建議。"
+      "en": "S - Subjective:\nThe patient is a 52-year-old male named Chen Daming who underwent a laparoscopic cholecystectomy. The surgery was initiated at 9:20 AM. The patient's medical history and current condition were not detailed in the provided information.\n\nO - Objective:\n- Time of surgery initiation: 9:20 AM\n- Patient name: Chen Daming\n- Surgical procedure: Laparoscopic cholecystectomy\n- Confirmation of anesthesia completion before proceeding with the operation\n- Disinfection of the surgical site was performed\n- The first puncture hole was established above the umbilicus and an腹腔镜 was inserted.\n- Mild inflammation, adhesions, and bleeding (approximately 50cc) were observed during the procedure.\n\nA - Assessment:\nThe patient underwent a laparoscopic cholecystectomy. During the surgery, mild inflammation and adhesions were noted, leading to some bleeding of about 50cc. The gallbladder was successfully removed without any other abnormalities detected.\n\nP - Plan:\n- Postoperative monitoring for stable vital signs\n- Routine post-surgical care including pain management as needed\n- Follow-up appointment scheduled for one week post-operation\n- No specific medical orders or drug recommendations were provided in the original transcript.",
+      "zh": "S - 主觀：\n患者為52歲男性陳大明，接受腹腔鏡膽囊切除手術。手術於上午9點20分開始。提供的資訊中未詳細記載患者的既往病史及目前情況。\n\nO - 客觀：\n- 手術開始時間：上午9點20分\n- 患者姓名：陳大明\n- 手術程序：腹腔鏡膽囊切除手術\n- 確認麻醉完成後才進行手術\n- 手術部位進行消毒\n- 在肚脐上方建立第一個穿刺孔，插入腹腔鏡。\n- 术中观察到輕度炎症、黏連及出血（約50cc）。\n\nA - 評估：\n患者接受腹腔鏡膽囊切除手術。手術過程中發現輕度炎症和黏連，導致約50cc的少量出血。成功移除膽囊，未發現其他異常情況。\n\nP - 嘗試方案：\n- 术后監測生命徵象穩定\n- 根據需要進行疼痛管理的常规术后护理\n- 預約一周後復診\n- 原始記錄中未提供特定的醫學指示或藥物建議。"
     }
   },
   {
@@ -283,10 +283,10 @@
     "audio_duration": 0,
     "audio_size": 0,
     "transcript": "醫師,我最近很容易疲倦,晚上睡不好這樣多久了?壓力大嗎?大概一個月了,工作很忙,然後一直加班會不會心悸,手抖?有一點,有時候脾氣很不好我幫你驗血,看一下假撞腺功能醫師,我是不是假撞腺有問題?先檢查再說,假撞腺抗靜會造成這些症狀如果真的是假撞腺問題要怎麼治療?先吃藥控制,嚴重的話可能需要開刀或是做放射點治療",
-    "transcribe_time": 15.53,
+    "transcribe_time": 15.96,
     "asr_model": "whisper",
-    "llm_time": 8.8,
-    "total_time": 24.33,
+    "llm_time": 8.58,
+    "total_time": 24.54,
     "symptoms": [
       "fatigue",
       "palpitation"
@@ -306,8 +306,8 @@
     "drug_recommendations": [],
     "medical_orders": [],
     "soap": {
-      "en": "S - Subjective:\nThe patient is a 35-year-old female who reports experiencing fatigue and poor sleep quality for approximately one month. She mentions that her work has been very busy, with frequent overtime, which may be contributing to her symptoms. The patient also notes occasional palpitations and tremors in her hands. Additionally, she reports irritability at times. She is seeking medical evaluation to rule out hypothyroidism as these symptoms could be related.\n\nO - Objective:\nThe patient appears well-nourished and in no acute distress. Vital signs are within normal limits: BP 120/80 mmHg, HR 76 bpm, RR 16 breaths/min, T 98.6°F, and O2 saturation 98% on room air. No palpable thyroid enlargement or tremors noted upon examination.\n\nA - Assessment:\nThe patient presents with symptoms of fatigue (R53.83) and palpitations (R00.2), which may be related to stress from her busy work schedule and frequent overtime. Hypothyroidism is a potential differential diagnosis given the patient's symptoms, but without further testing, this cannot be confirmed.\n\nP - Plan:\n1. Order laboratory tests including thyroid function tests (TSH, Free T4) to evaluate for hypothyroidism.\n2. Advise the patient on management of stress through relaxation techniques and adequate rest.\n3. Schedule a follow-up appointment in one week to review test results and discuss further steps if necessary.\n\nNo specific drug recommendations are made at this time pending laboratory results.",
-      "zh": "主觀（S）：\n患者為35歲女性，自述過去一個月來有疲倦和睡眠品質不良的症狀。她提到工作非常忙碌，經常需要加班，這可能對她的症狀有所貢獻。此外，她還時常感到心悸及手部顫抖。另外，她也表示偶爾會情緒焦躁。患者正在尋求醫療評估，以排除甲狀腺功能低下，因為這些症狀可能是相關的。\n\n客觀（O）：\n患者看起來營養良好，沒有急性的不適。生命徵象在正常範圍內：血壓120/80 mmHg、心率76次/分鐘、呼吸頻率16次/分鐘、體溫98.6°F、氧飽和度98%（空氣中）。檢查時未發現甲狀腺腫大或手部顫抖。\n\n評估（A）：\n患者表現出疲倦的症狀（R53.83）及心悸（R0.2），這些可能與忙碌的工作安排和經常加班所造成的壓力有關。根據患者的症狀，甲狀腺功能低下是一個潛在的差別診斷，但需進一步檢查才能確認。\n\n計畫（P）：\n1 化驗檢查包括甲狀腺功能檢查（促甲状腺激素（游離T44）、以評估是否患有甲狀腺功能低下。\n2 患者通過放鬆技巧和充足的休息來管理壓力。\n3 一週後安排隨診，以檢討化驗結果並討論必要時的進一步步措施。\n\n目前尚未提出特定藥物建議，等待化驗結果。"
+      "en": "S - Subjective:\nThe patient, a 35-year-old female, reports experiencing fatigue and insomnia for approximately one month. She mentions that her work has been very busy and she has been working overtime frequently. The patient also describes occasional palpitations and tremors in her hands. Additionally, she expresses irritability at times. She is seeking medical evaluation to rule out hypothyroidism as these symptoms may be related.\n\nO - Objective:\nThe patient appears well-nourished and in no acute distress. Vital signs are within normal limits: blood pressure 120/80 mmHg, heart rate 76 bpm, respiratory rate 16 breaths per minute, temperature 98.6°F (37°C). No palpable thyroid enlargement or tremors noted on examination.\n\nA - Assessment:\nThe patient's symptoms of fatigue, insomnia, occasional palpitations, and hand tremors suggest a possible underlying endocrine disorder such as hypothyroidism. Given the duration and severity of her symptoms, further evaluation is warranted to determine their cause.\n\nP - Plan:\n1. Order laboratory tests including thyroid function tests (TSH, T3, T4) to evaluate for potential hypothyroidism.\n2. Schedule an appointment with an endocrinologist if initial test results are abnormal or inconclusive.\n3. Advise the patient to maintain a balanced diet and ensure adequate rest.\n4. Monitor symptoms closely and follow up in one week.",
+      "zh": "主觀（S）：\n患者為35歲女性，報告稱過去約一個月來感到疲倦和失眠。她提到工作非常忙碌，經常需要加班。此外，患者還描述偶爾會有心悸和手部顫抖的情況。同時，她時常表現出易怒。她正在尋求醫學評估，以排除甲狀腺功能減退的可能性，因為這些症狀可能與此相關。\n\n客觀（O）：\n患者看起來營養良好且無急性不適。生命徵象在正常範圍內：血壓120/80 mmHg，心率76次/min，呼吸頻率每分鐘16次，體溫98.6°F (37°C)。檢查時未發現甲狀腺腫大或手部顫抖。\n\n評估（A）：\n患者的疲倦、失眠、偶爾的心悸和手部顫抖症狀可能暗示潛在的內分泌障礙，如甲狀腺功能減退。考慮到這些症狀的持續時間和嚴重程度，需要進一步檢查以確定其原因。\n\n計劃（P）：\n1. 預約進行實驗室檢查，包括甲狀腺功能檢查（TSH、T3、T4），以評估是否可能患有甲狀腺功能減退。\n2. 如果初步檢查結果異常或不確定，預約看內分泌科醫生。\n3. 為患者建議保持均衡飲食並確保充足休息。\n4. 密切監測症狀並在一周後跟進。"
     }
   }
 ]

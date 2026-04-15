@@ -13,22 +13,28 @@ SoapVoice 是一套基於本地 LLM 的醫療語音轉 SOAP 病歷系統：
 - 🧠 AI 驅動的醫療語意標準化與術語專業化（73 個內建映射 + 80+ 術語）
 - 📋 結構化 SOAP 病歷自動產出（含 ICD-10 候選碼預填）
 - 📊 ICD-10 診斷代碼映射與專科分類
-- 💊 藥物推薦與醫囑建議
+- 💊 藥務推薦與醫囑建議
 - 🔐 內網專用安全部署
 - 🖥️ **支援 CLI 命令列介面**
-- 🌐 **支援離線部署（llama.cpp + GGUF 模型）**
+- 🌐 **支援 Windows CPU 離線部署（llama.cpp + Gemma 4:E4B 模型）**
 
 ## 🚀 快速開始
 
-### 選項一：離線版本（推薦）
+### 選項一：離線版本（推薦，Windows 可打包）
 
 ```bash
-# 執行 Python
+# 執行 Python (使用 Gemma 4 模型)
 uv sync
-uv run python src/offline_server.py
+USE_LLAMA_CPP=true uv run python src/cli_typer.py main --text "病人胸悶兩天" --model gemma-4-e4b
 ```
 
-**開啟瀏覽器：http://localhost:8010**
+**功能**：
+- ✅ SOAP 病歷生成
+- ✅ 術語標準化（73 個內建映射）
+- ✅ ICD-10 分類（96,802 代碼）
+- ✅ 藥物推薦（12,042 藥品）
+- ✅ 醫囑建議（2,102 項目）
+- ✅ RAG 病例範本檢索（1,665 範本）
 
 ### 選項二：線上版本（需要 Ollama）
 
@@ -49,20 +55,71 @@ curl http://localhost:8010/api/v1/clinical/health
 
 ---
 
+## 🖥️ Windows 離線部署
+
+### 打包命令
+
+```bash
+# 安裝 pyinstaller
+uv pip install pyinstaller
+
+# 打包
+pyinstaller SoapVoice-Offline.spec --clean
+```
+
+### 產出
+
+```
+dist/SoapVoice/
+├── SoapVoice.exe           # 主程式
+├── models/
+│   ├── gemma-4-E4B-it-Q4_K_M.gguf  # 2.6GB (首選，效能卓越)
+│   └── Qwen2.5-7B-Instruct-Q4_K_M.gguf  # 4.4GB (備用)
+└── data/
+    └── local_db/medical.db               # 70MB
+```
+
+### 使用方式
+
+```bash
+# 生成 SOAP
+SoapVoice.exe main --text "病人胸悶兩天伴隨呼吸困難"
+
+# 使用 3B 模型（較快）
+SoapVoice.exe main --text "病人發燒" --model qwen2.5-3b
+
+# 啟動 API 伺服器
+SoapVoice.exe serve --port 8000
+
+# 列出模型
+SoapVoice.exe models
+```
+
+---
+
 ## 📦 模型配置
 
-### LLM 模型（SOAP 生成）
+### LLM 模型（SOAP 生成）- GGUF 離線版本
 
 | 模型 | 大小 | 用途 | 推薦 |
 |------|------|------|------|
-| qwen2.5:7b | 4.7 GB | SOAP 生成 | ✅ 預設 |
+| Qwen2.5-7B-Instruct-Q4_K_M.gguf | 4.4 GB | SOAP 生成 | ✅ 預設 |
+| qwen2.5-3b-instruct-q4_k_m.gguf | 2 GB | 快速推理 | ⭐ 輕量 |
+
+### LLM 模型 - Ollama 版本
+
+| 模型 | 大小 | 用途 | 推薦 |
+|------|------|------|------|
+| qwen2.5:7b | 4.7 GB | SOAP 生成 | ✅ 線上預設 |
 | qwen2.5:3b | 1.9 GB | 快速推理 | ⭐ 輕量 |
+| gemma4:e2b | 7.2 GB | 測試中 | 🔄 |
 
 ### OCR 模型
 
 | 模型 | 大小 | 用途 |
 |------|------|------|
-| glm-ocr | 2.2 GB | 螢幕截圖 OCR（預設） |
+| glm-ocr (Ollama) | 2.2 GB | 螢幕截圖 OCR（線上） |
+| EasyOCR (離線) | - | 繁體中文 + 英文 |
 
 ### ASR 模型
 
@@ -201,3 +258,33 @@ SoapVoice/
 ## 📄 授權
 
 MIT License
+
+Windows CPU 離線版本模型選擇建議
+1. LLM 模型 (SOAP 生成)
+模型	推薦量化
+gemma4:e4b	Q4_0
+qwen2.5:7b	Q4_K_M
+首選: gemma4:e4b — 輸出更詳細，適合醫療記錄
+---
+2. OCR / 螢幕截圖辨識
+模型	類型
+PaddleOCR-VL	VLM
+Tesseract	傳統 OCR
+Windows OneOCR	系統內建
+建議: PaddleOCR-VL-1.5 — 離線最強，但需 Python 環境
+輕量替代: Tesseract — Windows 內建，無需安裝
+---
+3. 語音轉文字 (ASR)
+模型	離線支援
+Whisper.cpp	✅ 完全離線
+Faster-Whisper	✅ Python
+SenseVoice	✅ ONNX
+建議: Whisper.cpp — Windows 支援完善，medium-q5 量化平衡速度與準確度
+---
+4. Windows 離線執行方案
+工具
+llama.cpp
+whisper.cpp
+PaddleOCR
+LM Studio
+推薦組合: llama.cpp + whisper.cpp + Tesseract (輕量) 或 PaddleOCR (完整)

@@ -21,6 +21,11 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+# **重要：在 import faster_whisper 之前設定環境變數**
+os.environ["WHISPER_DEVICE"] = "cpu"
+os.environ["WHISPER_COMPUTE_TYPE"] = "int8"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""  # 強制不使用 GPU
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -40,8 +45,8 @@ def check_dependencies() -> bool:
             missing.append(pkg)
 
     if missing:
-        logger.error(f"缺少依賴: {', '.join(missing)}")
-        logger.info("執行: uv sync")
+        logger.error(f"缺少依賴：{', '.join(missing)}")
+        logger.info("執行：uv sync")
         return False
 
     return True
@@ -56,7 +61,7 @@ def check_llm_model() -> bool:
     for path in model_paths:
         if path.exists():
             size_gb = path.stat().st_size / (1024**3)
-            logger.info(f"找到 LLM 模型: {path.name} ({size_gb:.1f}GB)")
+            logger.info(f"找到 LLM 模型：{path.name} ({size_gb:.1f}GB)")
             return True
 
     logger.warning("未找到 GGUF 模型，將使用 Ollama 回退")
@@ -70,7 +75,7 @@ def check_whisper_model() -> bool:
     if whisper_dir.exists():
         # 檢查是否有 blobs 目錄
         if (whisper_dir / "blobs").exists():
-            logger.info(f"找到 Whisper 模型: {whisper_dir}")
+            logger.info(f"找到 Whisper 模型：{whisper_dir}")
             return True
 
     logger.warning("未找到本地 Whisper 模型，將嘗試下載")
@@ -96,22 +101,23 @@ def start_server():
 
     # 顯示配置
     paths = get_model_paths()
-    logger.info(f"Whisper 模型: {paths['whisper_model_dir'] or 'None (需下載)'}")
-    logger.info(f"LLM 模型: {paths['llm_model_path']}")
+    logger.info(f"Whisper 模型：{paths['whisper_model_dir'] or 'None (需下載)'}")
+    logger.info(f"LLM 模型：{paths['llm_model_path']}")
+    logger.info("使用 CPU 模式運行 Whisper (避免 cuDNN 錯誤)")
+
+    # 設定 HF_HOME 讓 whisper 使用本地模型
+    if paths["whisper_model_dir"]:
+        os.environ["HF_HOME"] = str(paths["whisper_model_dir"])
 
     # 啟動 FastAPI
     import uvicorn
-
-    # 設定環境變數（讓 whisper 使用本地模型）
-    if paths["whisper_model_dir"]:
-        os.environ["HF_HOME"] = paths["whisper_model_dir"]
 
     from src.main import app
 
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8000,
+        port=8010,  # 使用 8010 避免與 Docker 容器衝突
         log_level="info",
     )
 
@@ -137,7 +143,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("使用者中斷")
     except Exception as e:
-        logger.error(f"啟動失敗: {e}")
+        logger.error(f"啟動失敗：{e}")
         sys.exit(1)
 
 

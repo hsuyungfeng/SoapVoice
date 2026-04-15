@@ -35,27 +35,43 @@
 
 ### OCR 段錯誤修復
 - [x] **修復 GUI 啟動記憶體區段錯誤**：OCR 解析器嘗試連接 Ollama Vision API 導致段錯誤。
-  - **根本原因**：Ollama Vision 嘗試連線 `localhost:11434`，但系統為 llama.cpp CPU 離線模式
-  - **影像記憶體壓力**：全螢幕截圖 (3840x2160 RGBA) 導致記憶體衝突
-  - **執行緒安全問題**：背景執行緒直接更新 tkinter UI
-- [x] **離線 OCR 配置**：當 `USE_LLAMA_CPP=true` 時自動禁用 Ollama Vision 與 EasyOCR，確保全離線運行。
-- [x] **OCR 優先順序調整**：按照 AGENTS.md 規範，優先使用 Tesseract (pytesseract) 作為主力 OCR 引擎。
-- [x] **影像縮小優化**：對超過 1920px 的截圖進行 50% 縮小，減少記憶體使用與處理負擔。
-- [x] **執行緒安全 UI 更新**：使用 `root.after()` 進行主執行緒 UI 更新，避免 tkinter 執行緒安全問題。
-- [x] **GUI 穩定啟動驗證**：測試確認 GUI 啟動無段錯誤，OCR 配置正確。
+  - **根本原因**：Ollama Vision 嘗試連線 `localhost:11434`時發生衝突。
+- [x] **離線 OCR 配置**：當 `USE_LLAMA_CPP=true` 時自動禁用 Ollama Vision 與 EasyOCR。
+- [x] **影像縮小優化**：對超過 1920px 的截圖進行 50% 縮小。
+- [x] **執行緒安全 UI 更新**：使用 `root.after()` 進行主執行緒 UI 更新。
+- [x] **GUI 穩定啟動驗證**：測試確認 GUI 啟動無段錯誤。
+
+### NLP 與 API 擴展功能修復 (Session 2026-04-15)
+- [x] **修復症狀提取 (Extract Symptoms)**：擴充 `terminology_mapper.py` 同義詞表，支援「肚子痛」、「想吐」等口語化表達。
+- [x] **修復 ICD-10 分類**：擴充 `icd10_classifier.py` 關鍵字，確保常見症狀能正確對應到 ICD-10 代碼。
+- [x] **完善醫囑與藥物建議**：在 `extended_soapvoice.py` 中建立完整的字典映射，根據 ICD-10 代碼與症狀提供精確建議。
+- [x] **優化 GUI SOAP 顯示**：重構 `desktop_app.py` 中的 `on_process_complete`，以結構化方式顯示診斷摘要、SOAP 內容（中英雙語）、建議醫囑及用藥。
+- [x] **驗證全離線 CPU 模式**：確認在 `USE_LLAMA_CPP=true` 下，Gemma 4 模型於 CPU 環境運行流暢（端到端耗時 < 10秒）。
 
 ---
 
-## 📅 短期目標 (Next Sprint)
+## ✅ 已完成 (Session 2026-04-15)
 
-- [ ] **ASR 優化 (Faster-Whisper)**
-    - [ ] 確認 `distil-large-v3` 模型在 CPU 上的啟動速度。
-    - [ ] 實施模型權重預加載機制，減少初次轉錄延遲。
-- [ ] **Windows 最終打包 (PyInstaller)**
-    - [ ] 確認 `VCRuntime140.dll` 已包含或提醒安裝。
-    - [ ] 確認 Tesseract 二進位檔路徑配置正確。
-    - [ ] 加入 `version_info.txt` 與 SoapVoice 圖示。
-    - [ ] 壓縮非必要依賴 (`torch`, `cv2.gui`)。
+### ASR 優化 (Faster-Whisper)
+- [x] **驗證 `distil-large-v3` 效能**：CPU (int8) 載入速度僅需 **1.49 秒**，優於舊版 medium 模型。
+- [x] **實作模型預加載機制**：在 FastAPI `lifespan` 中整合 `get_extended_engine()`，確保服務啟動即完成 ASR 與 NLP 模型加載，消除首錄延遲。
+- [x] **環境變數配置**：支援透過 `.env` 動態切換 ASR 模型與計算精度。
+
+### Windows 打包準備
+- [x] **優化 PyInstaller Spec**：重新編寫 `soapvoice.spec`，正確納入 `fastapi`、`uvicorn`、`requests` 等核心依賴，並精簡非必要大型套件。
+- [x] **加入版本資訊**：建立 `version_info.txt` 供 EXE 詳細資料使用。
+- [x] **Tesseract 路徑支援**：在 `ocr_parser.py` 加入 `TESSERACT_CMD` 環境變數支援，方便 Windows 使用者自定義路徑。
+
+---
+
+## 📅 下一步 (Final Release)
+
+- [ ] **Windows 環境最終編譯**
+    - [ ] 執行 `pyinstaller soapvoice.spec` 產生單一 EXE。
+    - [ ] 執行 `iscc installer/soapvoice.iss` 產生安裝檔。
+- [ ] **驗證清單**
+    - [ ] 完全拔除網路線後的 8-WAV 基準測試。
+    - [ ] 確認 `VCRuntime140.dll` 缺失時的安裝程式提醒。
 
 ## 🧪 驗證清單
 

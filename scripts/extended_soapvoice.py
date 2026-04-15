@@ -7,7 +7,8 @@ Pipeline:
 
 import time
 import requests
-from typing import Dict, Any, List
+import os
+from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from faster_whisper import WhisperModel
 import importlib.util
@@ -46,23 +47,35 @@ class ExtendedSoapVoiceEngine:
 
     def __init__(
         self,
-        whisper_model: str = "medium",
-        llm_model: str = "qwen2.5:7b",
+        whisper_model: Optional[str] = None,
+        llm_model: Optional[str] = None,
         compute_mode: str = "cpu",
     ):
-        self.whisper_model = whisper_model
-        self.llm_model = llm_model
+        self.whisper_model = whisper_model or os.getenv("ASR_MODEL", "distil-large-v3")
+        self.llm_model = llm_model or os.getenv("LLM_MODEL", "qwen2.5:7b")
         self.compute_mode = compute_mode
         self._whisper = None
         self._icd_classifier = None
         self._term_mapper = None
 
+    def initialize(self):
+        """顯式初始化所有模型 (預加載)"""
+        print(f"🚀 正在初始化 ExtendedSoapVoiceEngine (模型: {self.whisper_model})...")
+        self._init_models()
+        print("✅ ExtendedSoapVoiceEngine 初始化完成")
+
     def _init_models(self):
-        """初始化模型"""
+        """內部初始化模型"""
         if self._whisper is None:
-            device = "cuda" if self.compute_mode == "gpu" else "cpu"
-            compute = "int8_float16" if self.compute_mode == "gpu" else "int8"
-            self._whisper = WhisperModel(self.whisper_model, device=device, compute_type=compute)
+            # 從環境變數讀取計算類型
+            compute_type = os.getenv("ASR_COMPUTE_TYPE", "int8")
+            # 強制使用 CPU 和指定計算類型
+            self._whisper = WhisperModel(
+                self.whisper_model, 
+                device="cpu", 
+                compute_type=compute_type,
+                download_root="models/whisper"
+            )
             self._icd_classifier, self._term_mapper = load_nlp_modules()
 
     def transcribe(self, audio_path: str) -> str:
@@ -113,17 +126,41 @@ class ExtendedSoapVoiceEngine:
         # 根據 ICD-10 代碼提供基本醫囑
         icd_to_order = {
             "R05": ["止咳藥物", "祛痰劑", "多喝水"],
-            "R06.02": ["心電圖檢查", "胸部X光", "氧气治疗"],
+            "R06.02": ["心電圖檢查", "胸部X光", "氧氣治療"],
             "R07.89": ["心電圖", "血壓監測", "心臟酶檢查"],
+            "R07.9": ["心電圖", "心臟超音波", "生化檢查"],
             "J06.9": ["退燒藥物", "多休息", "門診追蹤"],
+            "R51": ["休息", "避免強光", "血壓監測"],
+            "R42": ["臥床休息", "避免突然改變體位", "前庭功能檢查"],
+            "R11.0": ["暫時禁食", "少量多次飲水", "止吐藥物"],
+            "R11.2": ["暫時禁食", "靜脈補液", "止吐藥物"],
+            "R10.9": ["腹部超音波", "血常規檢查", "暫時流質飲食"],
+            "R19.7": ["補充電解質", "益生菌", "清淡飲食"],
+            "I10": ["每日量血壓", "低鹽飲食", "按時服藥"],
+            "K29.7": ["胃鏡檢查建議", "清淡飲食", "制酸劑"],
+            "R58": ["傷口加壓止血", "傷口處理", "破傷風疫苗評估"],
         }
 
         for code in icd10_codes:
             if code in icd_to_order:
                 orders.extend(icd_to_order[code])
 
+        # 根據症狀提供額外醫囑
+        symptom_to_order = {
+            "headache": ["休息", "避免壓力"],
+            "dizziness": ["避免開車", "休息"],
+            "abdominal pain": ["禁食生冷", "熱敷腹部"],
+            "diarrhea": ["補水", "避免油膩"],
+            "bleeding": ["傷口清潔", "保持乾燥"],
+        }
+
+        for symptom in symptoms:
+            s_lower = symptom.lower()
+            if s_lower in symptom_to_order:
+                orders.extend(symptom_to_order[s_lower])
+
         # 去重
-        return list(set(orders))[:5]
+        return list(set(orders))[:8]
 
     def get_drug_recommendations(
         self, symptoms: List[str], icd10_codes: List[str]
@@ -134,17 +171,38 @@ class ExtendedSoapVoiceEngine:
         # 簡單的症狀對應藥物（實際應從資料庫查詢）
         symptom_drugs = {
             "咳嗽": {"name": "咳特靈", "dosage": "1# 3次/日", "category": "止咳"},
+            "cough": {"name": "Cough Syrup", "dosage": "10ml 3次/日", "category": "Antitussive"},
             "胸悶": {"name": "硝酸甘油", "dosage": "舌下含服", "category": "心臟"},
+            "chest tightness": {"name": "Nitroglycerin", "dosage": "SL PRN", "category": "Cardiac"},
             "發燒": {"name": "普拿疼", "dosage": "500mg 3次/日", "category": "退燒"},
+            "fever": {"name": "Paracetamol", "dosage": "500mg TID", "category": "Antipyretic"},
             "頭痛": {"name": "布洛芬", "dosage": "400mg 2次/日", "category": "止痛"},
+            "headache": {"name": "Ibuprofen", "dosage": "400mg BID", "category": "Analgesic"},
             "喉嚨痛": {"name": "含片", "dosage": "每日數次", "category": "局部"},
+            "sore throat": {"name": "Throat Lozenge", "dosage": "PRN", "category": "Local"},
+            "頭暈": {"name": "止暈藥", "dosage": "1# 3次/日", "category": "止暈"},
+            "dizziness": {"name": "Meclizine", "dosage": "25mg TID", "category": "Antivertigo"},
+            "vertigo": {"name": "Meclizine", "dosage": "25mg TID", "category": "Antivertigo"},
+            "嘔吐": {"name": "止吐藥", "dosage": "1# 3次/日", "category": "止吐"},
+            "vomiting": {"name": "Domperidone", "dosage": "10mg TID", "category": "Antiemetic"},
+            "nausea": {"name": "Domperidone", "dosage": "10mg TID", "category": "Antiemetic"},
+            "腹痛": {"name": "補斯可胖", "dosage": "1# 3次/日", "category": "解痙"},
+            "abdominal pain": {"name": "Buscopan", "dosage": "10mg TID", "category": "Antispasmodic"},
+            "腹瀉": {"name": "舒腹達", "dosage": "1包 3次/日", "category": "止瀉"},
+            "diarrhea": {"name": "Smecta", "dosage": "1 sac TID", "category": "Antidiarrheal"},
+            "high blood pressure": {"name": "Amlodipine", "dosage": "5mg QD", "category": "Antihypertensive"},
+            "gastroenteritis": {"name": "Gastrogel", "dosage": "10ml TID", "category": "Antacid"},
         }
 
         for symptom in symptoms:
-            if symptom in symptom_drugs:
+            s_lower = symptom.lower()
+            if s_lower in symptom_drugs:
+                drugs.append(symptom_drugs[s_lower])
+            elif symptom in symptom_drugs:
                 drugs.append(symptom_drugs[symptom])
 
         return drugs[:5]
+
 
     def generate_extended_soap(
         self,
@@ -209,7 +267,51 @@ P - Plan:
 
         soap_zh = response_zh.json().get("response", transcript)
 
-        return {"en": soap_en, "zh": soap_zh}
+        # 解析 SOAP 各欄位
+        soap_dict = {
+            "subjective": "",
+            "objective": "",
+            "assessment": "",
+            "plan": "",
+            "medical_orders": medical_orders,
+            "drug_recommendations": drug_recommendations,
+            "raw_en": soap_en,
+            "raw_zh": soap_zh,
+        }
+
+        # 嘗試解析英文版
+        lines = soap_en.split("\n")
+        current_section = None
+        for line in lines:
+            line = line.strip()
+            if line.lower().startswith("s - subjective:") or line.lower().startswith("s:"):
+                current_section = "subjective"
+                content = line.split(":", 1)[1].strip() if ":" in line else ""
+                if content:
+                    soap_dict["subjective"] += content + "\n"
+            elif line.lower().startswith("o - objective:") or line.lower().startswith("o:"):
+                current_section = "objective"
+                content = line.split(":", 1)[1].strip() if ":" in line else ""
+                if content:
+                    soap_dict["objective"] += content + "\n"
+            elif line.lower().startswith("a - assessment:") or line.lower().startswith("a:"):
+                current_section = "assessment"
+                content = line.split(":", 1)[1].strip() if ":" in line else ""
+                if content:
+                    soap_dict["assessment"] += content + "\n"
+            elif line.lower().startswith("p - plan:") or line.lower().startswith("p:"):
+                current_section = "plan"
+                content = line.split(":", 1)[1].strip() if ":" in line else ""
+                if content:
+                    soap_dict["plan"] += content + "\n"
+            elif current_section and line:
+                soap_dict[current_section] += line + "\n"
+
+        # 清理空白
+        for key in ["subjective", "objective", "assessment", "plan"]:
+            soap_dict[key] = soap_dict[key].strip()
+
+        return soap_dict
 
     def process(self, audio_path: str) -> ExtendedSOAPResult:
         """完整處理流程"""
@@ -255,8 +357,8 @@ P - Plan:
             icd10_codes=icd10_codes,
             medical_orders=medical_orders,
             drug_recommendations=drug_recommendations,
-            soap_en=soap_results["en"],
-            soap_zh=soap_results["zh"],
+            soap_en=soap_results["raw_en"],
+            soap_zh=soap_results["raw_zh"],
             processing_time=processing_time,
         )
 

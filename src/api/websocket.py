@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 # 全局變數
 _websocket_config: Dict[str, Any] = {}
 _active_transcribers: Dict[str, StreamTranscriber] = {}
+_model_load_lock = asyncio.Lock()
 
 
 # APIRouter

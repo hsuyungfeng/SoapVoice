@@ -16,6 +16,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.soap.soap_generator import SOAPGenerator, SOAPConfig, initialize_generator
 from src.nlp.terminology_mapper import MedicalTerminologyMapper
+from src.nlp.icd10_classifier import ICD10Classifier
+from src.db.clinical_db import ClinicalDatabase
 
 
 logger = logging.getLogger(__name__)
@@ -33,6 +35,8 @@ class SoapVoiceCLI:
         self.config = config or SOAPConfig(model_id="qwen3.5:9b")
         self.generator: Optional[SOAPGenerator] = None
         self.terminology_mapper = MedicalTerminologyMapper()
+        self.icd10_classifier = ICD10Classifier()
+        self.clinical_db = ClinicalDatabase()
 
     def initialize(self) -> None:
         """初始化 SOAP 生成器"""
@@ -132,11 +136,27 @@ class SoapVoiceCLI:
         except Exception as e:
             logger.warning(f"術語標準化失敗: {e}")
 
+        # 提取症狀與 ICD-10 候選
+        symptoms = [m.standard for m in term_mappings]
+        icd10_matches = self.icd10_classifier.classify(transcript)
+        icd10_codes = [m.code for m in icd10_matches]
+        
+        # 查詢資料庫
+        medical_orders = self.clinical_db.get_medical_orders(symptoms, icd10_codes)
+        drug_recommendations = self.clinical_db.get_drug_recommendations(symptoms, icd10_codes)
+
         # 生成 SOAP 病歷
         try:
             if not self.generator:
                 raise RuntimeError("SOAP 生成器未初始化")
-            result = self.generator.generate(transcript, patient_context)
+            result = self.generator.generate(
+                transcript=transcript, 
+                patient_context=patient_context,
+                medical_orders=medical_orders,
+                drug_recommendations=drug_recommendations
+            )
+            result["medical_orders"] = medical_orders
+            result["drug_recommendations"] = drug_recommendations
             return result
         except Exception as e:
             logger.error(f"SOAP 生成失敗: {e}")
@@ -180,6 +200,19 @@ class SoapVoiceCLI:
         if result.get("conversation_summary"):
             print("💬 對話摘要 (繁體中文):")
             print(result["conversation_summary"])
+            print()
+
+        # 顯示醫囑與藥物
+        if result.get("medical_orders"):
+            print("📋 建議醫囑:")
+            for order in result["medical_orders"]:
+                print(f"  • {order}")
+            print()
+
+        if result.get("drug_recommendations"):
+            print("💊 建議藥物:")
+            for drug in result["drug_recommendations"]:
+                print(f"  • {drug['name']} ({drug['dosage']})")
             print()
 
         # 顯示術語標準化結果

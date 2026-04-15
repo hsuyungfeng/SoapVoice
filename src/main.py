@@ -7,12 +7,23 @@ SoapVoice FastAPI 主入口
 import os
 import logging
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+
+# 載入環境變數（必須在所有模組導入之前）
+load_dotenv()
+
+# Forced reload trigger
+
+# **重要：在 import faster_whisper 相關模組之前設定環境變數**
+# 強制使用 CPU 模式，避免 cuDNN 錯誤
+os.environ.setdefault("WHISPER_DEVICE", "cpu")
+os.environ.setdefault("WHISPER_COMPUTE_TYPE", "int8")
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from dotenv import load_dotenv
 
 from src.api.websocket import router as websocket_router
 from src.api.rest import router as rest_router
@@ -20,11 +31,9 @@ from src.api.consultation_api import router as consultation_router
 from src.api.extended_api import router as extended_router
 from src.api.webhook_api import router as webhook_router
 from src.api.file_monitor_api import router as file_monitor_router
+from src.api.cloud_api import router as cloud_router
+from src.api.ocr_api import router as ocr_router
 from src.llm.ollama_engine import initialize_engine, ModelConfig
-
-
-# 載入環境變數
-load_dotenv()
 
 # 配置日誌
 logging.basicConfig(
@@ -66,6 +75,15 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Failed to initialize LLM engine: {e}")
 
+    # 預加載 Extended Pipeline (ASR + NLP)
+    try:
+        from src.api.extended_api import get_extended_engine
+        logger.info("Pre-loading Extended SOAP Pipeline...")
+        await get_extended_engine()
+        logger.info("Extended SOAP Pipeline pre-loaded successfully")
+    except Exception as e:
+        logger.warning(f"Failed to pre-load Extended SOAP Pipeline: {e}")
+
     yield
 
     # 關閉時清理
@@ -103,6 +121,8 @@ app.include_router(consultation_router, prefix="/api/v1", tags=["Consultation Fl
 app.include_router(extended_router, prefix="/api/v1", tags=["Extended Pipeline"])
 app.include_router(webhook_router, tags=["Webhooks"])
 app.include_router(file_monitor_router, tags=["File Monitor"])
+app.include_router(cloud_router, prefix="/api/v1", tags=["Cloud Integration"])
+app.include_router(ocr_router, prefix="/api/v1", tags=["OCR"])
 
 
 @app.get("/")
@@ -116,6 +136,15 @@ async def root():
         "version": APP_CONFIG["version"],
         "status": "running",
     }
+
+
+@app.get("/test.html")
+async def test_page():
+    """測試頁面"""
+    test_file = static_dir / "test.html"
+    if test_file.exists():
+        return FileResponse(str(test_file))
+    return {"error": "test.html not found"}
 
 
 @app.get("/health")
@@ -162,6 +191,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "src.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8010,  # 使用 8010 避免與 Docker 容器衝突
         reload=os.getenv("DEV_MODE", "false").lower() == "true",
     )

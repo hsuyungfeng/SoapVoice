@@ -7,7 +7,7 @@ from datetime import datetime
 
 RESULTS_DIR = Path("/home/hsu/Desktop/SoapVoice/tests/fixtures/results")
 
-MODELS = ["qwen2.5:3b", "qwen2.5:7b"]
+MODELS = ["qwen2.5:3b", "qwen2.5:7b", "gemma4:e4b", "gemma4:e2b"]
 
 AUDIO_FILES = [
     ("chest_pain.wav", "胸痛"),
@@ -22,33 +22,46 @@ AUDIO_FILES = [
 
 
 def load_results():
-    """Load results from compare_*.json files"""
-    # Use the compare_20260326_163919.json which has clean output (fixed num_predict)
-    preferred_file = RESULTS_DIR / "compare_20260326_163919.json"
-    if preferred_file.exists():
-        latest_file = preferred_file
-        print(f"Using working results: {latest_file}")
-    else:
-        # Find the latest compare_*.json file
-        compare_files = sorted(RESULTS_DIR.glob("compare_*.json"), reverse=True)
-        if not compare_files:
-            print("No compare_*.json files found")
-            return []
-
-        latest_file = compare_files[0]
-        print(f"Loading from: {latest_file}")
-
-    with open(latest_file, encoding="utf-8") as f:
-        data = json.load(f)
-
-    # Flatten the structure
+    """Load results from compare_*.json files and model_results.json files"""
     all_results = []
-    for model, model_data in data.items():
-        for r in model_data.get("results", []):
-            r["model_name"] = model
-            all_results.append(r)
+    
+    # Load batch files (compare_*.json)
+    for json_file in RESULTS_DIR.glob("compare_*.json"):
+        try:
+            with open(json_file, encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    for model, model_data in data.items():
+                        for r in model_data.get("results", []):
+                            r["model_name"] = model
+                            all_results.append(r)
+                elif isinstance(data, list):
+                    for r in data:
+                        all_results.append(r)
+        except Exception as e:
+            print(f"Error loading {json_file}: {e}")
 
-    return all_results
+    # Load direct model files (e.g., qwen2.5:3b_results.json)
+    for json_file in RESULTS_DIR.glob("*_results.json"):
+        try:
+            with open(json_file, encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    for r in data:
+                        if "model_name" not in r:
+                            r["model_name"] = r.get("model")
+                        all_results.append(r)
+        except Exception as e:
+            print(f"Error loading {json_file}: {e}")
+
+    # Deduplicate results based on model and file (keeping the latest tested ideally, but taking the first match here)
+    unique_results = {}
+    for r in all_results:
+        key = f"{r.get('model_name')}_{r.get('file')}"
+        if key not in unique_results:
+            unique_results[key] = r
+
+    return list(unique_results.values())
 
 
 def format_result(r):

@@ -4,8 +4,11 @@ Qwen3ASRModel: Qwen3-ASR 模型封裝
 提供語音轉文字功能，輸出簡體中文，需配合 opencc 轉換為繁體
 """
 
-from typing import Optional
-import torch
+from typing import TYPE_CHECKING, Optional
+
+# 延遲 import torch，避免啟動時載入 CUDA 庫
+if TYPE_CHECKING:
+    import torch
 
 
 class Qwen3ASRModel:
@@ -19,7 +22,7 @@ class Qwen3ASRModel:
         self,
         model_id: str = "Qwen/Qwen3-ASR-0.6B",
         device: str = "cuda",
-        dtype: Optional[torch.dtype] = torch.bfloat16,
+        dtype: Optional["torch.dtype"] = None,
     ):
         """初始化 Qwen3-ASR 模型
 
@@ -38,7 +41,13 @@ class Qwen3ASRModel:
         if self.model is not None:
             return
 
+        # 延遲 import torch
+        import torch
         from qwen_asr import Qwen3ASRModel
+
+        # 如果沒有指定 dtype，根據設備自動選擇
+        if self.dtype is None:
+            self.dtype = torch.bfloat16 if self.device == "cuda" else torch.float32
 
         self.model = Qwen3ASRModel.from_pretrained(
             self.model_id,
@@ -90,8 +99,11 @@ class Qwen3ASRModel:
             audio_path: 音頻文件路徑
 
         Returns:
-            (語言代碼, 置信度) 元組
+            (語言代碼，置信度) 元組
         """
+        if self.model is None:
+            self.load()
+
         result = self.model.transcribe(audio=audio_path, language=None)
         return ("zh", 1.0)
 

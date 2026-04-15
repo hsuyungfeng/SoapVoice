@@ -1,0 +1,504 @@
+[
+  {
+    "name": "胸痛",
+    "audio_file": "chest_pain.wav",
+    "audio_duration": 0,
+    "transcript": "請坐,今天有什麼不舒服? 醫師,我昨天開始胸口很悶 呼吸不太順暢 這樣的情況持續多久了? 有沒有發燒或咳嗽? 大概兩天了,沒有發燒 但是走路快一點就會喘 之前有類似症狀嗎? 有沒有心臟方面的病史? 沒有,但是我有抽菸 大概抽了10年 好,我先幫你安排心電圖和胸部X光檢查 醫師,嚴重嗎? 目前先做檢查確認,你不要緊張",
+    "asr_time": 22.67,
+    "llm_time": 13.23,
+    "total_time": 35.9,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient presents with chest tightness and dyspnea for 2 days, no fever or cough. History of smoking for 10 years.\n胸悶和活動後喘息，已持續兩天，無發燒或咳嗽。患者有10年抽菸史。體檢未見異常。建議安排心電圖和胸部X光檢查，根據結果進一步處理。",
+      "objective": "No significant findings on physical examination.",
+      "assessment": "Likely benign condition; further investigation via ECG and chest X-ray required. ICD-10 codes: R50.9, R05, R06.02",
+      "plan": "Order ECG and chest X-ray. Follow-up based on results.",
+      "conversation_summary": "",
+      "raw_response": "S: Patient presents with chest tightness and dyspnea for 2 days, no fever or cough. History of smoking for 10 years.\n\nO: No significant findings on physical examination.\n\nA: Likely benign condition; further investigation via ECG and chest X-ray required. ICD-10 codes: R50.9, R05, R06.02\n\nP: Order ECG and chest X-ray. Follow-up based on results. \n\nCONVERSATION_SUMMARY: 患者主訴胸悶和活動後喘息，已持續兩天，無發燒或咳嗽。患者有10年抽菸史。體檢未見異常。建議安排心電圖和胸部X光檢查，根據結果進一步處理。",
+      "classification_confidence": {
+        "subjective": 0.15,
+        "objective": 0.11764705882352941,
+        "assessment": 0.0,
+        "plan": 0.07692307692307693
+      },
+      "normalized_terms": [
+        {
+          "original": "心電圖",
+          "standard": "ECG",
+          "icd10_candidates": null
+        },
+        {
+          "original": "發燒",
+          "standard": "fever",
+          "icd10_candidates": [
+            "R50.9"
+          ]
+        },
+        {
+          "original": "咳嗽",
+          "standard": "cough",
+          "icd10_candidates": [
+            "R05"
+          ]
+        },
+        {
+          "original": "胸部",
+          "standard": "chest",
+          "icd10_candidates": null
+        },
+        {
+          "original": "心臟",
+          "standard": "heart",
+          "icd10_candidates": null
+        },
+        {
+          "original": "喘",
+          "standard": "dyspnea",
+          "icd10_candidates": [
+            "R06.02"
+          ]
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）"
+      ],
+      "drug_recommendations": [
+        {
+          "name": "\"十全\"利咳錠20毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "〝福元〞福得可錠１５毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"振貿\"衛彼心膠囊10毫克（悠卡諾）",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"生達\"立舒心膜衣錠5毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        }
+      ]
+    }
+  },
+  {
+    "name": "高血壓",
+    "audio_file": "hypertension.wav",
+    "audio_duration": 0,
+    "transcript": "張先生,今天來血壓控制怎麼樣? 醫師,最近血壓還是很高 早上都160多 有按時吃藥嗎? 鹽分有沒有控制? 藥有吃,但是口味比較重 鹽放比較多 這樣不行哦,高血壓要好好控制 不然會影響腎臟和心臟 醫師,我有時候會頭暈 是不是血壓太高? 對,血壓高的時候容易頭暈 我幫你調整一下用藥 好的,那我要注意什麼? 少鹽,少油,多運動 每天量血壓記錄下來",
+    "asr_time": 23.06,
+    "llm_time": 11.76,
+    "total_time": 34.82,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient reports his blood pressure is still high at 160 in the morning, despite taking medication and reducing salt intake.\n近期早上血壓仍高，達160，雖按時服藥並減少鹽分攝入，但仍有頭暈現象。医師建議控制鹽分和油的攝入量，並安排調整治療方案。",
+      "objective": "Blood pressure measurement not provided; patient reports dizziness when blood pressure is high.",
+      "assessment": "Diagnosis of hypertension (ICD-10 I10); symptom of dizziness related to high blood pressure.",
+      "plan": "Reduce salt and oil intake; follow-up for medication adjustment.",
+      "conversation_summary": "",
+      "raw_response": "S: Patient reports his blood pressure is still high at 160 in the morning, despite taking medication and reducing salt intake.\nO: Blood pressure measurement not provided; patient reports dizziness when blood pressure is high.\nA: Diagnosis of hypertension (ICD-10 I10); symptom of dizziness related to high blood pressure.\nP: Reduce salt and oil intake; follow-up for medication adjustment.\nCONVERSATION_SUMMARY: 患者主訴近期早上血壓仍高，達160，雖按時服藥並減少鹽分攝入，但仍有頭暈現象。医師建議控制鹽分和油的攝入量，並安排調整治療方案。",
+      "classification_confidence": {
+        "subjective": 0.1,
+        "objective": 0.058823529411764705,
+        "assessment": 0.0,
+        "plan": 0.15384615384615385
+      },
+      "normalized_terms": [
+        {
+          "original": "高血壓",
+          "standard": "hypertension",
+          "icd10_candidates": [
+            "I10"
+          ]
+        },
+        {
+          "original": "量血壓",
+          "standard": "blood pressure measurement",
+          "icd10_candidates": null
+        },
+        {
+          "original": "頭暈",
+          "standard": "dizziness",
+          "icd10_candidates": [
+            "R42"
+          ]
+        },
+        {
+          "original": "心臟",
+          "standard": "heart",
+          "icd10_candidates": null
+        },
+        {
+          "original": "腎",
+          "standard": "kidney",
+          "icd10_candidates": null
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)",
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑"
+      ],
+      "drug_recommendations": [
+        {
+          "name": "\"振貿\"衛彼心膠囊10毫克（悠卡諾）",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"生達\"立舒心膜衣錠5毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        }
+      ]
+    }
+  },
+  {
+    "name": "糖尿病",
+    "audio_file": "diabetes.wav",
+    "audio_duration": 0,
+    "transcript": "李女士,你的血糖控制怎麽樣? 醫師,這幾天血糖都比較高 控負大概200多 飲食有沒有按時? 水果吃多少? 有吃飯,但是忍不住會吃水果 上午還吃了兩顆芭樂 芭樂雖然不甜,但是糖分還是有,要適量 醫師,那我可以吃什麽水果? 芭樂、蓮霧,奇異果比較好,一次不要超過一碗 醫師,我的腳有時候會麻,是不是神經病變? 有可能,這是糖尿病常見的併發症 我幫你安排神經檢查",
+    "asr_time": 23.57,
+    "llm_time": 12.07,
+    "total_time": 35.64,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient reports poor blood sugar control with readings around 200 mg/dL. Patient follows dietary guidelines but struggles to limit fruit intake, consumed two papayas in the morning.",
+      "objective": "No objective findings mentioned.",
+      "assessment": "Possible diabetic neuropathy; patient advised on appropriate fruit choices and quantity. ICD-10: E11.9",
+      "plan": "Schedule nerve function tests. Continue general outpatient consultation fee - basic healthcare facility outpatient consultation fee for 3-1 (≤30 cases per day without prescription or self-compounding by the hospital).\n適當選擇和控制水果攝入量，並安排神經功能檢查。",
+      "conversation_summary": "",
+      "raw_response": "S: Patient reports poor blood sugar control with readings around 200 mg/dL. Patient follows dietary guidelines but struggles to limit fruit intake, consumed two papayas in the morning.\nO: No objective findings mentioned.\nA: Possible diabetic neuropathy; patient advised on appropriate fruit choices and quantity. ICD-10: E11.9\nP: Schedule nerve function tests. Continue general outpatient consultation fee - basic healthcare facility outpatient consultation fee for 3-1 (≤30 cases per day without prescription or self-compounding by the hospital).\nCONVERSATION_SUMMARY: 李女士報告血糖控制不佳，讀數約200 mg/dL。她遵循飲食指導但難以限制水果攝入，早上吃了兩顆芭樂。建議適當選擇和控制水果攝入量，並安排神經功能檢查。",
+      "classification_confidence": {
+        "subjective": 0.0,
+        "objective": 0.058823529411764705,
+        "assessment": 0.11764705882352941,
+        "plan": 0.15384615384615385
+      },
+      "normalized_terms": [
+        {
+          "original": "糖尿病",
+          "standard": "diabetes mellitus",
+          "icd10_candidates": [
+            "E11.9"
+          ]
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)",
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）"
+      ],
+      "drug_recommendations": []
+    }
+  },
+  {
+    "name": "傷口護理",
+    "audio_file": "wound_care.wav",
+    "audio_duration": 0,
+    "transcript": "阿姨,我來幫你換藥 護理師,這傷口什麼時候會好? 我看一下傷口,恢復得不錯,已經沒有發炎了 已經一個禮拜了,本來說三天就可以洗澡對吧? 對,手術傷口十天後就可以碰水了,這兩天先擦澡 傷口旁邊有點癢,正常嗎? 傷口在浴盒會癢,盡量不要抓,我幫你塗止癢藥膏 請問傷口上的美容膠帶要撕掉嗎? 讓它自然脫落就好,不用刻意撕,平時傷口保持乾燥",
+    "asr_time": 24.36,
+    "llm_time": 11.23,
+    "total_time": 35.59,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient inquires about wound healing and bathing after surgery.",
+      "objective": "Wound shows no inflammation; healing progressing well, one week post-surgery.",
+      "assessment": "Wound healing on schedule; patient can bathe after 10 days. Slight itching around the wound is normal; advise against scratching and apply anti-itch cream.",
+      "plan": "Allow adhesive bandage to fall off naturally; keep wound area dry.",
+      "conversation_summary": "护士为阿姨更换伤口敷料并解答了关于伤口愈合和术后洗澡的问题。伤口恢复良好，无炎症，十天后可以接触水，但两天内只能擦浴。伤口周围有些痒是正常的，建议不要抓，并涂抹止痒药膏。美容胶带自然脱落即可，平时保持伤口干燥。",
+      "raw_response": "S: Patient inquires about wound healing and bathing after surgery.\nO: Wound shows no inflammation; healing progressing well, one week post-surgery.\nA: Wound healing on schedule; patient can bathe after 10 days. Slight itching around the wound is normal; advise against scratching and apply anti-itch cream.\nP: Allow adhesive bandage to fall off naturally; keep wound area dry.\nCONVERSATION_SUMMARY: 护士为阿姨更换伤口敷料并解答了关于伤口愈合和术后洗澡的问题。伤口恢复良好，无炎症，十天后可以接触水，但两天内只能擦浴。伤口周围有些痒是正常的，建议不要抓，并涂抹止痒药膏。美容胶带自然脱落即可，平时保持伤口干燥。",
+      "classification_confidence": {
+        "subjective": 0.05,
+        "objective": 0.0,
+        "assessment": 0.0,
+        "plan": 0.15384615384615385
+      },
+      "normalized_terms": [
+        {
+          "original": "發炎",
+          "standard": "inflammation",
+          "icd10_candidates": null
+        },
+        {
+          "original": "換藥",
+          "standard": "dressing change",
+          "icd10_candidates": null
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)"
+      ],
+      "drug_recommendations": []
+    }
+  },
+  {
+    "name": "呼吸道",
+    "audio_file": "respiratory.wav",
+    "audio_duration": 0,
+    "transcript": "怎麼了? 咳嗽嗎? 醫師,我咳嗽一個多禮拜了 有痰但是咳不出來 有沒有發燒? 喉嚨痛不痛? 有一點發燒,喉嚨很痛 痰是黃色的 先去照一下胸部X光 看一下肺部情況 醫師,我是不是肺炎? 目前不確定,等X光結果出來再說 好,我先幫你抽血檢查 好,那需要住院嗎? 先看檢查結果 如果肺部有發炎可能需要住院治療",
+    "asr_time": 22.92,
+    "llm_time": 13.33,
+    "total_time": 36.25,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "[Patient presents with a one-week history of cough, yellow sputum, mild fever (temperature not specified), and severe throat pain. Patient is concerned about pneumonia.]\n咳嗽一個多禮拜，有黃色痰、輕微發燒和嚴重的咽喉痛。患者擔心是否為肺炎。經醫生建議先做胸部X光檢查並抽血檢查，以進一步評估肺部狀況。初步診斷可能是呼吸道感染或炎症，需等待X光及血液檢查結果來確認，若確診有肺部發炎可能需要住院治療。",
+      "objective": "[Chest X-ray ordered to evaluate lung condition. Blood draw ordered for further investigation.]",
+      "assessment": "[Preliminary assessment suggests possible respiratory infection or inflammation; differential diagnosis includes pneumonia (J18.9). Further evaluation required based on X-ray and blood test results.]",
+      "plan": "[Follow-up with chest X-ray results. Monitor symptoms. If lung inflammation is confirmed, hospitalization may be necessary. Prescribe \"全\"利咳錠20毫克, 〝福元〞福得可錠１５毫克, 肺紓解膜衣錠20毫克, and 肺喘克錠10毫克.]",
+      "conversation_summary": "",
+      "raw_response": "S: [Patient presents with a one-week history of cough, yellow sputum, mild fever (temperature not specified), and severe throat pain. Patient is concerned about pneumonia.]\n\nO: [Chest X-ray ordered to evaluate lung condition. Blood draw ordered for further investigation.]\n\nA: [Preliminary assessment suggests possible respiratory infection or inflammation; differential diagnosis includes pneumonia (J18.9). Further evaluation required based on X-ray and blood test results.]\n\nP: [Follow-up with chest X-ray results. Monitor symptoms. If lung inflammation is confirmed, hospitalization may be necessary. Prescribe \"全\"利咳錠20毫克, 〝福元〞福得可錠１５毫克, 肺紓解膜衣錠20毫克, and 肺喘克錠10毫克.]\n\nCONVERSATION_SUMMARY: 患者主訴咳嗽一個多禮拜，有黃色痰、輕微發燒和嚴重的咽喉痛。患者擔心是否為肺炎。經醫生建議先做胸部X光檢查並抽血檢查，以進一步評估肺部狀況。初步診斷可能是呼吸道感染或炎症，需等待X光及血液檢查結果來確認，若確診有肺部發炎可能需要住院治療。",
+      "classification_confidence": {
+        "subjective": 0.15,
+        "objective": 0.058823529411764705,
+        "assessment": 0.23529411764705882,
+        "plan": 0.15384615384615385
+      },
+      "normalized_terms": [
+        {
+          "original": "發燒",
+          "standard": "fever",
+          "icd10_candidates": [
+            "R50.9"
+          ]
+        },
+        {
+          "original": "咳嗽",
+          "standard": "cough",
+          "icd10_candidates": [
+            "R05"
+          ]
+        },
+        {
+          "original": "很痛",
+          "standard": "severe pain",
+          "icd10_candidates": [
+            "R52"
+          ]
+        },
+        {
+          "original": "胸部",
+          "standard": "chest",
+          "icd10_candidates": null
+        },
+        {
+          "original": "喉嚨",
+          "standard": "throat",
+          "icd10_candidates": null
+        },
+        {
+          "original": "肺炎",
+          "standard": "pneumonia",
+          "icd10_candidates": [
+            "J18.9"
+          ]
+        },
+        {
+          "original": "發炎",
+          "standard": "inflammation",
+          "icd10_candidates": null
+        },
+        {
+          "original": "抽血",
+          "standard": "blood draw",
+          "icd10_candidates": null
+        },
+        {
+          "original": "肺",
+          "standard": "lung",
+          "icd10_candidates": null
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）"
+      ],
+      "drug_recommendations": [
+        {
+          "name": "\"十全\"利咳錠20毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "〝福元〞福得可錠１５毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "肺紓解膜衣錠20毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        },
+        {
+          "name": "肺喘克錠10毫克",
+          "dosage": "**",
+          "category": "建議用藥"
+        }
+      ]
+    }
+  },
+  {
+    "name": "醫囑",
+    "audio_file": "drug_order.wav",
+    "audio_duration": 0,
+    "transcript": "王先生,這是你的廚房簽 醫師,這些藥怎麼吃? 這包是降血壓藥,每天早餐後吃一顆 這包是利尿劑,下午吃,注意要多喝水 醫師,這個止痛藥什麼時候吃? 痛的時候再吃,一天最多四顆 不要空腹吃,會傷胃 這些藥有沒有副作用? 可能會有點頭暈或是手腳無力 如果有問題立刻回診 好的,這些藥要吃多久? 血壓藥先吃一個月再回診 利尿劑看情況可以停",
+    "asr_time": 22.86,
+    "llm_time": 11.11,
+    "total_time": 33.97,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient inquires about medication usage and side effects.",
+      "objective": "None",
+      "assessment": "R42 - Other symptoms involving the circulatory system\nday. Avoid taking on an empty stomach to prevent stomach issues. Monitor for dizziness or weakness.",
+      "plan": "",
+      "conversation_summary": "王先生詢問藥物用法、副作用及服用期間。",
+      "raw_response": "S: Patient inquires about medication usage and side effects.\nO: None\nA: R42 - Other symptoms involving the circulatory system\nP: Take antihypertensive daily after breakfast for one month. Take diuretic in the afternoon with plenty of water. Take pain reliever as needed, not more than 4 times a day. Avoid taking on an empty stomach to prevent stomach issues. Monitor for dizziness or weakness.\nCONVERSATION_SUMMARY: 王先生詢問藥物用法、副作用及服用期間。",
+      "classification_confidence": {
+        "subjective": 0.15,
+        "objective": 0.058823529411764705,
+        "assessment": 0.11764705882352941,
+        "plan": 0.07692307692307693
+      },
+      "normalized_terms": [
+        {
+          "original": "頭暈",
+          "standard": "dizziness",
+          "icd10_candidates": [
+            "R42"
+          ]
+        },
+        {
+          "original": "胃",
+          "standard": "stomach",
+          "icd10_candidates": null
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）",
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑"
+      ],
+      "drug_recommendations": [
+        {
+          "name": "\"派頓\"胃腸藥錠",
+          "dosage": "**",
+          "category": "建議用藥"
+        }
+      ]
+    }
+  },
+  {
+    "name": "手術記錄",
+    "audio_file": "surgery_record.wav",
+    "audio_duration": 0,
+    "transcript": "手術開始時間上午9點20分 確認病人姓名 陳大名 手術項目是腹腔鏡膽囊切除術 確認麻醉完成 開始消毒手術部位 建立第一個穿刺孔於肚臍上方 插入腹腔鏡 確認膽囊位置 發現有輕微發炎黏連 出血量約50cc 手術進行中 分離膽囊與周圍組織 準備加鑄膽管 確認沒有其他異常 開始切除膽囊 取出膽囊 手術傷口縫合 手術時間45分鐘 病人生命真相穩定 手術完成",
+    "asr_time": 25.46,
+    "llm_time": 11.76,
+    "total_time": 37.22,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient underwent laparoscopic cholecystectomy at 9:20 AM.\nown pharmacy (1-30 cases), General outpatient consultation fee - Primary healthcare outpatient consultation fee 2. For each physician, for the part of daily outpatient volume exceeding 40 but less than 60 cases (41-60) (1) Prescribing to a designated pharmacy.",
+      "objective": "Mild inflammation and adhesions found during surgery; approximately 50cc of bleeding occurred.",
+      "assessment": "Diagnosis: Cholecystitis (K74.31). Plan to continue postoperative care and monitor patient closely.",
+      "plan": "",
+      "conversation_summary": "上午9點20分開始進行腹腔鏡膽囊切除手術，發現輕微發炎和黏連，出血約50cc。手術時間45分鐘，病人生命體徵穩定。手術完成。",
+      "raw_response": "S: Patient underwent laparoscopic cholecystectomy at 9:20 AM.\nO: Mild inflammation and adhesions found during surgery; approximately 50cc of bleeding occurred.\nA: Diagnosis: Cholecystitis (K74.31). Plan to continue postoperative care and monitor patient closely.\nP: General outpatient consultation fee - Primary healthcare outpatient consultation fee 1. For each physician, for the part of daily outpatient volume up to 40 cases (3-1) without prescribing or prescribing by this institution's own pharmacy (1-30 cases), General outpatient consultation fee - Primary healthcare outpatient consultation fee 2. For each physician, for the part of daily outpatient volume exceeding 40 but less than 60 cases (41-60) (1) Prescribing to a designated pharmacy.\nCONVERSATION_SUMMARY: 上午9點20分開始進行腹腔鏡膽囊切除手術，發現輕微發炎和黏連，出血約50cc。手術時間45分鐘，病人生命體徵穩定。手術完成。",
+      "classification_confidence": {
+        "subjective": 0.0,
+        "objective": 0.0,
+        "assessment": 0.0,
+        "plan": 0.07692307692307693
+      },
+      "normalized_terms": [
+        {
+          "original": "發炎",
+          "standard": "inflammation",
+          "icd10_candidates": null
+        },
+        {
+          "original": "縫合",
+          "standard": "suturing",
+          "icd10_candidates": null
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）",
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑"
+      ],
+      "drug_recommendations": []
+    }
+  },
+  {
+    "name": "醫病對話",
+    "audio_file": "doctor_patient.wav",
+    "audio_duration": 0,
+    "transcript": "醫師,我最近很容易疲倦,晚上睡不好 這樣多久了? 壓力大嗎? 大概一個月了,工作很忙,然後一直加班 會不會心悸,手抖? 有一點,有時候脾氣很不好 我幫你驗血,看一下假撞腺功能 醫師,我是不是假撞腺有問題? 先檢查再說,假撞腺抗靜會造成這些症狀 如果真的是假撞腺問題要怎麼治療? 先吃藥控制,嚴重的話可能需要開刀或是做放射點治療",
+    "asr_time": 22.86,
+    "llm_time": 11.16,
+    "total_time": 34.02,
+    "model": "qwen2.5:7b",
+    "backend": "ollama",
+    "result": {
+      "subjective": "Patient reports fatigue and insomnia for about a month due to work stress and overtime.\n近一個月來感到疲倦和失眠，因工作壓力大且經常加班。有時會出現心悸和手抖現象。初步診斷可能為甲狀腺功能亢進，建議進行血液檢查以確認並根據情況開立藥物治療，必要時考慮手術或放射治療。",
+      "objective": "Palpitations and occasional hand tremors noted.",
+      "assessment": "Assessment suggests possible hyperthyroidism based on patient symptoms; ICD-10 codes R53.83, R00.2.",
+      "plan": "Order blood tests to evaluate thyroid function. Prescribe medication for symptom control if confirmed; consider surgery or radioablation in severe cases.",
+      "conversation_summary": "",
+      "raw_response": "S: Patient reports fatigue and insomnia for about a month due to work stress and overtime.\nO: Palpitations and occasional hand tremors noted.\nA: Assessment suggests possible hyperthyroidism based on patient symptoms; ICD-10 codes R53.83, R00.2.\nP: Order blood tests to evaluate thyroid function. Prescribe medication for symptom control if confirmed; consider surgery or radioablation in severe cases.\nCONVERSATION_SUMMARY: 患者主訴近一個月來感到疲倦和失眠，因工作壓力大且經常加班。有時會出現心悸和手抖現象。初步診斷可能為甲狀腺功能亢進，建議進行血液檢查以確認並根據情況開立藥物治療，必要時考慮手術或放射治療。",
+      "classification_confidence": {
+        "subjective": 0.1,
+        "objective": 0.058823529411764705,
+        "assessment": 0.11764705882352941,
+        "plan": 0.15384615384615385
+      },
+      "normalized_terms": [
+        {
+          "original": "疲倦",
+          "standard": "fatigue",
+          "icd10_candidates": [
+            "R53.83"
+          ]
+        },
+        {
+          "original": "心悸",
+          "standard": "palpitation",
+          "icd10_candidates": [
+            "R00.2"
+          ]
+        }
+      ],
+      "case_templates": [],
+      "medical_orders": [
+        "一般門診診察費－基層院所門診診察費  ２．每位醫師每日門診量超過四十人次，但在六十人次以下部分（41-60）（１）處方交付特約藥局調劑",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（1-1）處方交付特約藥局調劑(1-30人次）",
+        "一般門診診察費－基層院所門診診察費１．每位醫師每日門診量在四十人次以下部分（3-1）未開處方或處方由本院所自行調劑(1-30人次)"
+      ],
+      "drug_recommendations": []
+    }
+  }
+]

@@ -1,0 +1,8 @@
+🚀 啟動後端伺服器: uv run uvicorn src.main:app --host 127.0.0.1 --port 8010 --log-level warning
+Traceback (most recent call last):
+  File "/home/hsu/Desktop/SoapVoice/start_server_simple.py", line 83, in <module>
+    main()
+    ~~~~^^
+  File "/home/hsu/Desktop/SoapVoice/start_server_simple.py", line 52, in main
+    import requests
+ModuleNotFoundError: No module named 'requests'

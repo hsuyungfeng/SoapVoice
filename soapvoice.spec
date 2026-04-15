@@ -1,8 +1,22 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 from pathlib import Path
+import os
 
 ROOT_DIR = Path(SPECPATH)
+
+# 排除非必要的大型套件以壓縮體積
+# 保持 fastapi, uvicorn, requests, faster_whisper 等核心依賴
+EXCLUDES = [
+    'matplotlib', 'scipy', 'torchvision', 'transformers', 
+    'numba', 'sklearn', 'pandas', 'opentelemetry', 'triton', 'grpc', 
+    'onnxruntime', 'librosa', 'av', 'sounddevice', 'soundfile', 
+    'shapely', 'imageio', 'skimage', 'soynlp', 'nagisa', 'pydub', 
+    'psutil', 'gevent', 'zope', 'lxml', 'jinja2', 'rich'
+]
+
+# 偵測是否在 Wine/Windows 環境
+is_windows = os.name == 'nt' or os.getenv('WINEPREFIX') is not None
 
 a = Analysis(
     ['src/gui/desktop_app.py'],
@@ -12,6 +26,7 @@ a = Analysis(
         (str(ROOT_DIR / 'models'), 'models'),
         (str(ROOT_DIR / 'data'), 'data'),
         (str(ROOT_DIR / '.env'), '.'),
+        (str(ROOT_DIR / 'config'), 'config'),
     ],
     hiddenimports=[
         'llama_cpp', 'llama_cpp.llama', 'llama_cpp._internals',
@@ -19,11 +34,13 @@ a = Analysis(
         'ttkbootstrap', 'tkinter', 'PIL',
         'pyaudio', 'pyperclip', 'mss',
         'sentence_transformers', 'chromadb',
+        'fastapi', 'uvicorn', 'requests', 'pydantic', 'httpx',
+        'websockets', 'starlette', 'typing_extensions'
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['matplotlib', 'scipy', 'torch', 'torchaudio', 'torchvision', 'transformers', 'numba', 'sklearn', 'pandas', 'opentelemetry', 'triton', 'grpc', 'onnxruntime', 'librosa', 'cv2', 'av', 'sounddevice', 'soundfile', 'easyocr', 'shapely', 'imageio', 'skimage', 'opencc', 'soynlp', 'nagisa', 'pydub', 'psutil', 'gevent', 'zope', 'lxml', 'jinja2', 'rich', 'anyio', 'orjson', 'uvicorn', 'websockets', 'fastapi', 'pydantic', 'httpx', 'requests', 'aiohttp'],
+    excludes=EXCLUDES,
     noarchive=False,
     optimize=0,
 )
@@ -48,4 +65,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    version='version_info.txt',
 )

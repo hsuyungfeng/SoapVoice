@@ -29,11 +29,11 @@ async def get_extended_engine():
             if _extended_engine is None:
                 from scripts.extended_soapvoice import ExtendedSoapVoiceEngine
 
-                logger.info("Initializing ExtendedSoapVoiceEngine...")
-                _extended_engine = ExtendedSoapVoiceEngine(
-                    whisper_model="medium", llm_model="qwen2.5:7b"
-                )
-                logger.info("ExtendedSoapVoiceEngine initialized")
+                logger.info("Initializing ExtendedSoapVoiceEngine (pre-loading)...")
+                _extended_engine = ExtendedSoapVoiceEngine()
+                # 執行阻塞的初始化操作
+                await asyncio.to_thread(_extended_engine.initialize)
+                logger.info("ExtendedSoapVoiceEngine initialized and models loaded")
     return _extended_engine
 
 
@@ -57,7 +57,7 @@ class ExtendedProcessResponse(BaseModel):
     icd10_codes: List[Dict[str, Any]]
     medical_orders: List[str]
     drug_recommendations: List[Dict[str, str]]
-    soap: Dict[str, str]
+    soap: Dict[str, Any]  # 接受包含字串和列表的字典
     processing_time: float
     model: str
 
@@ -134,20 +134,31 @@ async def extended_process(request: ExtendedProcessRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+from fastapi import Form
+
+
 @router.post("/transcribe")
-async def transcribe_audio(audio: UploadFile = File(...)):
+async def transcribe_audio(audio: UploadFile = File(None), audio_path: str = Form(None)):
     """
     音訊轉文字
 
-    上傳音訊檔案，輸出轉錄結果
+    支援上傳音訊檔案或提供檔案路徑
     """
     engine = await get_extended_engine()
 
-    # 保存上傳的檔案
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-        content = await audio.read()
-        tmp.write(content)
-        tmp_path = tmp.name
+    # 如果提供了 audio_path，從本地讀取檔案
+    if audio_path:
+        if not os.path.exists(audio_path):
+            raise HTTPException(status_code=404, detail=f"檔案不存在: {audio_path}")
+        tmp_path = audio_path
+    elif audio:
+        # 保存上傳的檔案
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+            content = await audio.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+    else:
+        raise HTTPException(status_code=400, detail="需要提供 audio 檔案或 audio_path")
 
     try:
         # 阻塞的 Whisper 轉錄，在執行緒池中執行
@@ -159,7 +170,9 @@ async def transcribe_audio(audio: UploadFile = File(...)):
             "processing_time": 0,
         }
     finally:
-        os.unlink(tmp_path)
+        # 只有臨時檔案才刪除
+        if audio and tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
 @router.get("/symptoms/{text}")

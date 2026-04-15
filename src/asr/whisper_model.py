@@ -4,6 +4,7 @@ WhisperModel: Faster-Whisper 模型封裝
 提供語音轉文字功能，支援中英文自動偵測
 """
 
+import os
 from typing import Optional
 from pathlib import Path
 
@@ -20,21 +21,22 @@ class WhisperModel:
     def __init__(
         self,
         model_id: str = "large-v3",
-        device: str = "cuda",
-        compute_type: str = "float16",
+        device: Optional[str] = None,
+        compute_type: Optional[str] = None,
         download_root: Optional[str] = None,
     ):
         """初始化 Whisper 模型
 
         Args:
             model_id: 模型大小，可選 tiny, base, small, medium, large-v2, large-v3
-            device: 設備類型，cuda 或 cpu
-            compute_type: 計算精度，float16, int8, int8_float16
+            device: 設備類型，cuda 或 cpu（預設從環境變數 WHISPER_DEVICE 讀取，若無則為 cuda）
+            compute_type: 計算精度，float16, int8, int8_float16（預設從環境變數 WHISPER_COMPUTE_TYPE 讀取，若無則為 float16）
             download_root: 模型下載目錄
         """
+        # 從環境變數讀取預設值（支援 CPU fallback）
+        self.device = device or os.environ.get("WHISPER_DEVICE", "cuda")
+        self.compute_type = compute_type or os.environ.get("WHISPER_COMPUTE_TYPE", "float16")
         self.model_id = model_id
-        self.device = device
-        self.compute_type = compute_type
         self.download_root = download_root
 
         # 初始化 Faster-Whisper 模型
@@ -42,8 +44,8 @@ class WhisperModel:
         model_path = download_root if download_root else model_id
         self.model = faster_whisper.WhisperModel(
             model_size_or_path=model_path,
-            device=device,
-            compute_type=compute_type,
+            device=self.device,
+            compute_type=self.compute_type,
             download_root=download_root,
         )
 
@@ -112,7 +114,7 @@ class WhisperModel:
             audio_path: 音頻文件路徑
 
         Returns:
-            (語言代碼, 置信度) 元組
+            (語言代碼，置信度) 元組
         """
         _, info = self.model.transcribe(
             audio_path,
@@ -233,4 +235,4 @@ class WhisperModel:
         ]
 
     def __repr__(self) -> str:
-        return f"WhisperModel(model_id={self.model_id}, device={self.device})"
+        return f"WhisperModel(model_id={self.model_id}, device={self.device}, compute_type={self.compute_type})"

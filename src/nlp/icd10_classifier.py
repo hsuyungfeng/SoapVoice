@@ -32,49 +32,77 @@ class ICD10Classifier:
         "胸痛": [("R07.9", "Chest pain, unspecified", "胸痛未特指", "Respiratory", 0.9)],
         "喘": [("R06.02", "Shortness of breath", "呼吸急促", "Respiratory", 0.85)],
         "呼吸困難": [("R06.02", "Shortness of breath", "呼吸急促", "Respiratory", 0.9)],
+        "沒氣": [("R06.02", "Shortness of breath", "呼吸急促", "Respiratory", 0.7)],
+        "呼吸不順": [("R06.02", "Shortness of breath", "呼吸急促", "Respiratory", 0.8)],
         "咳嗽": [("R05", "Cough", "咳嗽", "Respiratory", 0.9)],
+        "乾咳": [("R05", "Cough", "咳嗽", "Respiratory", 0.9)],
+        "有痰": [("R05", "Cough with sputum", "有痰的咳嗽", "Respiratory", 0.85)],
         "咳血": [("R04.2", "Hemoptysis", "咳血", "Respiratory", 0.95)],
         
         # 全身性症狀
         "發燒": [("R50.9", "Fever, unspecified", "發燒未特指", "General", 0.9)],
+        "發熱": [("R50.9", "Fever, unspecified", "發燒未特指", "General", 0.85)],
         "疲倦": [("R53.83", "Other fatigue", "其他疲倦", "General", 0.85)],
+        "沒力氣": [("R53.83", "Other fatigue", "其他疲倦", "General", 0.8)],
+        "很累": [("R53.83", "Other fatigue", "其他疲倦", "General", 0.8)],
         "體重減輕": [("R63.4", "Abnormal weight loss", "異常體重減輕", "General", 0.85)],
+        "變瘦": [("R63.4", "Abnormal weight loss", "異常體重減輕", "General", 0.8)],
         "盜汗": [("R61", "Hyperhidrosis", "多汗症", "General", 0.8)],
         
         # 神經系統症狀
         "頭痛": [("R51", "Headache", "頭痛", "Neurological", 0.9)],
+        "頭很痛": [("R51", "Headache", "頭痛", "Neurological", 0.9)],
         "頭暈": [("R42", "Dizziness and giddiness", "頭暈", "Neurological", 0.85)],
+        "頭很暈": [("R42", "Dizziness and giddiness", "頭暈", "Neurological", 0.85)],
+        "頭暈目眩": [("R42", "Dizziness and giddiness", "頭暈", "Neurological", 0.9)],
+        "想吐": [("R11.0", "Nausea", "噁心", "Digestive", 0.85)],
         "暈倒": [("R55", "Syncope and collapse", "暈厥和虛脫", "Neurological", 0.9)],
+        "失去意識": [("R40.20", "Unspecified coma", "意識喪失", "Neurological", 0.9)],
         "失眠": [("G47.0", "Disorders of initiating and maintaining sleep", "失眠症", "Neurological", 0.85)],
+        "睡不著": [("G47.0", "Disorders of initiating and maintaining sleep", "失眠症", "Neurological", 0.85)],
         "焦慮": [("F41.9", "Anxiety disorder, unspecified", "焦慮症未特指", "Psychiatric", 0.8)],
         
         # 消化系統症狀
         "腹痛": [("R10.9", "Unspecified abdominal pain", "腹痛未特指", "Digestive", 0.85)],
+        "肚子痛": [("R10.9", "Unspecified abdominal pain", "腹痛未特指", "Digestive", 0.85)],
+        "胃痛": [("R10.13", "Epigastric pain", "胃痛", "Digestive", 0.9)],
         "腹瀉": [("R19.7", "Diarrhea, unspecified", "腹瀉未特指", "Digestive", 0.9)],
+        "拉肚子": [("R19.7", "Diarrhea, unspecified", "腹瀉未特指", "Digestive", 0.9)],
         "便秘": [("K59.0", "Constipation", "便秘", "Digestive", 0.9)],
+        "解便困難": [("K59.0", "Constipation", "便秘", "Digestive", 0.85)],
         "噁心": [("R11.0", "Nausea", "噁心", "Digestive", 0.85)],
         "嘔吐": [("R11.2", "Vomiting", "嘔吐", "Digestive", 0.9)],
+        "吐了": [("R11.2", "Vomiting", "嘔吐", "Digestive", 0.9)],
         "胃灼熱": [("R12", "Heartburn", "胃灼熱", "Digestive", 0.85)],
+        "溢酸": [("K21.9", "Gastro-esophageal reflux disease without esophagitis", "胃食道逆流", "Digestive", 0.85)],
         
         # 心血管系統症狀
         "心悸": [("R00.2", "Palpitations", "心悸", "Cardiovascular", 0.85)],
+        "心跳很快": [("R00.0", "Tachycardia, unspecified", "心搏過速未特指", "Cardiovascular", 0.85)],
         "心跳過快": [("R00.0", "Tachycardia, unspecified", "心搏過速未特指", "Cardiovascular", 0.85)],
         "心跳過慢": [("R00.1", "Bradycardia, unspecified", "心搏過緩未特指", "Cardiovascular", 0.85)],
         "高血壓": [("I10", "Essential (primary) hypertension", "原發性高血壓", "Cardiovascular", 0.9)],
+        "血壓很高": [("I10", "Essential (primary) hypertension", "原發性高血壓", "Cardiovascular", 0.9)],
         "低血壓": [("I95.9", "Hypotension, unspecified", "低血壓未特指", "Cardiovascular", 0.85)],
         
         # 肌肉骨骼症狀
         "背痛": [("M54.9", "Dorsalgia, unspecified", "背痛未特指", "Musculoskeletal", 0.85)],
+        "腰痛": [("M54.5", "Low back pain", "腰痛", "Musculoskeletal", 0.85)],
         "頸痛": [("M54.2", "Cervicalgia", "頸痛", "Musculoskeletal", 0.85)],
         "關節痛": [("M25.50", "Pain in unspecified joint", "關節痛未特指", "Musculoskeletal", 0.85)],
         "肌肉痛": [("M79.1", "Myalgia", "肌痛", "Musculoskeletal", 0.85)],
         
         # 皮膚症狀
         "紅腫": [("L20.83", "Atopic dermatitis", "異位性皮膚炎", "Dermatological", 0.75)],
+        "發紅": [("L53.9", "Erythematous condition, unspecified", "發紅", "Dermatological", 0.8)],
         "皮疹": [("R21", "Rash and other nonspecific skin eruption", "皮疹", "Dermatological", 0.85)],
+        "起疹子": [("R21", "Rash and other nonspecific skin eruption", "皮疹", "Dermatological", 0.85)],
         "癢": [("L29.9", "Pruritus, unspecified", "癢未特指", "Dermatological", 0.85)],
+        "皮膚癢": [("L29.9", "Pruritus, unspecified", "癢未特指", "Dermatological", 0.85)],
         "水泡": [("L10.9", "Pemphigus, unspecified", "天皰瘡未特指", "Dermatological", 0.7)],
         "燙傷": [("T30.0", "Burn of unspecified degree", "燙傷未特指程度", "Injury", 0.8)],
+        "流血": [("R58", "Hemorrhage, not elsewhere classified", "流血", "Injury", 0.85)],
+
         
         # 泌尿系統症狀
         "頻尿": [("R35.0", "Frequency of micturition", "尿頻", "Genitourinary", 0.9)],

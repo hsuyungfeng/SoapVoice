@@ -33,6 +33,10 @@ try:
     import pytesseract
 
     HAS_PYTESSERACT = True
+    # 支援 Windows 下自定義 Tesseract 路徑
+    tesseract_cmd = os.getenv("TESSERACT_CMD")
+    if tesseract_cmd:
+        pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
 except ImportError:
     pytesseract = None
 

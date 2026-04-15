@@ -15,6 +15,7 @@ from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
 from src.nlp.icd10_classifier import ICD10Classifier, ICD10Match
 from src.nlp.soap_classifier import SOAPClassifier, SOAPClassification
 from src.soap.soap_generator import SOAPGenerator, SOAPConfig
+from src.db.clinical_db import ClinicalDatabase
 
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ _terminology_mapper: Optional[MedicalTerminologyMapper] = None
 _icd10_classifier: Optional[ICD10Classifier] = None
 _soap_classifier: Optional[SOAPClassifier] = None
 _soap_generator: Optional[SOAPGenerator] = None
+_clinical_db: Optional[ClinicalDatabase] = None
 
 
 def get_terminology_mapper() -> MedicalTerminologyMapper:
@@ -67,6 +69,14 @@ def get_soap_generator() -> SOAPGenerator:
         )
         _soap_generator = SOAPGenerator(config)
     return _soap_generator
+
+
+def get_clinical_db() -> ClinicalDatabase:
+    """取得臨床資料庫（單例）"""
+    global _clinical_db
+    if _clinical_db is None:
+        _clinical_db = ClinicalDatabase()
+    return _clinical_db
 
 
 # Request/Response Models
@@ -148,6 +158,8 @@ class SOAPSection(BaseModel):
     assessment: str = ""
     plan: str = ""
     conversation_summary: str = ""
+    medical_orders: List[str] = []
+    drug_recommendations: List[Dict[str, str]] = []
 
 
 class SOAPGenerateResponse(BaseModel):
@@ -330,17 +342,27 @@ async def generate_soap(
     start_time = time.time()
 
     try:
-        # 如果指定了模型，重新配置 generator
-        if request.model:
-            from src.soap.soap_generator import SOAPConfig
-
-            config = SOAPConfig(model_id=request.model)
-            generator = SOAPGenerator(config)
+        # 提取症狀與 ICD-10 用於查找資料庫
+        # 我們先使用 mapper 提取症狀
+        mapper = get_terminology_mapper()
+        _, mappings = mapper.map_text(request.transcript)
+        symptoms = [m.standard for m in mappings]
+        
+        classifier = get_icd10_classifier()
+        icd10_matches = classifier.classify(request.transcript)
+        icd10_codes = [m.code for m in icd10_matches]
+        
+        # 查詢醫囑與藥物
+        clinical_db = get_clinical_db()
+        medical_orders = clinical_db.get_medical_orders(symptoms, icd10_codes)
+        drug_recommendations = clinical_db.get_drug_recommendations(symptoms, icd10_codes)
 
         # 生成 SOAP
         soap_dict = generator.generate(
             transcript=request.transcript,
             patient_context=request.patient_context,
+            medical_orders=medical_orders,
+            drug_recommendations=drug_recommendations
         )
 
         processing_time = (time.time() - start_time) * 1000
@@ -352,24 +374,8 @@ async def generate_soap(
                 assessment=soap_dict.get("assessment", ""),
                 plan=soap_dict.get("plan", ""),
                 conversation_summary=soap_dict.get("conversation_summary", ""),
-            ),
-            metadata={
-                "confidence": soap_dict.get("classification_confidence", {}),
-                "model_version": generator.config.model_id,
-                "normalized_terms": soap_dict.get("normalized_terms", []),
-            },
-            processing_time_ms=round(processing_time, 2),
-        )
-
-        processing_time = (time.time() - start_time) * 1000
-
-        return SOAPGenerateResponse(
-            soap=SOAPSection(
-                subjective=soap_dict.get("subjective", ""),
-                objective=soap_dict.get("objective", ""),
-                assessment=soap_dict.get("assessment", ""),
-                plan=soap_dict.get("plan", ""),
-                conversation_summary=soap_dict.get("conversation_summary", ""),
+                medical_orders=medical_orders,
+                drug_recommendations=drug_recommendations,
             ),
             metadata={
                 "confidence": soap_dict.get("classification_confidence", {}),
