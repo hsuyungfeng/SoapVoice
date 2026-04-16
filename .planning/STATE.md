@@ -23,6 +23,8 @@
   - ✅ **預加載機制優化**：伺服器啟動時自動預加載 `distil-large-v3` 模型，顯著降低首次轉錄延遲。
   - ✅ **共享模型實例**：確保 WebSocket API 與 REST API 共享相同的 ASR 模型實例，節省記憶體並提高效率。
   - ✅ **修復模型路徑 Bug**：修復 `WhisperModel` 在指定 `download_root` 時無法正確載入模型 ID 的問題。
+  - ✅ **修復 ASR API 一致性**：修復 `ExtendedSoapVoiceEngine` 在使用 ASR 封裝器時發生的 `ValueError`，確保全域 API 格式統一。
+  - ✅ **優化中文文字拼接**：移除 ASR 轉錄結果中針對中日文的不必要空格。
 
 - **2026-04-15**: NLP 提取與擴展功能修復 (Session 3)
   - ✅ **修復症狀提取**：增加口語化同義詞支援（如「肚子痛」、「想吐」）。

@@ -97,8 +97,8 @@ class ExtendedSoapVoiceEngine:
     def transcribe(self, audio_path: str) -> str:
         """語音轉文字"""
         self._init_models()
-        segments, _ = self._whisper.transcribe(audio_path, language="zh")
-        return "".join([s.text for s in segments])
+        result = self._whisper.transcribe(audio_path, language="zh")
+        return result.get("text", "")
 
     def extract_symptoms(self, text: str) -> List[str]:
         """從文字提取症狀"""

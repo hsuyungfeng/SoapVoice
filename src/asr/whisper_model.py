@@ -96,11 +96,16 @@ class WhisperModel:
             full_text_parts.append(segment.text.strip())
 
         # 組合完整文字
-        full_text = " ".join(full_text_parts)
+        # 對於中文，不使用空格連接
+        detected_language = info.language if info.language else language or "auto"
+        if detected_language in ["zh", "ja"]:
+            full_text = "".join(full_text_parts)
+        else:
+            full_text = " ".join(full_text_parts)
 
         return {
             "text": full_text,
-            "language": info.language if info.language else language or "auto",
+            "language": detected_language,
             "language_probability": info.language_probability,
             "segments": segments_list,
             "duration": info.duration,

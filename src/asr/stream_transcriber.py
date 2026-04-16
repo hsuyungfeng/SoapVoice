@@ -243,7 +243,11 @@ class StreamTranscriber:
 
             # 更新當前文字
             if text_parts:
-                self._current_text = " ".join(text_parts)
+                # 對於中文，不使用空格連接
+                if lang in ["zh", "ja"]:
+                    self._current_text = "".join(text_parts)
+                else:
+                    self._current_text = " ".join(text_parts)
                 self._last_result = self._current_text
             else:
                 # 如果沒有新內容且只有幻覺，保持之前的文字或清空（視需求而定）
