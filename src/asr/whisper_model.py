@@ -73,27 +73,57 @@ class WhisperModel:
             - duration: 音頻時長
         """
         # 執行轉錄
+        # 設定繁體中文醫療對話的提示，並關閉依賴前文以減少幻覺循環
         segments, info = self.model.transcribe(
             audio_path,
             language=language,
             task=task,
             beam_size=beam_size,
             vad_filter=vad_filter,
+            initial_prompt="這是一段繁體中文的醫療看診對話記錄。醫師與病患進行問診。",
+            condition_on_previous_text=False,
         )
 
         # 收集所有分段文字
         segments_list = []
         full_text_parts = []
+        
+        # 擴大的幻覺黑名單與過濾邏輯
+        hallucination_blacklist = [
+            "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", "Amara.org", 
+            "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場", "MING PAO", 
+            "CANADA", "TORONTO", "明報", "多倫多", "Zhang", "Today", "Kyi-day", 
+            "killed", "Sysh", "recently", "you're-must"
+        ]
 
         for segment in segments:
+            text = segment.text.strip()
+            if not text:
+                continue
+                
+            # 檢查是否為重複的標點符號幻覺 (如 ". . . . .")
+            import re
+            if re.match(r'^[\.\s。，,！？!\?\-]+$', text):
+                continue
+                
+            # 檢查是否包含黑名單中的片段
+            is_hallucination = False
+            for black_word in hallucination_blacklist:
+                if black_word.lower() in text.lower():
+                    is_hallucination = True
+                    break
+                    
+            if is_hallucination:
+                continue
+
             segments_list.append(
                 {
                     "start": segment.start,
                     "end": segment.end,
-                    "text": segment.text.strip(),
+                    "text": text,
                 }
             )
-            full_text_parts.append(segment.text.strip())
+            full_text_parts.append(text)
 
         # 組合完整文字
         # 對於中文，不使用空格連接

@@ -186,7 +186,8 @@ class StreamTranscriber:
                 beam_size=self.beam_size,
                 vad_filter=True,
                 vad_parameters=dict(threshold=0.1, min_silence_duration_ms=500),
-                initial_prompt="醫療診斷對話。",
+                initial_prompt="這是一段繁體中文的醫療看診對話記錄。醫師與病患進行問診。",
+                condition_on_previous_text=False,
             )
 
             # 收集分段結果
@@ -194,31 +195,20 @@ class StreamTranscriber:
 
             # 擴大的幻覺黑名單
             hallucination_blacklist = [
-                "谢谢",
-                "謝謝",
-                "字幕",
-                "志愿者",
-                "感謝",
-                "感谢",
-                "Watching",
-                "Amara.org",
-                "李宗盛",
-                "杨茜茜",
-                "楊茜茜",
-                "訂閱",
-                "订阅",
-                "剧场",
-                "劇場",
-                "MING PAO",
-                "CANADA",
-                "TORONTO",
-                "明報",
-                "多倫多",
+                "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", "Amara.org", 
+                "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場", "MING PAO", 
+                "CANADA", "TORONTO", "明報", "多倫多", "Zhang", "Today", "Kyi-day", 
+                "killed", "Sysh", "recently", "you're-must"
             ]
 
             for segment in segments:
                 text = segment.text.strip()
                 if not text:
+                    continue
+
+                # 檢查是否為重複的標點符號幻覺
+                import re
+                if re.match(r'^[\.\s。，,！？!\?\-]+$', text):
                     continue
 
                 # 檢查是否包含黑名單中的片段
@@ -314,7 +304,8 @@ class StreamTranscriber:
                     beam_size=self.beam_size,
                     vad_filter=True,
                     vad_parameters=dict(threshold=0.1, min_silence_duration_ms=500),
-                    initial_prompt="醫療診斷對話。",
+                    initial_prompt="這是一段繁體中文的醫療看診對話記錄。醫師與病患進行問診。",
+                    condition_on_previous_text=False,
                 )
 
                 final_text_parts = []
@@ -322,31 +313,20 @@ class StreamTranscriber:
 
                 # 擴大的幻覺黑名單
                 hallucination_blacklist = [
-                    "谢谢",
-                    "謝謝",
-                    "字幕",
-                    "志愿者",
-                    "感謝",
-                    "感谢",
-                    "Watching",
-                    "Amara.org",
-                    "李宗盛",
-                    "杨茜茜",
-                    "楊茜茜",
-                    "訂閱",
-                    "订阅",
-                    "剧场",
-                    "劇場",
-                    "MING PAO",
-                    "CANADA",
-                    "TORONTO",
-                    "明報",
-                    "多倫多",
+                    "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", "Amara.org", 
+                    "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場", "MING PAO", 
+                    "CANADA", "TORONTO", "明報", "多倫多", "Zhang", "Today", "Kyi-day", 
+                    "killed", "Sysh", "recently", "you're-must"
                 ]
 
                 for segment in segments:
                     text = segment.text.strip()
                     if not text:
+                        continue
+
+                    # 檢查是否為重複的標點符號幻覺
+                    import re
+                    if re.match(r'^[\.\s。，,！？!\?\-]+$', text):
                         continue
 
                     # 檢查是否包含黑名單中的片段
