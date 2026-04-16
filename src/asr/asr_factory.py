@@ -19,11 +19,14 @@ class ASRBackend(Enum):
 class ASRBackendFactory:
     """ASR 引擎工廠
 
-    根據配置創建對應的 ASR 模型實例
+    根據配置創建對應的 ASR 模型實例，並支援模型快取與預加載
     """
 
-    @staticmethod
+    _model_cache = {}
+
+    @classmethod
     def create_backend(
+        cls,
         backend: str = "whisper",
         **kwargs,
     ) -> object:
@@ -36,29 +39,48 @@ class ASRBackendFactory:
         Returns:
             ASR 模型實例
         """
+        # 建立快取鍵（基於 backend 與主要參數）
+        import os
+        default_whisper = os.getenv("ASR_MODEL", "distil-large-v3")
+        model_id = kwargs.get("model_id", default_whisper if backend == "whisper" else "Qwen/Qwen3-ASR-0.6B")
+        device = kwargs.get("device") or os.environ.get("WHISPER_DEVICE", "cuda")
+        compute_type = kwargs.get("compute_type") or os.environ.get("WHISPER_COMPUTE_TYPE", "float16")
+        download_root = kwargs.get("download_root", "models/whisper")
+
+        cache_key = f"{backend}:{model_id}:{device}:{compute_type}:{download_root}"
+
+        if cache_key in cls._model_cache:
+            return cls._model_cache[cache_key]
+
         if backend == "qwen3asr":
             from src.asr.qwen3asr_model import Qwen3ASRModel
 
-            return Qwen3ASRModel(
-                model_id=kwargs.get("model_id", "Qwen/Qwen3-ASR-0.6B"),
-                device=kwargs.get("device", "cuda"),
+            model = Qwen3ASRModel(
+                model_id=model_id,
+                device=device,
                 dtype=kwargs.get("dtype"),
             )
         else:
             from src.asr.whisper_model import WhisperModel
 
-            return WhisperModel(
-                model_id=kwargs.get("model_id", "large-v3"),
-                device=kwargs.get("device", "cuda"),
-                compute_type=kwargs.get("compute_type", "float16"),
-                download_root=kwargs.get("download_root"),
+            model = WhisperModel(
+                model_id=model_id,
+                device=device,
+                compute_type=compute_type,
+                download_root=download_root,
             )
+
+        cls._model_cache[cache_key] = model
+        return model
+
 
     @staticmethod
     def get_backend_name(backend: str) -> str:
         """取得引擎顯示名稱"""
+        import os
+        default_whisper = os.getenv("ASR_MODEL", "distil-large-v3")
         names = {
-            "whisper": "Faster-Whisper large-v3",
+            "whisper": f"Faster-Whisper {default_whisper}",
             "qwen3asr": "Qwen3-ASR-0.6B",
         }
         return names.get(backend, backend)

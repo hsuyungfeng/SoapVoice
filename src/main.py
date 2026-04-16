@@ -79,8 +79,11 @@ async def lifespan(app: FastAPI):
     try:
         from src.api.extended_api import get_extended_engine
         logger.info("Pre-loading Extended SOAP Pipeline...")
-        await get_extended_engine()
-        logger.info("Extended SOAP Pipeline pre-loaded successfully")
+        engine = await get_extended_engine()
+        if hasattr(engine, "_whisper"):
+             logger.info(f"Extended SOAP Pipeline pre-loaded successfully (Whisper object: {engine._whisper.model})")
+        else:
+             logger.info("Extended SOAP Pipeline pre-loaded successfully")
     except Exception as e:
         logger.warning(f"Failed to pre-load Extended SOAP Pipeline: {e}")
 

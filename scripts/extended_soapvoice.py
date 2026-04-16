@@ -10,7 +10,6 @@ import requests
 import os
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
-from faster_whisper import WhisperModel
 import importlib.util
 
 
@@ -42,6 +41,21 @@ class ExtendedSOAPResult:
     processing_time: float
 
 
+# 載入 ASR 工廠
+def load_asr_factory():
+    """載入 ASR 工廠"""
+    import sys
+    from pathlib import Path
+    
+    # 確保 src 正在 sys.path 中
+    project_root = Path(__file__).parent.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+        
+    from src.asr.asr_factory import ASRBackendFactory
+    return ASRBackendFactory
+
+
 class ExtendedSoapVoiceEngine:
     """擴展版 SoapVoice 引擎"""
 
@@ -69,10 +83,12 @@ class ExtendedSoapVoiceEngine:
         if self._whisper is None:
             # 從環境變數讀取計算類型
             compute_type = os.getenv("ASR_COMPUTE_TYPE", "int8")
-            # 強制使用 CPU 和指定計算類型
-            self._whisper = WhisperModel(
-                self.whisper_model, 
-                device="cpu", 
+            # 使用 ASR 工廠進行初始化 (支援模型快取)
+            factory = load_asr_factory()
+            self._whisper = factory.create_backend(
+                backend="whisper",
+                model_id=self.whisper_model,
+                device=self.compute_mode,
                 compute_type=compute_type,
                 download_root="models/whisper"
             )

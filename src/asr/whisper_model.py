@@ -41,9 +41,8 @@ class WhisperModel:
 
         # 初始化 Faster-Whisper 模型
         # 支援本地模型路徑或 HuggingFace 模型 ID
-        model_path = download_root if download_root else model_id
         self.model = faster_whisper.WhisperModel(
-            model_size_or_path=model_path,
+            model_size_or_path=model_id,
             device=self.device,
             compute_type=self.compute_type,
             download_root=download_root,
