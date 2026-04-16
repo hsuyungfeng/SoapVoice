@@ -18,8 +18,11 @@
 
 ## 最近更新
 
-- **2026-04-16**: ASR 與 OCR 引擎優化 (Session 4)
+- **2026-04-16**: 穩定性與效能優化 (Session 4)
+  - ✅ **修復 GUI 啟動段錯誤**：延遲初始化 `OCRParser` 與 `AudioRecorder` 等重量級組件，防止主執行緒資源競爭導致的 Segmentation Fault。
+  - ✅ **ALSA 雜訊過濾**：使用 context manager 隱藏 `PyAudio` 初始化時的 ALSA 與 PulseAudio 驅動警告。
   - ✅ **ASR 模型優化**：實現 ASR 模型快取與預加載，修復 `ValueError` 與路徑 Bug，優化中文文字拼接。
+  - ✅ **ASR 幻覺過濾**：設定 `initial_prompt` 強制繁體中文，關閉 `condition_on_previous_text` 防止迴圈，並擴大幻覺黑名單。
   - ✅ **OCR 引擎遷移**：將主力 OCR 引擎由 EasyOCR 替換為 **Tesseract-OCR (pytesseract)**。
   - ✅ **UI 更新**：更新 Web 介面 OCR 選擇，預設使用 Tesseract-OCR (主力離線)。
   - ✅ **依賴清理**：從 `pyproject.toml` 中移除 `easyocr` 依賴，減輕安裝負擔並確保全離線環境穩定性。

@@ -138,8 +138,8 @@ class SoapVoiceApp:
 
         self.setup_custom_styles()
         self.config_manager = ConfigManager()
-        self.ocr_parser = OCRParser()
-        self.recorder = AudioRecorder()
+        self.ocr_parser = None
+        self.recorder = None
 
         self.current_soap_text = ""
         self.current_ocr_text = ""
@@ -149,6 +149,19 @@ class SoapVoiceApp:
         self.setup_ui()
         self.update_ui_state("idle")
         self.start_backend_process()
+        
+        # 延遲初始化重量級組件
+        self.root.after(500, self._delayed_init)
+
+    def _delayed_init(self):
+        """延遲初始化重量級組件以避免阻塞 UI"""
+        try:
+            if not self.ocr_parser:
+                self.ocr_parser = OCRParser()
+            if not self.recorder:
+                self.recorder = AudioRecorder()
+        except Exception as e:
+            logger.error(f"Delayed init failed: {e}")
 
     def setup_custom_styles(self):
         style = ttk.Style()
@@ -279,6 +292,9 @@ class SoapVoiceApp:
             if curr < 95: self.progress["value"] = curr + 2; self.root.after(500, self.animate_progress)
 
     def start_recording(self):
+        if not self.recorder:
+            messagebox.showwarning("警告", "錄音模組尚未初始化完成，請稍後再試。")
+            return
         model_name = self.model_var.get()
         self.update_ui_state("recording")
         threading.Thread(target=self.run_ocr_and_match, args=(model_name,), daemon=True).start()
@@ -286,6 +302,7 @@ class SoapVoiceApp:
         threading.Thread(target=self.recorder.record_loop, daemon=True).start()
 
     def stop_recording(self):
+        if not self.recorder: return
         self.update_ui_state("processing")
         wav_path = str(PROJECT_ROOT / "data" / "recordings" / "temp.wav")
         os.makedirs(os.path.dirname(wav_path), exist_ok=True)
@@ -326,6 +343,9 @@ class SoapVoiceApp:
         self.timestamp_label.config(text=f"產出時間: {ts}"); self.expand_view()
 
     def run_ocr_and_match(self, model_name):
+        if not self.ocr_parser:
+            logger.warning("OCRParser not initialized yet")
+            return
         try:
             ocr_text = self.ocr_parser.capture_screen_to_text()
             if not ocr_text: return
