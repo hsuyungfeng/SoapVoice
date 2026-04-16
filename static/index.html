@@ -895,16 +895,21 @@
 
                     <div id="whisper-panel" class="tab-content">
                         <div class="form-group">
+                            <label>選擇 ASR 模型</label>
+                            <select id="asrModel">
+                                <option value="distil-large-v3">Distil-Large-V3 (快速)</option>
+                                <option value="medium">Whisper Medium (平衡)</option>
+                                <option value="large-v3">Whisper Large-V3 (精準)</option>
+                                <option value="Qwen3-ASR">Qwen3-ASR (輕量)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>計算裝置</label>
                             <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="asrMode" value="cpu" checked>
-                                    <span>CPU</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="asrMode" value="gpu">
-                                    <span>GPU</span>
-                                </label>
+                                <input type="radio" name="asrMode" value="cpu" checked id="asrCpu">
+                                <label for="asrCpu" style="display:inline; margin-right: 15px;">CPU</label>
+                                <input type="radio" name="asrMode" value="gpu" id="asrGpu">
+                                <label for="asrGpu" style="display:inline;">GPU</label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1265,6 +1270,7 @@
 
         async function runWhisper() {
             const fileInput = document.getElementById('asrFile');
+            const asrModel = document.getElementById('asrModel').value;
             const mode = document.querySelector('input[name="asrMode"]:checked').value;
 
             if (fileInput.files.length === 0) return alert('請上傳音檔');
@@ -1279,12 +1285,20 @@
             document.getElementById('ocrResult').style.display = 'none';
 
             updateStatus('running', '轉錄中');
-            addLog('🎤', `開始 Whisper 轉錄 | 檔案: ${fileInput.files[0].name}`);
+            addLog('🎤', `開始 ${asrModel} 轉錄 | 檔案: ${fileInput.files[0].name}`);
             updateProgress(20);
 
             const formData = new FormData();
             formData.append('audio', fileInput.files[0]);
             formData.append('device', mode);
+            
+            if (asrModel === 'Qwen3-ASR') {
+                formData.append('model', 'Qwen/Qwen3-ASR-0.6B');
+                formData.append('backend', 'qwen3asr');
+            } else {
+                formData.append('model', asrModel);
+                formData.append('backend', 'whisper');
+            }
 
             try {
                 const startTime = performance.now();

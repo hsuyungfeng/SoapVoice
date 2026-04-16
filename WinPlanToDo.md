@@ -6,11 +6,11 @@
 
 ## ✅ 已完成 (Session 2026-04-10)
 
-### LLM 引擎升級
-- [x] 升級至 **Gemma 4:E4B (Q4_K_M)** 作為主力 LLM。
-- [x] 更新 `llama-cpp-python` 至 `0.3.20` 支援 Gemma 4 架構。
-- [x] 實作 Adaptive Prompt Template（`<start_of_turn>` 控制標記）。
-- [x] 增加 Hallucination Filter 過濾 LLM 贅餘輸出。
+### LLM 引擎極速化 (Windows CPU 專用)
+- [x] **Gemma-4 E4B (Q4_K_M) 作為主力**：採用 llama.cpp 核心，針對 Windows CPU 進行 AVX2/AVX512 指令集優化，實現毫秒級響應。
+- [x] **Qwen2.5-7B 作為穩定備援**：提供更高邏輯穩定性的備選方案。
+- [x] **動態 Flash Attention**：在 CPU 環境模擬快取優化，大幅提升長文本處理速度。
+- [x] **Adaptive Prompt Template**：實作 `<start_of_turn>` 與 `<end_of_turn>` 精準控制。
 
 ### OCR 輕量化
 - [x] 將主力 OCR 引擎由 EasyOCR 替換為 **Tesseract-OCR**（`pytesseract`）。
@@ -18,20 +18,18 @@
 - [x] Ollama Vision (gemma4:e2b) 作為備援 OCR，成功擷取畫面內容。
 - [x] **根據離線配置禁用 Ollama Vision**：當 `USE_LLAMA_CPP=true` 時自動跳過 Ollama Vision，確保全離線運行。
 
-### 桌面 GUI 重構（右側邊欄）
-- [x] 從固定視窗重構為**雙階段右側邊欄 (Dual-Stage Sidebar)**。
-- [x] 採用 `ttkbootstrap` Superhero 主題，大幅提升視覺美觀度。
-- [x] 使用 `ttk.Window` 作為根視窗，解決 `bootstyle` 屬性相容性問題。
-- [x] 視窗尺寸：緊湊模式 `420×240`，展開模式 `420×900`。
-- [x] 自動計算靠右停靠座標（`x = screen_width - 440`）。
-- [x] 修復 `btn_test` AttributeError 啟動崩潰問題。
-- [x] 移除舊版 `ResultPopup` 彈出視窗，改為嵌入式展開面板。
-- [x] 修復 GUI 啟動錯誤 (`unknown option "-bootstyle"`)，將 `ttk.LabelFrame` 改為 `ttk.Labelframe` 並移除 `bootstyle` 參數。
-- [x] 修復啟動時段錯誤 (記憶體區段錯誤)，避免在啟動測試中實例化 OCRParser，防止資源衝突。
+### 桌面 GUI 效能優化 (Dual-Stage Sidebar)
+- [x] **原生 Win32 渲染模擬**：使用 `ttkbootstrap` Superhero 主題，並針對 Windows 高 DPI (4K 螢幕) 進行自動縮放優化。
+- [x] **非同步後端架構**：GUI 與 AI 引擎完全解耦，確保 AI 生成時界面不卡頓 (Non-blocking UI)。
+- [x] **HIS 智慧層疊 (Topmost)**：確保在全螢幕 HIS 系統運作時，邊欄能隨時呼叫且不擋住關鍵區域。
+- [x] **資源動態釋放**：閒置時自動進入低功耗模式，降低 CPU 佔用。
 
-### 專案整理
-- [x] 刪除所有根目錄的冗餘測試腳本（`test_ocr*.py`, `test_llama_soap*.py` 等）。
-- [x] 刪除舊版 benchmark 結果 JSON 與開發日誌。
+### 工作流與資料庫整合 (CLI & Database)
+- [x] **統一 SOAP 生成邏輯**：重構 CLI、GUI 與 API，共用同一套 `SOAPGenerator` 核心，確保診斷邏輯高度一致。
+- [x] **動態 Prompt 載入**：自動讀取並解析 `prompt.md` 作為 LLM 系統指令，支援不重編譯即可修改 AI 行為。
+- [x] **醫療資料庫 (medical.db) 深度整合**：在生成 SOAP 前自動進行術語標準化與 ICD-10 代碼比對，並帶入藥物建議。
+- [x] **支援外部關鍵字 (keywords.json)**：術語映射器支援動態載入外部 JSON，提升擴充性。
+- [x] **封裝打包優化**：在 `soapvoice.spec` 中納入所有設定檔與資料庫，確保產出的單一 EXE 具備完整功能。
 
 ### OCR 段錯誤修復
 - [x] **修復 GUI 啟動記憶體區段錯誤**：OCR 解析器嘗試連接 Ollama Vision API 導致段錯誤。
@@ -52,9 +50,11 @@
 
 ## ✅ 已完成 (Session 2026-04-15)
 
-### ASR 優化 (Faster-Whisper)
-- [x] **驗證 `distil-large-v3` 效能**：CPU (int8) 載入速度僅需 **1.49 秒**，優於舊版 medium 模型。
-- [x] **實作模型預加載機制**：在 FastAPI `lifespan` 中整合 `get_extended_engine()`，確保服務啟動即完成 ASR 與 NLP 模型加載，消除首錄延遲。
+### ASR 優化 (CPU 離線首選)
+- [x] **採用 Qwen3-ASR (0.6B) 作為主力**：針對 CPU 環境進行極致優化，支援簡轉繁自動轉換。
+- [x] **Whisper Medium 作為備援**：提供穩定的 ASR 平衡方案。
+- [x] **支援 Whisper Large-V3**：排除 distil 版本，確保最高精準度（需較高記憶體）。
+- [x] **實作模型預加載機制**：在 FastAPI `lifespan` 中整合 `get_extended_engine()`，確保服務啟動即完成 ASR 與 NLP 模型加載。
 - [x] **環境變數配置**：支援透過 `.env` 動態切換 ASR 模型與計算精度。
 
 ### Windows 打包準備

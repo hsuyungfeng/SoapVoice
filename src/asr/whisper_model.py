@@ -51,18 +51,18 @@ class WhisperModel:
     def transcribe(
         self,
         audio_path: str,
-        language: Optional[str] = None,
+        language: Optional[str] = "zh",
         task: str = "transcribe",
-        beam_size: int = 5,
+        beam_size: int = 10,
         vad_filter: bool = True,
     ) -> dict:
         """執行語音辨識
 
         Args:
             audio_path: 音頻文件路徑
-            language: 語言代碼，None 為自動偵測
+            language: 語言代碼，預設為 "zh" (繁體中文)
             task: 任務類型，transcribe 或 translate
-            beam_size: Beam search 大小
+            beam_size: Beam search 大小 (提升至 10 以增加準確度)
             vad_filter: 是否啟用語音活動檢測
 
         Returns:
@@ -80,8 +80,11 @@ class WhisperModel:
             task=task,
             beam_size=beam_size,
             vad_filter=vad_filter,
-            initial_prompt="這是一段繁體中文的醫療看診對話記錄。醫師與病患進行問診。",
+            initial_prompt="這是一段繁體中文的醫療看診對話記錄。醫師與病患進行問診。對話內容包含：發燒、咳嗽、抽菸、心臟病、胸悶。",
             condition_on_previous_text=False,
+            # 增加一些對中文友好的參數
+            repetition_penalty=1.2,
+            no_repeat_ngram_size=3,
         )
 
         # 收集所有分段文字
@@ -93,7 +96,8 @@ class WhisperModel:
             "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", "Amara.org", 
             "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場", "MING PAO", 
             "CANADA", "TORONTO", "明報", "多倫多", "Zhang", "Today", "Kyi-day", 
-            "killed", "Sysh", "recently", "you're-must"
+            "killed", "Sysh", "recently", "you're-must", "fashow", "chou yin", "chowl",
+            "jank", "tureen", "tut-tut", "hush-x", "gawonged"
         ]
 
         for segment in segments:

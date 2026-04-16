@@ -138,7 +138,12 @@ from fastapi import Form
 
 
 @router.post("/transcribe")
-async def transcribe_audio(audio: UploadFile = File(None), audio_path: str = Form(None)):
+async def transcribe_audio(
+    audio: UploadFile = File(None),
+    audio_path: str = Form(None),
+    model: Optional[str] = Form(None),
+    backend: Optional[str] = Form("whisper"),
+):
     """
     音訊轉文字
 
@@ -161,12 +166,14 @@ async def transcribe_audio(audio: UploadFile = File(None), audio_path: str = For
         raise HTTPException(status_code=400, detail="需要提供 audio 檔案或 audio_path")
 
     try:
-        # 阻塞的 Whisper 轉錄，在執行緒池中執行
-        transcript = await asyncio.to_thread(engine.transcribe, tmp_path)
+        # 阻塞的 ASR 轉錄，在執行緒池中執行
+        # 支援動態切換模型
+        transcript = await asyncio.to_thread(engine.transcribe, tmp_path, model=model, backend=backend)
         return {
             "transcript": transcript,
             "language": "zh",
-            "model": engine.whisper_model or "whisper-medium",
+            "model": model or engine.whisper_model or "whisper-medium",
+            "backend": backend,
             "processing_time": 0,
         }
     finally:

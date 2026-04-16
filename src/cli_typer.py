@@ -22,9 +22,6 @@ from rich.table import Table
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.soap.soap_generator import SOAPGenerator, SOAPConfig, initialize_generator
-from src.nlp.terminology_mapper import MedicalTerminologyMapper
-from src.nlp.icd10_classifier import ICD10Classifier
-from src.db.clinical_db import ClinicalDatabase
 from src.llm import LlamaEngine, LlamaConfig
 from src.asr.whisper_model import WhisperModel
 
@@ -57,12 +54,7 @@ class SoapVoiceTyperCLI:
         self.whisper_device = whisper_device
         
         self.generator: Optional[SOAPGenerator] = None
-        self.llama_engine: Optional[LlamaEngine] = None
         self.asr_model: Optional[WhisperModel] = None
-        
-        self.terminology_mapper = MedicalTerminologyMapper()
-        self.icd10_classifier = ICD10Classifier()
-        self.clinical_db = ClinicalDatabase()
 
     def initialize(self, skip_llm: bool = False) -> None:
         """初始化 ASR 與 LLM 引擎"""
@@ -73,21 +65,22 @@ class SoapVoiceTyperCLI:
         ) as progress:
             if not skip_llm:
                 task_llm = progress.add_task("初始化 LLM 引擎...", total=None)
+                
+                # 建立統一配置
                 if self.backend == "llama.cpp":
                     if not self.model_path:
                         self.model_path = "models/gemma-4-E4B-it-Q4_K_M.gguf"
-                    config = LlamaConfig(
-                        model_path=self.model_path,
-                        n_gpu_layers=0,
-                        n_threads=8,
-                        max_tokens=2048,
-                        temperature=0.3,
-                    )
-                    self.llama_engine = LlamaEngine(config)
-                    self.llama_engine.initialize()
+                    
+                    # 設定環境變數讓 SOAPGenerator 使用 llama.cpp
+                    os.environ["USE_LLAMA_CPP"] = "true"
+                    os.environ["LLAMA_MODEL_PATH"] = self.model_path
+                    
+                    self.generator = initialize_generator()
                 else:
+                    os.environ["USE_LLAMA_CPP"] = "false"
                     config = SOAPConfig(model_id=self.model)
                     self.generator = initialize_generator(config)
+                
                 progress.update(task_llm, completed=True)
 
     def initialize_asr(self) -> None:
@@ -122,118 +115,16 @@ class SoapVoiceTyperCLI:
 
     def process_text(self, text: str) -> dict:
         """處理文字輸入並生成 SOAP"""
-        # 術語標準化
-        _, term_mappings = self.terminology_mapper.map_text(text)
-        symptoms = [m.standard for m in term_mappings]
-
-        # 進行 ICD-10 分類
-        icd10_matches = self.icd10_classifier.classify(text)
-        icd10_codes = [m.code for m in icd10_matches]
-
-        # 查詢醫囑與藥物
-        medical_orders = self.clinical_db.get_medical_orders(symptoms, icd10_codes)
-        drug_recommendations = self.clinical_db.get_drug_recommendations(symptoms, icd10_codes)
-
-        # 生成 SOAP
-        if self.backend == "llama.cpp" and self.llama_engine:
-            return self._process_with_llama(
-                text, term_mappings, medical_orders, drug_recommendations
-            )
-        else:
-            if not self.generator:
-                self.initialize()
-            result = self.generator.generate(
-                transcript=text,
-                patient_context=None,
-                medical_orders=medical_orders,
-                drug_recommendations=drug_recommendations,
-            )
-            result["normalized_terms"] = [
-                {"original": m.original, "standard": m.standard, "icd10_candidates": m.icd10_candidates}
-                for m in term_mappings
-            ]
-            result["medical_orders"] = medical_orders
-            result["drug_recommendations"] = drug_recommendations
-            return result
-
-    def _process_with_llama(
-        self, text: str, term_mappings, medical_orders: List[str], drug_recommendations: List[dict]
-    ) -> dict:
-        """使用 llama.cpp 生成 SOAP (同步自 prompt.md)"""
-        term_list = "\n".join([f"  - {m.original} -> {m.standard}" for m in term_mappings])
-        orders_str = ", ".join(medical_orders) if medical_orders else "無"
-        drugs_str = ", ".join([f"{d['name']} ({d['dosage']})" for d in drug_recommendations]) if drug_recommendations else "無"
-
-        prompt = f"""你是專業的醫療記錄助理。請將醫師與病患的語音記錄轉換成標準詳細的 SOAP 格式病歷，並整理聊天摘要。
-
-醫療對話：
-{text}
-
-術語標準化參考：
-{term_list}
-
-預期診斷代碼 (ICD-10)：
-無
-
-醫囑/處置建議：
-{orders_str}
-
-藥物建議：
-{drugs_str}
-
-請按照以下格式輸出：
-
-1. SOAP 格式病歷 (使用英文專業醫師用語):
-
-S (Subjective - 主訴):
-[內容]
-
-O (Objective - 客觀發現):
-[內容]
-
-A (Assessment - 評估診斷):
-[內容]
-
-P (Plan):
-[內容]
-
-2. 對話摘要 (使用繁體中文，在最後加上):
-
-CONVERSATION_SUMMARY:
-[繁體中文總結]
-"""
-        result_text = self.llama_engine.generate(prompt)
+        if not self.generator:
+            self.initialize()
+            
+        # 使用統一的 SOAPGenerator，它內部會處理術語標準化、ICD-10 與資料庫查詢
+        result = self.generator.generate(
+            transcript=text,
+            patient_context=None
+        )
         
-        # 清理幻覺內容 (模型可能會在總結後繼續生成內容)
-        result_text = self._clean_hallucinated_output(result_text)
-
-        return {
-            "subjective": self._extract_section(result_text, "S"),
-            "objective": self._extract_section(result_text, "O"),
-            "assessment": self._extract_section(result_text, "A"),
-            "plan": self._extract_section(result_text, "P"),
-            "conversation_summary": self._extract_section(result_text, "CONVERSATION_SUMMARY"),
-            "normalized_terms": [
-                {"original": m.original, "standard": m.standard, "icd10_candidates": m.icd10_candidates}
-                for m in term_mappings
-            ],
-            "raw_output": result_text,
-            "medical_orders": medical_orders,
-            "drug_recommendations": drug_recommendations,
-        }
-
-    def _extract_section(self, text: str, section: str) -> str:
-        """從文字中提取指定段落"""
-        if section == "CONVERSATION_SUMMARY":
-            pattern = r"CONVERSATION_SUMMARY\s*[:：]\s*(.*)"
-        else:
-            pattern = rf"{section}\s*\(.*?\)\s*[:：]\s*(.*?)(?=\n[A-P]\s*\(|\nCONVERSATION_SUMMARY|$)"
-            if not re.search(pattern, text, re.IGNORECASE | re.DOTALL):
-                pattern = rf"{section}\s*[:：]\s*(.*?)(?=\n[OAP]|[\n]CONVERSATION_SUMMARY|$)"
-        match = re.search(pattern, text, re.I | re.DOTALL)
-        if match:
-            return match.group(1).strip()
-        return ""
+        return result
 
     def display_result(self, result: dict) -> None:
         """顯示結果"""
@@ -253,41 +144,14 @@ CONVERSATION_SUMMARY:
                 icd10 = f" ({', '.join(term['icd10_candidates'])})" if term.get("icd10_candidates") else ""
                 console.print(f"  - {term['original']} -> [green]{term['standard']}[/green]{icd10}")
 
-    def _clean_hallucinated_output(self, text: str) -> str:
-        """清理模型幻覺生成的後續對話或標籤"""
-        # 如果發現 CONVERSATION_SUMMARY 後面還有對話標籤，則切掉
-        patterns = [
-            r"\n\n\s*Assistant\s*:",
-            r"\n\n\s*User\s*:",
-            r"\n\n\s*醫師\s*[:：]",
-            r"\n\n\s*病患\s*[:：]",
-            r"\n\n\s*醫生\s*[:：]",
-            r"\n\n\s*Note\s*[:：]",
-            r"\n\n\s*病例總結\s*[:：]",
-        ]
-        
-        # 尋找 CONVERSATION_SUMMARY 的位置
-        summary_idx = text.find("CONVERSATION_SUMMARY")
-        if summary_idx != -1:
-            # 只在摘要之後進行切除
-            after_summary = text[summary_idx:]
-            for p in patterns:
-                m = re.search(p, after_summary, re.I)
-                if m:
-                    # 切掉匹配點之後的所有內容
-                    text = text[:summary_idx + m.start()]
-                    break
-                    
-        return text.strip()
-
 
 @app.command()
 def process(
     text: Optional[str] = typer.Option(None, "--text", "-t", help="直接輸入醫療對話文字"),
     file: Optional[Path] = typer.Option(None, "--file", "-f", help="從檔案讀取醫療對話"),
     audio: Optional[Path] = typer.Option(None, "--audio", "-a", help="音訊檔案路徑"),
-    model: str = typer.Option("qwen2.5:7b", "--model", "-m", help="Ollama 模型名稱"),
-    backend: str = typer.Option("ollama", "--backend", "-b", help="LLM 後端 (ollama/llama.cpp)"),
+    model: str = typer.Option("gemma-4-e4b", "--model", "-m", help="模型名稱"),
+    backend: str = typer.Option("llama.cpp", "--backend", "-b", help="LLM 後端 (ollama/llama.cpp)"),
     model_path: Optional[str] = typer.Option(None, "--model-path", help="llama.cpp 模型路徑"),
     whisper_model: str = typer.Option("medium", "--whisper-model", help="Whisper 模型 (tiny/base/small/medium/large)"),
     whisper_device: str = typer.Option("cpu", "--whisper-device", help="Whisper 執行設備 (cpu/cuda)"),
@@ -327,7 +191,7 @@ def process(
 
 
 @app.command()
-def serve(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
+def serve(host: str = "0.0.0.0", port: int = 8010, reload: bool = False):
     """啟動 API 伺服器"""
     import uvicorn
     console.print(f"[green]啟動伺服器:[/green] http://{host}:{port}")
@@ -341,7 +205,7 @@ def models():
     table.add_column("名稱", style="cyan")
     table.add_column("後端", style="green")
     table.add_row("qwen2.5:7b", "Ollama")
-    table.add_row("Qwen2.5-7B-Instruct-GGUF", "llama.cpp")
+    table.add_row("gemma-4-E4B-it-Q4_K_M.gguf", "llama.cpp")
     console.print(table)
 
 

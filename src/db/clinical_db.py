@@ -30,32 +30,45 @@ class ClinicalDatabase:
         orders = []
         try:
             cursor = conn.cursor()
-            # 優先根據 ICD-10 代碼搜尋醫囑
+            # 優先根據 ICD-10 代碼搜尋具體處置或檢查
             if icd10_codes:
-                placeholders = ",".join(["?"] * len(icd10_codes))
-                # 這裡假設醫囑表中可能有關聯欄位，若無則進行關鍵字搜尋
-                # 先嘗試診斷直接對應 (mock 一下 ICD10 logic 若表無 direct mapping)
                 for code in icd10_codes:
-                    # 搜尋名稱中包含 ICD 代碼描述的部分
-                    cursor.execute("SELECT name_cn FROM medical_orders WHERE notes LIKE ? OR name_cn LIKE ? LIMIT 3", (f"%{code}%", f"%{code}%"))
+                    # 排除行政、訪視費、診察費、護理費
+                    cursor.execute("""
+                        SELECT name_cn FROM medical_orders 
+                        WHERE (notes LIKE ? OR name_cn LIKE ?) 
+                        AND category NOT IN ('診察費', '訪視費', '行政費', '護理費', '材料費')
+                        AND name_cn NOT LIKE '%訪視%'
+                        AND name_cn NOT LIKE '%離島%'
+                        AND name_cn NOT LIKE '%費%'
+                        LIMIT 3
+                    """, (f"%{code}%", f"%{code}%"))
                     for row in cursor.fetchall():
                         orders.append(row[0])
             
-            # 若無醫囑，搜尋類別
-            if not orders:
-                cursor.execute("SELECT name_cn FROM medical_orders WHERE category IN ('診察費', '處置費') LIMIT 3")
-                for row in cursor.fetchall():
-                    orders.append(row[0])
+            # 若無 ICD 對應，根據症狀關鍵字搜尋醫囑
+            if not orders and symptoms:
+                for symptom in symptoms:
+                    if len(symptom) < 2: continue
+                    cursor.execute("""
+                        SELECT name_cn FROM medical_orders 
+                        WHERE (name_cn LIKE ? OR notes LIKE ?)
+                        AND category IN ('檢查費', '治療處置費', '放射線診療費')
+                        AND name_cn NOT LIKE '%費%'
+                        LIMIT 2
+                    """, (f"%{symptom}%", f"%{symptom}%"))
+                    for row in cursor.fetchall():
+                        orders.append(row[0])
                     
         except Exception as e:
             logger.error(f"查詢醫囑失敗: {e}")
         finally:
             conn.close()
                 
-        return list(set(orders))[:5]
+        return sorted(list(set(orders)))[:5]
         
     def get_drug_recommendations(self, symptoms: List[str], icd10_codes: List[str]) -> List[Dict[str, str]]:
-        """根據症狀和 ICD-10 獲獲藥物建議"""
+        """根據症狀和 ICD-10 獲取藥物建議"""
         conn = self._get_connection()
         if not conn:
             return []
@@ -64,13 +77,24 @@ class ClinicalDatabase:
         try:
             cursor = conn.cursor()
             for symptom in symptoms:
-                # 搜尋藥物適應症或名稱
-                cursor.execute("SELECT drug_name_cn, drug_name_en, ai_notes FROM drugs WHERE drug_name_cn LIKE ? OR drug_name_en LIKE ? LIMIT 2", (f"%{symptom}%", f"%{symptom}%"))
+                if len(symptom) < 2: continue
+                # 搜尋藥物名稱或適應症
+                cursor.execute("""
+                    SELECT drug_name_cn, drug_name_en, ai_notes, indications 
+                    FROM drugs 
+                    WHERE (drug_name_cn LIKE ? OR indications LIKE ?) 
+                    AND indications IS NOT NULL 
+                    AND indications != ''
+                    LIMIT 2
+                """, (f"%{symptom}%", f"%{symptom}%"))
                 for row in cursor.fetchall():
-                    # 優先使用 ai_notes 中的劑量資訊（若有）
+                    # 排除不相關的產科藥物 (除非症狀包含產科關鍵字)
+                    indication = row[3] if row[3] else ""
+                    if ("剖腹" in indication or "產" in indication) and "產" not in "".join(symptoms):
+                        continue
+
                     dosage = "遵醫囑"
                     if row[2] and "用法用量" in row[2]:
-                         # 簡單解析 snippet
                          parts = row[2].split("用法用量")
                          if len(parts) > 1:
                             dosage = parts[1].split("\n")[0].strip(": ")[:30]
@@ -78,6 +102,7 @@ class ClinicalDatabase:
                     drugs.append({
                         "name": row[0],
                         "dosage": dosage,
+                        "indication": indication[:100] + "..." if len(indication) > 100 else indication,
                         "category": "建議用藥"
                     })
                     

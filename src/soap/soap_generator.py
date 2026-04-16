@@ -50,7 +50,7 @@ class SOAPConfig:
     api_base: str = "http://localhost:11434"
     max_tokens: int = 1024
     temperature: float = 0.3
-    num_ctx: int = 8192
+    num_ctx: int = int(os.getenv("LLAMA_N_CTX", "4096"))
     max_subjective_length: int = 100  # 字元限制
     enable_rag: bool = True  # 啟用 RAG 病例範本檢索
     rag_top_k: int = 3  # RAG 檢索結果數量
@@ -117,6 +117,8 @@ class SOAPGenerator:
                 temperature=self.config.temperature,
                 n_gpu_layers=0,
                 n_threads=int(os.getenv("LLAMA_THREADS", "8")),
+                n_batch=512,
+                flash_attn=True
             )
         else:
             model_config = EngineConfig(
@@ -129,6 +131,22 @@ class SOAPGenerator:
         self._engine = initialize_engine(model_config)
         logger.info("SOAPGenerator initialized")
 
+    def _load_system_prompt(self) -> str:
+        """從 prompt.md 載入系統提示詞"""
+        prompt_path = get_resource_path("prompt.md")
+        if prompt_path.exists():
+            try:
+                content = prompt_path.read_text(encoding="utf-8")
+                # 尋找指令開始的部分
+                match = re.search(r"(You are a highly skilled Medical Scribe.*)", content, re.DOTALL)
+                if match:
+                    return match.group(1).strip()
+            except Exception as e:
+                logger.warning(f"無法讀取 prompt.md: {e}")
+        
+        # 預設提示詞 (Fallback)
+        return "You are a professional medical scribe. Convert the transcript into a concise English SOAP note."
+
     def _build_prompt(
         self,
         transcript: str,
@@ -140,7 +158,7 @@ class SOAPGenerator:
         medical_orders: Optional[List[str]] = None,
         drug_recommendations: Optional[List[Dict[str, str]]] = None,
     ) -> str:
-        """建立 SOAP 生成提示詞 (同步自 prompt.md)"""
+        """建立 SOAP 生成提示詞 (整合 prompt.md 指令與動態數據)"""
 
         # 準備上下文
         term_list = (
@@ -160,11 +178,14 @@ class SOAPGenerator:
         case_templates_str = "無"
         if case_templates and len(case_templates) > 0:
             case_templates_str = ""
-            for i, template in enumerate(case_templates[:3]):  # 最多3個
+            for i, template in enumerate(case_templates[:3]):
                 case_templates_str += f"\n【參考病例 {i + 1}】\n{template.get('content', '')[:500]}"
 
-        # 使用 prompt.md 定義的系統提示詞
-        prompt = f"""你是專業的醫療記錄助理。請將醫師與病患的語音記錄轉換成標準詳細的 SOAP 格式病歷，並整理聊天摘要。
+        # 載入指令
+        system_instruction = self._load_system_prompt()
+
+        # 組合最終 Prompt
+        prompt = f"""{system_instruction}
 
 醫療對話：
 {normalized_text if normalized_text else transcript}
@@ -184,27 +205,8 @@ class SOAPGenerator:
 參考病例範本：
 {case_templates_str}
 
-請 **嚴格按照以下格式** 輸出，每行開頭必須是 S:、O:、A:、P: 或 CONVERSATION_SUMMARY:
-
-```
-S: [在此填入病人的主訴描述，包含主要症狀、持續時間、嚴重程度]
-
-O: [在此填入客觀發現，包括理學檢查結果、生命徵象、檢驗數據]
-
-A: [在此填入診斷，包含診斷名稱及 ICD-10 代碼，若無 ICD-10 代碼則根據症狀推斷]
-
-P: [在此填入治療計畫，包括用藥、治療處置、後續追蹤]
-
-CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
-```
-
-重要提醒：
-1. 每一行開頭必須是 S:、O:、A:、P: 或 CONVERSATION_SUMMARY:
-2. 冒號後直接寫內容，不要有多餘的文字
-3. Plan 部分要包含具體的處置計畫，不要只寫「觀察」
-4. 若無 ICD-10 代碼，根據症狀推斷可能的代碼
-5. 保持專業英文醫療用語用於 SOAP 部分
-6. 對話摘要使用繁體中文"""
+請嚴格遵循上述格式規範進行輸出。
+"""
         return prompt
 
     def generate(
@@ -250,11 +252,14 @@ CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
         )
 
         try:
+            logger.info(f"Generating SOAP with prompt length: {len(prompt)}")
             response = self._engine.generate(
                 prompt=prompt,
                 max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
             )
+            logger.info(f"LLM Response received, length: {len(response)}")
+            
             result = self._parse_response(response, transcript)
             result["normalized_terms"] = [
                 {
@@ -272,6 +277,8 @@ CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
 
     def _parse_response(self, response: str, transcript: str) -> Dict[str, Any]:
         """解析 LLM 回應成結構化 SOAP"""
+        logger.debug(f"Raw LLM Response: {response}")
+        
         soap: Dict[str, Any] = {
             "subjective": "",
             "objective": "",
@@ -281,18 +288,18 @@ CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
             "raw_response": response,
         }
 
-        # 段落樣式定義 - 簡化格式
+        # 段落樣式定義 - 針對 English 提示詞優化，並保留中文作為相容性
         patterns = {
-            "subjective": r"^S:\s*",
-            "objective": r"^O:\s*",
-            "assessment": r"^A:\s*",
-            "plan": r"^P:\s*",
-            "conversation_summary": r"^CONVERSATION_SUMMARY:\s*",
+            "subjective": r"(?:\*\*?)?(?:S:|S\s*\(Subjective\):|Subjective:|\[Subjective\]|\[病人主訴\]|\[主觀敘述\])(?:\*\*?)?\s*",
+            "objective": r"(?:\*\*?)?(?:O:|O\s*\(Objective\):|Objective:|\[Objective\]|\[客觀發現\]|\[理學檢查\])(?:\*\*?)?\s*",
+            "assessment": r"(?:\*\*?)?(?:A:|A\s*\(Assessment\):|Assessment:|\[Assessment\]|\[診斷評估\]|\[臨床診斷\])(?:\*\*?)?\s*",
+            "plan": r"(?:\*\*?)?(?:P:|P\s*\(Plan\):|Plan:|\[Plan\]|\[治療計畫\]|\[處置建議\])(?:\*\*?)?\s*",
+            "conversation_summary": r"(?:\*\*?)?(?:CONVERSATION_SUMMARY:|Summary:|對話摘要:|摘要:)(?:\*\*?)?\s*",
         }
-
+        
         lines = response.strip().split("\n")
         current_section = None
-
+        
         for line in lines:
             line_s = line.strip()
             if not line_s:
@@ -300,7 +307,7 @@ CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
 
             matched = False
             for section, pattern in patterns.items():
-                if re.match(pattern, line_s, re.I | re.M):
+                if re.search(pattern, line_s, re.I):
                     current_section = section
                     content = re.sub(pattern, "", line_s, flags=re.I).strip()
                     if content:
@@ -309,12 +316,17 @@ CONVERSATION_SUMMARY: [用繁體中文總結對話內容]
                     break
 
             if not matched and current_section:
-                if "字元控制" in line_s or "英文專業醫師" in line_s:
+                if any(x in line_s for x in ["字元控制", "英文專業醫師", "在此填入", "在此描述"]):
                     continue
                 soap[current_section] += line_s + "\n"
 
         for key in ["subjective", "objective", "assessment", "plan", "conversation_summary"]:
             soap[key] = soap[key].strip()
+
+        # Fallback: 如果四大區塊全部落空，可能是模型格式完全不對，將全文放入 Subjective
+        if not any([soap["subjective"], soap["objective"], soap["assessment"], soap["plan"]]):
+            logger.warning("SOAP 解析完全失敗，採用 Fallback 模式")
+            soap["subjective"] = response.strip()
 
         return soap
 

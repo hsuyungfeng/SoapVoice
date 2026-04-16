@@ -26,6 +26,8 @@ a = Analysis(
         (str(ROOT_DIR / 'models'), 'models'),
         (str(ROOT_DIR / 'data'), 'data'),
         (str(ROOT_DIR / '.env'), '.'),
+        (str(ROOT_DIR / 'prompt.md'), '.'),
+        (str(ROOT_DIR / 'keywords.json'), '.'),
         (str(ROOT_DIR / 'config'), 'config'),
     ],
     hiddenimports=[

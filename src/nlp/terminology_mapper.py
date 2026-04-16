@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple
 from dataclasses import dataclass
+from src.utils.resource_path import get_resource_path
 
 logger = logging.getLogger(__name__)
 
@@ -156,8 +157,10 @@ class MedicalTerminologyMapper:
         self._mappings: Dict[str, TermMapping] = {}
         self._load_builtin_mappings()
         
-        if vocab_file:
-            self._load_external_vocab(vocab_file)
+        # 優先加載傳入的檔案，其次嘗試加載專案根目錄的 keywords.json
+        target_vocab = vocab_file or get_resource_path("keywords.json")
+        if target_vocab:
+            self._load_external_vocab(str(target_vocab))
 
     def _load_builtin_mappings(self) -> None:
         """載入內建映射表"""

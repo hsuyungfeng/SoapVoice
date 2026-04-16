@@ -21,6 +21,7 @@ from typing import Optional, Callable, Dict
 from enum import Enum
 import pyperclip
 import datetime
+from PIL import Image, ImageDraw
 
 logger = logging.getLogger(__name__)
 
@@ -102,29 +103,28 @@ class TrayIconManager:
     def _get_icon_for_state(self):
         """根據狀態取得不同顏色的圖示"""
         try:
-            from PIL import Image, ImageDraw
-
-            width = 64
-            height = 64
-            image = Image.new("RGB", (width, height), color="#2C3E50")
+            width = 32
+            height = 32
+            # 使用 RGB 並確保背景不透明，對 Linux 相容性較佳
+            image = Image.new("RGB", (width, height), color=(44, 62, 80))
             draw = ImageDraw.Draw(image)
 
             colors = {
-                RecordingState.IDLE: "#95A5A6",
-                RecordingState.RECORDING: "#E74C3C",
-                RecordingState.PROCESSING: "#F39C12",
-                RecordingState.COMPLETED: "#27AE60",
-                RecordingState.ERROR: "#E74C3C",
+                RecordingState.IDLE: (149, 165, 166),      # Gray
+                RecordingState.RECORDING: (231, 76, 60),   # Red
+                RecordingState.PROCESSING: (243, 156, 18), # Orange
+                RecordingState.COMPLETED: (39, 174, 96),  # Green
+                RecordingState.ERROR: (231, 76, 60),       # Red
             }
 
-            color = colors.get(self.state, "#95A5A6")
-            draw.ellipse([20, 10, 44, 34], fill=color, outline="#2C3E50", width=2)
-            draw.rectangle([26, 34, 38, 50], fill=color, outline="#2C3E50", width=2)
-            draw.arc([22, 20, 42, 40], 0, 180, fill=color, width=2)
-
+            color = colors.get(self.state, (149, 165, 166))
+            # 畫一個實心圓
+            draw.ellipse([4, 4, 28, 28], fill=color, outline=(255, 255, 255), width=1)
+            
             return image
-        except:
-            return None
+        except Exception as e:
+            logger.error(f"建立狀態圖示失敗: {e}")
+            return Image.new("RGB", (32, 32), color=(149, 165, 166))
 
     def create_menu(self):
         """建立右鍵選單"""
@@ -132,19 +132,21 @@ class TrayIconManager:
             import pystray
 
             return pystray.Menu(
-                pystray.MenuItem("📸 擷取病患資訊", self._on_capture, shortcut="S"),
-                pystray.MenuItem("🎤 開始錄音", self._on_start_recording, shortcut="R"),
-                pystray.MenuItem("⏹ 停止錄音", self._on_stop_recording, shortcut="T"),
+                pystray.MenuItem("🪟 開啟視窗", self._on_restore, default=True),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem("📋 複製 SOAP", self._on_copy_soap, shortcut="C"),
-                pystray.MenuItem("📋 複製全部 (自動)", self._on_copy_all, shortcut="Shift+C"),
-                pystray.MenuItem("📋 貼上至 HIS (自動)", self._on_paste_his, shortcut="V"),
+                pystray.MenuItem("📸 擷取病患資訊", self._on_capture),
+                pystray.MenuItem("🎤 開始錄音", self._on_start_recording),
+                pystray.MenuItem("⏹ 停止錄音", self._on_stop_recording),
+                pystray.Menu.SEPARATOR,
+                pystray.MenuItem("📋 複製 SOAP", self._on_copy_soap),
+                pystray.MenuItem("📋 複製全部 (自動)", self._on_copy_all),
+                pystray.MenuItem("📋 貼上至 HIS (自動)", self._on_paste_his),
                 pystray.Menu.SEPARATOR,
                 pystray.MenuItem("📁 開啟記錄資料夾 (自動)", self._on_open_folder),
                 pystray.MenuItem("☁️ 雲端匯出 (自動)", self._on_cloud_export),
                 pystray.Menu.SEPARATOR,
                 pystray.MenuItem("⚙️ 設定", self._on_settings),
-                pystray.MenuItem("🚪 結束程式", self._on_exit),
+                pystray.MenuItem("🚪 結束程式", self._on_exit_app),
             )
         except ImportError:
             return None
@@ -153,28 +155,34 @@ class TrayIconManager:
         """啟動系統匣"""
         try:
             import pystray
-            from PIL import Image, ImageDraw
 
-            # 建立右下角圖示（灰色待機狀態）
-            width = 64
-            height = 64
-            image = Image.new("RGB", (width, height), color="#2C3E50")
-            draw = ImageDraw.Draw(image)
-            draw.ellipse([20, 10, 44, 34], fill="#95A5A6", outline="#2C3E50", width=2)
-            draw.rectangle([26, 34, 38, 50], fill="#95A5A6", outline="#2C3E50", width=2)
-            draw.arc([22, 20, 42, 40], 0, 180, fill="#95A5A6", width=2)
+            # 建立初始圖示
+            image = self._get_icon_for_state()
+            if image is None:
+                logger.error("無法建立初始圖示")
+                return
 
             self._icon = pystray.Icon(
                 "SoapVoice",
                 image=image,
                 menu=self.create_menu(),
-                title="SoapVoice - 門診語音錄製系統 (右下角)",
+                title="SoapVoice",
             )
+            
+            # 再次確保 image 已設定
+            if not self._icon.icon:
+                self._icon.icon = image
+
             self._running = True
-            threading.Thread(target=self._icon.run, daemon=True).start()
-            logger.info("System tray started - bottom-right")
+            # 使用 daemon=True 確保主程式結束時執行緒也會結束
+            tray_thread = threading.Thread(target=self._icon.run, daemon=True)
+            tray_thread.start()
+            
+            logger.info("System tray initialized and starting...")
         except ImportError as e:
             logger.error(f"pystray not installed: {e}")
+        except Exception as e:
+            logger.error(f"System tray start failed: {e}")
 
     def stop(self):
         if self._icon:
@@ -272,7 +280,10 @@ class TrayIconManager:
     def _show_notification(self, message: str):
         """顯示系統通知"""
         if self._icon:
-            self._icon.notify(message, "SoapVoice")
+            try:
+                self._icon.notify(message, "SoapVoice")
+            except (NotImplementedError, Exception) as e:
+                logger.warning(f"無法顯示系統通知: {e}")
 
     # ============ 其他選單回調 ============
 
@@ -302,9 +313,17 @@ class TrayIconManager:
         except Exception as e:
             logger.error(f"Copy failed: {e}")
 
+    def _on_restore(self, icon, item):
+        if self.on_state_change:
+            self.on_state_change("restore")
+
     def _on_settings(self, icon, item):
         if self.on_state_change:
             self.on_state_change("settings")
+
+    def _on_exit_app(self, icon, item):
+        if self.on_state_change:
+            self.on_state_change("exit")
 
     def _on_exit(self, icon, item):
         self.stop()

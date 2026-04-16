@@ -33,6 +33,9 @@ class LlamaConfig:
     n_ctx: int = 4096
     n_threads: int = 8
     n_threads_batch: int = 8
+    n_batch: int = 512
+    n_ubatch: int = 512
+    flash_attn: bool = True
     temperature: float = 0.3
     top_p: float = 0.9
     top_k: int = 40
@@ -96,6 +99,9 @@ class LlamaEngine:
             n_ctx=self.config.n_ctx,
             n_threads=self.config.n_threads,
             n_threads_batch=self.config.n_threads_batch,
+            n_batch=self.config.n_batch,
+            n_ubatch=self.config.n_ubatch,
+            flash_attn=self.config.flash_attn,
             rope_freq_base=self.config.rope_freq_base,
             rope_freq_scale=self.config.rope_freq_scale,
             use_mmap=self.config.use_mmap,

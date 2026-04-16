@@ -69,7 +69,7 @@ class Qwen3ASRModel:
 
         Returns:
             包含以下鍵的字典:
-            - text: 識別的文字（簡體中文）
+            - text: 識別的文字（繁體中文）
             - language: 偵測的語言
             - segments: 分段結果列表
             - duration: 音頻時長
@@ -77,13 +77,31 @@ class Qwen3ASRModel:
         if self.model is None:
             self.load()
 
-        result = self.model.transcribe(audio=audio_path, language=language)
+        # 語言代碼映射
+        lang_map = {
+            "zh": "Chinese",
+            "en": "English",
+            "ja": "Japanese",
+            "ko": "Korean",
+            "yue": "Cantonese",
+        }
+        mapped_language = lang_map.get(language, language)
+
+        result = self.model.transcribe(audio=audio_path, language=mapped_language)
 
         text = str(result)
         if "text='" in text:
             start = text.find("text='") + 6
             end = text.find("'", start)
             text = text[start:end]
+            
+        # 自動轉換為繁體
+        try:
+            from src.asr.asr_factory import ChineseConverter
+            if ChineseConverter.is_available():
+                text = ChineseConverter.convert(text)
+        except Exception:
+            pass
 
         return {
             "text": text,

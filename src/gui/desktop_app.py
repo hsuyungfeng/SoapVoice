@@ -38,6 +38,7 @@ except ImportError:
 
 from src.gui.config_manager import ConfigManager
 from src.nlp.ocr_parser import OCRParser
+from src.system_tray import TrayIconManager, RecordingState
 from contextlib import contextmanager
 
 @contextmanager
@@ -140,6 +141,7 @@ class SoapVoiceApp:
         self.config_manager = ConfigManager()
         self.ocr_parser = None
         self.recorder = None
+        self.tray = TrayIconManager(on_state_change=self._on_tray_action)
 
         self.current_soap_text = ""
         self.current_ocr_text = ""
@@ -149,6 +151,7 @@ class SoapVoiceApp:
         self.setup_ui()
         self.update_ui_state("idle")
         self.start_backend_process()
+        self.tray.start()
         
         # 延遲初始化重量級組件
         self.root.after(500, self._delayed_init)
@@ -222,6 +225,37 @@ class SoapVoiceApp:
 
         self.setup_result_ui()
 
+    def _on_tray_action(self, action: str):
+        """處理來自系統匣的動作"""
+        if action == "restore":
+            self.root.after(0, self.restore_window)
+        elif action == "capture":
+            self.root.after(0, self.start_recording)  # 錄製流程包含 OCR
+        elif action == "start_recording":
+            self.root.after(0, self.start_recording)
+        elif action == "stop_recording":
+            self.root.after(0, self.stop_recording)
+        elif action == "settings":
+            messagebox.showinfo("設定", "設定功能開發中")
+        elif action == "exit":
+            self.root.after(0, self.quit_app)
+
+    def restore_window(self):
+        """從系統匣恢復視窗"""
+        self.root.deiconify()
+        self.root.attributes("-topmost", True)
+        self.root.focus_force()
+
+    def quit_app(self):
+        """徹底關閉應用程式"""
+        if self.server_process:
+            self.server_process.terminate()
+        if self.tray:
+            self.tray.stop()
+        self.root.quit()
+        self.root.destroy()
+        sys.exit(0)
+
     def setup_result_ui(self):
         # 1. 患者資訊
         p_card = ttk.Labelframe(self.scrollable_frame, text=" 🏥 患者臨床資訊 (AI 自動提取) ", padding=20)
@@ -252,10 +286,19 @@ class SoapVoiceApp:
 
         # 4. 操作列
         act_frame = ttk.Frame(self.scrollable_frame, padding=10); act_frame.pack(fill=X, pady=35)
+        
+        # ASR 模型選擇
+        asr_row = ttk.Frame(act_frame); asr_row.pack(fill=X, pady=(0, 15))
+        ttk.Label(asr_row, text="語音轉錄引擎:", font=(FONT_FAMILY, 12, "bold"), bootstyle="secondary").pack(side=LEFT)
+        self.asr_model_var = tk.StringVar(value="distil-large-v3")
+        self.asr_cb = ttk.Combobox(asr_row, textvariable=self.asr_model_var, values=["distil-large-v3", "medium", "large-v3", "Qwen3-ASR"], state="readonly", width=18, font=(FONT_FAMILY, 12))
+        self.asr_cb.pack(side=LEFT, padx=15)
+        
+        # LLM 模型選擇
         m_row = ttk.Frame(act_frame); m_row.pack(fill=X, pady=(0, 20))
-        ttk.Label(m_row, text="選用模型引擎:", font=(FONT_FAMILY, 12, "bold"), bootstyle="secondary").pack(side=LEFT)
+        ttk.Label(m_row, text="SOAP 分析引擎:", font=(FONT_FAMILY, 12, "bold"), bootstyle="secondary").pack(side=LEFT)
         self.model_var = tk.StringVar(value="gemma4:e4b")
-        ttk.Combobox(m_row, textvariable=self.model_var, values=["gemma4:e4b", "qwen2.5:7b"], state="readonly", width=18, font=(FONT_FAMILY, 12)).pack(side=LEFT, padx=15)
+        ttk.Combobox(m_row, textvariable=self.model_var, values=["gemma4:e4b", "qwen2.5:7b", "qwen2.5:3b"], state="readonly", width=18, font=(FONT_FAMILY, 12)).pack(side=LEFT, padx=15)
 
         b_row = ttk.Frame(act_frame); b_row.pack(fill=X)
         ttk.Button(b_row, text=" 💾 儲存並關閉 ", bootstyle="success", command=self.save_and_shrink).pack(side=LEFT, padx=5, expand=True, fill=X, ipady=18)
@@ -277,14 +320,17 @@ class SoapVoiceApp:
             self.status_var.set("系統就緒")
             self.btn_record.configure(state=NORMAL); self.btn_stop.configure(state=DISABLED); self.btn_process.configure(state=DISABLED)
             self.is_processing = False; self.progress["value"] = 0
+            if self.tray: self.tray.update_state(RecordingState.IDLE)
         elif state == "recording":
             self.indicator.itemconfig(self.indicator_circle, fill="#ef4444")
             self.status_var.set("錄音中")
             self.btn_record.configure(state=DISABLED); self.btn_stop.configure(state=NORMAL)
+            if self.tray: self.tray.update_state(RecordingState.RECORDING)
         elif state == "processing":
             self.indicator.itemconfig(self.indicator_circle, fill="#f59e0b")
             self.status_var.set("分析中")
             self.is_processing = True; self.animate_progress()
+            if self.tray: self.tray.update_state(RecordingState.PROCESSING)
 
     def animate_progress(self):
         if self.is_processing:
@@ -319,27 +365,74 @@ class SoapVoiceApp:
     def process_audio_api(self, wav_path, model_name):
         try:
             self.root.after(0, lambda: self.status_label.config(text="正在執行 ASR 語音轉錄..."))
+            asr_model = self.asr_model_var.get()
+            backend = "whisper"
+            if asr_model == "Qwen3-ASR":
+                backend = "qwen3asr"
+                asr_model = "Qwen/Qwen3-ASR-0.6B"
+            
             with open(wav_path, "rb") as f:
-                res = requests.post(f"{API_BASE_URL}/api/v1/extended/transcribe", files={"audio": f}, timeout=60)
+                res = requests.post(f"{API_BASE_URL}/api/v1/extended/transcribe", 
+                                    files={"audio": f}, 
+                                    data={"model": asr_model, "backend": backend},
+                                    timeout=120)
             transcript = res.json().get("transcript", "")
             if not transcript:
                 self.root.after(0, lambda: (self.status_var.set("❌ 無內容"), self.update_ui_state("idle"))); return
             self.root.after(0, lambda: self.status_label.config(text="正在分析並生成 SOAP..."))
             res_soap = requests.post(f"{API_BASE_URL}/api/v1/extended/process", json={"transcript": transcript, "model": model_name}, timeout=120)
             self.root.after(0, lambda: self.on_process_complete(res_soap.json(), datetime.now().strftime("%H:%M:%S")))
-        except Exception:
+        except Exception as e:
+            logger.error(f"API Error: {e}")
             self.root.after(0, lambda: (self.status_var.set("❌ API 錯誤"), self.update_ui_state("idle")))
 
     def on_process_complete(self, data, ts=""):
         self.update_ui_state("idle"); self.status_var.set("處理完成")
-        self.text_transcript.delete("1.0", END); self.text_transcript.insert("1.0", data.get("transcript", ""))
+        
+        # 1. 顯示繁體中文逐字稿 (ASR Transcript)
+        transcript = data.get("transcript", "")
+        self.text_transcript.delete("1.0", END); self.text_transcript.insert("1.0", transcript)
+        
         soap = data.get("soap", {})
-        fmt = f"【 臨床診斷摘要 】\n● 症狀: {', '.join(data.get('symptoms', []))}\n"
+        
+        # 2. 組合顯示內容 (僅保留精華資訊)
+        fmt = f"【 臨床分析結果 】\n"
+        fmt += f"● 主要症狀: {', '.join(data.get('symptoms', []))}\n"
         icd = data.get("icd10_codes", [])
-        if icd: fmt += f"● ICD-10: {', '.join([f'{i.get('code')} {i.get('description')}' for i in icd])}\n"
-        fmt += f"\n【 SOAP 病歷 (繁體中文) 】\n{soap.get('raw_zh', '無回傳')}\n\n【 SOAP Note (English) 】\n{soap.get('raw_en', 'No response')}\n\n"
-        fmt += f"【 建議醫囑 】\n" + "\n".join([f"  - {o}" for o in data.get("medical_orders", [])])
-        self.current_soap_text = fmt; self.text_soap.delete("1.0", END); self.text_soap.insert("1.0", fmt)
+        if icd:
+            fmt += f"● ICD-10 參考: {', '.join([f'{i.get('code')}' for i in icd[:3]])}\n"
+        
+        # 3. 核心 SOAP Note (English Only)
+        fmt += f"\n【 English SOAP Note 】\n"
+        # 優先從單獨欄位讀取，若無則顯示 Pending
+        s = soap.get('subjective', '').strip()
+        o = soap.get('objective', '').strip()
+        a = soap.get('assessment', '').strip()
+        p = soap.get('plan', '').strip()
+        
+        fmt += f"S: {s if s else 'No subjective data recorded.'}\n\n"
+        fmt += f"O: {o if o else 'No objective findings recorded.'}\n\n"
+        fmt += f"A: {a if a else 'Assessment pending clinical confirmation.'}\n\n"
+        fmt += f"P: {p if p else 'Plan to be determined by attending physician.'}\n"
+        
+        # 4. 建議醫囑 (已過濾行政雜項)
+        orders = data.get("medical_orders", [])
+        if orders:
+            fmt += f"\n【 建議醫囑 】\n"
+            for order in sorted(orders):
+                fmt += f"  - {order}\n"
+        
+        # 5. 建議藥物 (含適應症)
+        drugs = data.get("drug_recommendations", [])
+        if drugs:
+            fmt += f"\n【 建議用藥 】\n"
+            for d in drugs:
+                ind = d.get('indication', '請參照仿單')
+                if len(ind) > 40: ind = ind[:37] + "..."
+                fmt += f"  - {d['name']} ({d['dosage']}) | 適應症: {ind}\n"
+
+        self.current_soap_text = fmt
+        self.text_soap.delete("1.0", END); self.text_soap.insert("1.0", fmt)
         self.timestamp_label.config(text=f"產出時間: {ts}"); self.expand_view()
 
     def run_ocr_and_match(self, model_name):
@@ -402,8 +495,27 @@ class SoapVoiceApp:
         threading.Thread(target=run, daemon=True).start()
 
     def on_closing(self):
-        if self.server_process: self.server_process.terminate()
+        """點擊關閉按鈕時縮小到系統匣"""
+        try:
+            print("\n[Info] SoapVoice 已縮小到系統匣 (背景執行中)")
+            self.root.withdraw()
+            if self.tray:
+                self.tray._show_notification("SoapVoice 已縮小到系統匣")
+        except Exception as e:
+            logger.error(f"關閉視窗時發生錯誤: {e}")
+            # 如果縮小失敗，則直接退出
+            self.quit_app()
+
+    def quit_app(self):
+        """徹底關閉應用程式"""
+        print("[Info] 正在關閉 SoapVoice...")
+        if self.server_process:
+            self.server_process.terminate()
+        if self.tray:
+            self.tray.stop()
+        self.root.quit()
         self.root.destroy()
+        sys.exit(0)
 
 def main():
     root = ttk.Window(title="SoapVoice Ultimate", themename="superhero", resizable=(False, False))

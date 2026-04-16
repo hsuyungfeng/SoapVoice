@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 import os
 
-API_BASE = "http://localhost:8000"
+API_BASE = "http://127.0.0.1:8010"
 STATIC_DIR = Path("/home/hsu/Desktop/SoapVoice/static")
 
 AUDIO_FILES = [
