@@ -32,9 +32,12 @@ if lsof -i :8000 &> /dev/null; then
     sleep 2
 fi
 
-# 設定音訊環境變數（避免 ALSA 錯誤）
-export PULSE_SERVER=unix:/tmp/pulse.socket
+# 設定音訊環境變數（解決 ALSA/PyAudio 錯誤）
+# 移除特定的 PULSE_SERVER 路徑，讓系統自動偵測 D-Bus session
+unset PULSE_SERVER
 export ALSA_CARD=0
+# 禁用 ALSA 的 MMAP 模式（許多 PulseAudio/PipeWire 配置不支援此模式，會導致 Expression failed 錯誤）
+export ASOUND_IO_TYPE=pulse
 
 # 啟動系統
 echo "🚀 啟動 SoapVoice..."

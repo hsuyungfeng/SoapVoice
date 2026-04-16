@@ -38,6 +38,19 @@ except ImportError:
 
 from src.gui.config_manager import ConfigManager
 from src.nlp.ocr_parser import OCRParser
+from contextlib import contextmanager
+
+@contextmanager
+def ignore_stderr():
+    """忽略 stderr 輸出（用於隱藏 ALSA/PortAudio 噪音）"""
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    old_stderr = os.dup(sys.stderr.fileno())
+    os.dup2(devnull, sys.stderr.fileno())
+    try:
+        yield
+    finally:
+        os.dup2(old_stderr, sys.stderr.fileno())
+        os.close(devnull)
 
 class AudioRecorder:
     def __init__(self):
@@ -47,7 +60,8 @@ class AudioRecorder:
         self.stream = None
         if pyaudio:
             try:
-                self.p = pyaudio.PyAudio()
+                with ignore_stderr():
+                    self.p = pyaudio.PyAudio()
             except Exception:
                 self.p = None
 
