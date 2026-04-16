@@ -3,7 +3,8 @@ SoapVoice Phase 8.2 - 螢幕擷取 + OCR 病患資訊模組
 
 功能：
 - 擷取螢幕畫面
-- 使用 EasyOCR 識別病患資訊
+- 使用 Tesseract-OCR (pytesseract) 識別病患資訊 (主力)
+- 使用 EasyOCR 作為備援識別
 - 解析姓名、身分證、生日、病歷號、時間、醫師
 """
 
@@ -137,10 +138,10 @@ class ScreenCapture:
 class PatientInfoOCR:
     """病患資訊 OCR 識別"""
 
-    def __init__(self, mode: str = "auto"):
+    def __init__(self, mode: str = "tesseract"):
         """
         Args:
-            mode: "auto" (優先用 Tesseract), "tesseract", "easyocr"
+            mode: "tesseract" (主力), "easyocr" (備援)
         """
         self.mode = mode
         self.easy_reader = None
@@ -153,14 +154,15 @@ class PatientInfoOCR:
             try:
                 # 嘗試執行一次以確認路徑
                 tess_ver = pytesseract.get_tesseract_version()
-                logger.info(f"Tesseract detected: {tess_ver}")
+                logger.info(f"Tesseract detected (Primary): {tess_ver}")
             except Exception as e:
                 logger.warning(f"pytesseract installed but bin not found: {e}")
                 # 繼續，但在執行時會失敗
 
         # 2. 只有在模式要求或 Tesseract 不可用時初始化 EasyOCR
-        if self.mode == "easyocr" or (self.mode == "auto" and not HAS_PYTESSERACT):
+        if self.mode == "easyocr" or (not HAS_PYTESSERACT and HAS_EASYOCR):
             self._init_easyocr()
+
 
     def _init_easyocr(self):
         """初始化 EasyOCR reader (重量級)"""
@@ -174,17 +176,16 @@ class PatientInfoOCR:
     def recognize_from_file(self, image_path: str) -> List[Tuple]:
         """從檔案識別
         Returns:
-            [(text, bounding_box, confidence), ...]
-            注意內容格式儘量與 EasyOCR 保持一致以便相容解析邏輯
+            [(bounding_box, text, confidence), ...]
         """
-        # 方法 1: Tesseract (優先)
-        if (self.mode == "auto" or self.mode == "tesseract") and HAS_PYTESSERACT:
+        # 方法 1: Tesseract (主力)
+        if self.mode == "tesseract" and HAS_PYTESSERACT:
             try:
-                logger.info("Using Tesseract-OCR...")
+                logger.info("Using Tesseract-OCR (Primary)...")
                 from PIL import Image
                 img = Image.open(image_path)
                 data = pytesseract.image_to_data(img, lang="chi_tra+eng", output_type=pytesseract.Output.DICT)
-                
+
                 results = []
                 for i in range(len(data['text'])):
                     text = data['text'][i].strip()
@@ -195,10 +196,10 @@ class PatientInfoOCR:
                         bbox = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]
                         conf = float(data['conf'][i]) / 100.0
                         results.append((bbox, text, conf))
-                
+
                 if results:
                     return results
-                logger.warning("Tesseract found no text, failing over...")
+                logger.warning("Tesseract found no text, failing over to EasyOCR if available...")
             except Exception as e:
                 logger.warning(f"Tesseract OCR failed: {e}")
 
@@ -208,22 +209,42 @@ class PatientInfoOCR:
                 self._init_easyocr()
             if self.easy_reader:
                 try:
-                    logger.info("Using EasyOCR...")
+                    logger.info("Using EasyOCR (Fallback)...")
                     raw_results = self.easy_reader.readtext(image_path)
                     # EasyOCR 格式本身就是 [ (bbox, text, conf), ... ]
-                    # 這裡統一回傳格式
                     results = []
                     for r in raw_results:
                         results.append((r[0], r[1], r[2]))
                     return results
                 except Exception as e:
                     logger.error(f"EasyOCR failed: {e}")
-
         logger.error("No OCR engine available or all failed")
         return []
 
     def recognize_from_array(self, image_array) -> List[Tuple]:
         """從圖像陣列識別"""
+        # 方法 1: Tesseract (主力)
+        if self.mode == "tesseract" and HAS_PYTESSERACT:
+            try:
+                from PIL import Image
+                img = Image.fromarray(image_array)
+                data = pytesseract.image_to_data(img, lang="chi_tra+eng", output_type=pytesseract.Output.DICT)
+
+                results = []
+                for i in range(len(data['text'])):
+                    text = data['text'][i].strip()
+                    if text:
+                        x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+                        bbox = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]
+                        conf = float(data['conf'][i]) / 100.0
+                        results.append((bbox, text, conf))
+
+                if results:
+                    return results
+            except Exception as e:
+                logger.warning(f"Tesseract OCR (array) failed: {e}")
+
+        # 方法 2: EasyOCR (備援)
         if HAS_EASYOCR:
             if self.easy_reader is None:
                 self._init_easyocr()

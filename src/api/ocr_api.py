@@ -13,7 +13,7 @@ router = APIRouter(prefix="/ocr", tags=["OCR"])
 @router.post("/process")
 async def process_ocr(
     image: UploadFile = File(...),
-    engine: str = Form("easyocr"),
+    engine: str = Form("tesseract"),
     device: str = Form("cpu")
 ):
     """
@@ -39,7 +39,21 @@ async def process_ocr(
         
         parser = OCRParser(vision_model=vision_model)
         
-        if engine == "easyocr":
+        if engine == "tesseract":
+            if not parser.HAS_PYTESSERACT:
+                return {
+                    "status": "error",
+                    "text": "",
+                    "detail": "Tesseract-OCR (pytesseract) 未安裝或無法啟動",
+                    "engine_requested": engine,
+                    "device": device
+                }
+            
+            import pytesseract
+            # 支援繁體中文與英文
+            text = pytesseract.image_to_string(img_pil, lang="chi_tra+eng")
+            
+        elif engine == "easyocr":
             if not parser.HAS_EASYOCR:
                 return {
                     "status": "error",
@@ -60,6 +74,7 @@ async def process_ocr(
             target_model = engine if engine != "vision" else "glm-ocr"
             text = parser._ocr_with_ollama_vision(img_np, model=target_model)
         else:
+            # 預設嘗試所有方法，但優先順序已在 OCRParser 中設定為 Tesseract
             text = parser._try_ocr_methods(img_np)
         
         return {

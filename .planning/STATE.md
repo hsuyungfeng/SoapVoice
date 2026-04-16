@@ -18,13 +18,12 @@
 
 ## 最近更新
 
-- **2026-04-16**: ASR 模型預加載與快取優化 (Session 4)
-  - ✅ **實現 ASR 模型快取**：更新 `ASRBackendFactory` 支援全域模型快取，避免重複載入。
-  - ✅ **預加載機制優化**：伺服器啟動時自動預加載 `distil-large-v3` 模型，顯著降低首次轉錄延遲。
-  - ✅ **共享模型實例**：確保 WebSocket API 與 REST API 共享相同的 ASR 模型實例，節省記憶體並提高效率。
-  - ✅ **修復模型路徑 Bug**：修復 `WhisperModel` 在指定 `download_root` 時無法正確載入模型 ID 的問題。
-  - ✅ **修復 ASR API 一致性**：修復 `ExtendedSoapVoiceEngine` 在使用 ASR 封裝器時發生的 `ValueError`，確保全域 API 格式統一。
-  - ✅ **優化中文文字拼接**：移除 ASR 轉錄結果中針對中日文的不必要空格。
+- **2026-04-16**: ASR 與 OCR 引擎優化 (Session 4)
+  - ✅ **ASR 模型優化**：實現 ASR 模型快取與預加載，修復 `ValueError` 與路徑 Bug，優化中文文字拼接。
+  - ✅ **OCR 引擎遷移**：將主力 OCR 引擎由 EasyOCR 替換為 **Tesseract-OCR (pytesseract)**。
+  - ✅ **UI 更新**：更新 Web 介面 OCR 選擇，預設使用 Tesseract-OCR (主力離線)。
+  - ✅ **依賴清理**：從 `pyproject.toml` 中移除 `easyocr` 依賴，減輕安裝負擔並確保全離線環境穩定性。
+  - ✅ **全域一致性**：更新 `ocr_api.py`、`ocr_parser.py` 與 `capture_ocr.py` 確保 Tesseract 作為首選方案。
 
 - **2026-04-15**: NLP 提取與擴展功能修復 (Session 3)
   - ✅ **修復症狀提取**：增加口語化同義詞支援（如「肚子痛」、「想吐」）。
