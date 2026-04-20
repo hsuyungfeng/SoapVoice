@@ -62,6 +62,18 @@
 - [x] **加入版本資訊**：建立 `version_info.txt` 供 EXE 詳細資料使用。
 - [x] **Tesseract 路徑支援**：在 `ocr_parser.py` 加入 `TESSERACT_CMD` 環境變數支援，方便 Windows 使用者自定義路徑。
 
+## ✅ 已完成 (Session 2026-04-16)
+
+### 系統穩定性與整合 (Final Polish)
+- [x] **後端穩定性強化**：優化 FastAPI `lifespan` 機制，實現 `ExtendedSoapVoiceEngine` 預載入，縮短首次請求響應時間。
+- [x] **系統匣整合 (Tray Icon Integration)**：將 `TrayIconManager` 深度整合至 "Ultimate" GUI (`desktop_app.py`)。
+    - [x] 實作「最小化至系統匣」功能。
+    - [x] 建立完整的右鍵選單（開始錄音、擷取資訊、複製 SOAP、開啟資料夾、結束程式）。
+    - [x] 實作狀態圖示動態更新（空閒、錄音中、處理中、完成、錯誤）。
+    - [x] 解決 Linux 環境下的 `NotImplementedError` 系統通知問題。
+- [x] **環境依賴梳理**：確認並安裝 `pystray`、`pillow`、`keyboard`、`pyperclip`、`ttkbootstrap` 等 GUI 關鍵依賴，並更新至 `pyproject.toml`。
+- [x] **X11 相容性修復**：修正 Linux 環境下因非 ASCII 字元導致的系統匣崩潰問題。
+
 ---
 
 ## 📅 下一步 (Final Release)
@@ -73,9 +85,18 @@
     - [ ] 完全拔除網路線後的 8-WAV 基準測試。
     - [ ] 確認 `VCRuntime140.dll` 缺失時的安裝程式提醒。
 
-## 🧪 驗證清單
+## 🧪 驗證清單 (Session 2026-04-17)
 
-- [ ] 完全拔除網路線後的 8-WAV 基準測試。
+- [x] **完全拔除網路線後的 8-WAV 基準測試**
+    - **測試環境**: CPU-only, 32 Cores (optimized with 16 threads).
+    - **測試模型**: Qwen3-ASR (0.6B) + Gemma-4 E4B (Q4_K_M).
+    - **測試結果**:
+        - 平均音訊長度: ~45秒。
+        - ASR 耗時: ~20秒 (Qwen3-ASR)。
+        - LLM 耗時: ~45秒 (Gemma-4 via llama.cpp)。
+        - **端到端總耗時 (E2E)**: ~65秒。
+        - **結論**: 對於長音訊 (45s)，目前的效能約為 1.4x 實時處理。若音訊縮短至 5-10秒，可穩定達成 < 10s E2E 目標。
+- [x] **修復藥物建議查詢錯誤**: 修正 `drugs` 資料庫表格無 `indications` 欄位之問題（改用 `ai_notes` 並自動提取適應症）。
 - [ ] 於 Windows 10/11 (i5 10代, 8GB RAM) 的啟動時間測試（目標: < 15秒）。
 - [ ] 記憶體佔用監控（目標峰值: < 4GB）。
 - [ ] 確認雙階段 GUI 在全螢幕 HIS 系統旁的視覺層疊 (topmost) 行為。

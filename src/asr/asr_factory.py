@@ -5,7 +5,6 @@ ASR 引擎工廠與簡繁轉換工具
 Qwen3-ASR 輸出簡體中文，自動轉換為繁體
 """
 
-from typing import Optional
 from enum import Enum
 
 

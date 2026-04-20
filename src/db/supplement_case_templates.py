@@ -8,9 +8,8 @@
 import sqlite3
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 import sys
-import os
 
 # 嘗試導入 docx 處理模組
 try:
@@ -134,7 +133,7 @@ class CaseTemplateSupplementer:
             conn.commit()
 
             logger.info("=" * 60)
-            logger.info(f"病例範本補充完成!")
+            logger.info("病例範本補充完成!")
             logger.info(f"成功插入: {inserted_count}")
             logger.info(f"跳過已存在: {skipped_count}")
             logger.info(f"處理失敗: {error_count}")

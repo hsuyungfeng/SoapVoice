@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import logging
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -78,29 +78,44 @@ class ClinicalDatabase:
             cursor = conn.cursor()
             for symptom in symptoms:
                 if len(symptom) < 2: continue
-                # 搜尋藥物名稱或適應症
+                # 搜尋藥物名稱或 ai_notes (包含適應症資訊)
                 cursor.execute("""
-                    SELECT drug_name_cn, drug_name_en, ai_notes, indications 
+                    SELECT drug_name_cn, drug_name_en, ai_notes 
                     FROM drugs 
-                    WHERE (drug_name_cn LIKE ? OR indications LIKE ?) 
-                    AND indications IS NOT NULL 
-                    AND indications != ''
+                    WHERE (drug_name_cn LIKE ? OR ai_notes LIKE ?) 
+                    AND ai_notes IS NOT NULL 
+                    AND ai_notes != ''
                     LIMIT 2
                 """, (f"%{symptom}%", f"%{symptom}%"))
                 for row in cursor.fetchall():
+                    drug_name = row[0]
+                    ai_notes = row[2] if row[2] else ""
+                    
+                    # 從 ai_notes 提取適應症部分 (假設格式為 **主要用途/適應症**)
+                    indication = "請參照仿單"
+                    if "適應症" in ai_notes:
+                        parts = ai_notes.split("適應症")
+                        if len(parts) > 1:
+                            indication = parts[1].split("**")[0].strip("- \n")
+                            # 限制長度
+                            if "\n" in indication:
+                                indication = indication.split("\n")[0]
+
                     # 排除不相關的產科藥物 (除非症狀包含產科關鍵字)
-                    indication = row[3] if row[3] else ""
                     if ("剖腹" in indication or "產" in indication) and "產" not in "".join(symptoms):
                         continue
 
                     dosage = "遵醫囑"
-                    if row[2] and "用法用量" in row[2]:
-                         parts = row[2].split("用法用量")
+                    if ai_notes and "用法用量" in ai_notes:
+                         parts = ai_notes.split("用法用量")
                          if len(parts) > 1:
-                            dosage = parts[1].split("\n")[0].strip(": ")[:30]
+                            dosage = parts[1].split("**")[0].strip("- : \n")
+                            if "\n" in dosage:
+                                dosage = dosage.split("\n")[0]
+                            dosage = dosage[:30]
                     
                     drugs.append({
-                        "name": row[0],
+                        "name": drug_name,
                         "dosage": dosage,
                         "indication": indication[:100] + "..." if len(indication) > 100 else indication,
                         "category": "建議用藥"

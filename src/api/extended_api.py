@@ -134,7 +134,6 @@ async def extended_process(request: ExtendedProcessRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-from fastapi import Form
 
 
 @router.post("/transcribe")

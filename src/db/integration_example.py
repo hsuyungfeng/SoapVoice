@@ -128,7 +128,7 @@ def demo_symptom_to_drug_recommendation():
                 if drug["payment_rules"]:
                     print(f"   給付規定: {drug['payment_rules']}")
         else:
-            print(f"\n找不到推薦藥物")
+            print("\n找不到推薦藥物")
 
     db.close()
 

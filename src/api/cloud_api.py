@@ -1,7 +1,6 @@
 import logging
-from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
 router = APIRouter(prefix="/cloud", tags=["Cloud Integration"])
 logger = logging.getLogger(__name__)

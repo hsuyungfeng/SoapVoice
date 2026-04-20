@@ -2,9 +2,7 @@
 測試術語標準化與 ICD-10 分類功能
 """
 
-import os
 import sys
-import re
 from pathlib import Path
 
 # 添加專案根目錄到 Python 路徑

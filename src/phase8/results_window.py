@@ -9,14 +9,11 @@ SoapVoice Phase 8.4 - 結果浮動視窗
 - 一鍵複製功能
 """
 
-import os
-import sys
 import logging
 import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-from typing import Optional, Dict, Callable
+from tkinter import scrolledtext, messagebox
+from typing import Optional, Callable
 import pyperclip
-import threading
 
 logger = logging.getLogger(__name__)
 
@@ -297,7 +294,6 @@ class ResultsWindow:
     def _auto_export(self):
         """自動匯出到雲端（本地資料夾）"""
         try:
-            import json
             from pathlib import Path
             import datetime
             import shutil

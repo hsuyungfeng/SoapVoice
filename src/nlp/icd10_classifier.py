@@ -5,7 +5,7 @@ ICD-10 分類器模組
 """
 
 import logging
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, List
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)

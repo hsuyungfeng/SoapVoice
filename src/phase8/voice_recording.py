@@ -8,15 +8,13 @@ SoapVoice Phase 8.3 - 語音錄製 + LLM SOAP 生成模組
 """
 
 import os
-import sys
 import logging
 import time
 import wave
 import threading
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Dict
 from dataclasses import dataclass
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -430,7 +428,7 @@ def main():
         print("處理中...")
         result = workflow.stop_and_process()
 
-        print(f"\n=== 結果 ===")
+        print("\n=== 結果 ===")
         print(f"音訊: {result.audio_file}")
         print(f"\n逐字稿:\n{result.transcript}")
         print(

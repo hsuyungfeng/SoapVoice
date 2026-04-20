@@ -3,10 +3,9 @@
 用於離線環境，不需要 Ollama
 """
 
-import os
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)

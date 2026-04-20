@@ -15,9 +15,8 @@ import threading
 import time
 import logging
 import json
-import shutil
 from pathlib import Path
-from typing import Optional, Callable, Dict
+from typing import Optional, Callable
 from enum import Enum
 import pyperclip
 import datetime
@@ -261,7 +260,7 @@ class TrayIconManager:
                 json.dump(export_data, f, ensure_ascii=False, indent=2)
 
             # 檢查是否有音訊檔案
-            audio_files = list(self._data_dir.glob(f"*.wav"))
+            audio_files = list(self._data_dir.glob("*.wav"))
             if audio_files:
                 logger.info(f"Found {len(audio_files)} audio files for export")
 

@@ -12,7 +12,7 @@ import time
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
 
-from fastapi import APIRouter, HTTPException, Header, Request, Depends
+from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -272,7 +272,7 @@ async def _handle_soap_generated(payload: Dict[str, Any]) -> Dict[str, Any]:
     if not soap_result:
         return {"error": "No soap_result in payload"}
 
-    logger.info(f"SOAP generated successfully")
+    logger.info("SOAP generated successfully")
     return {"status": "completed", "soap": soap_result}
 
 

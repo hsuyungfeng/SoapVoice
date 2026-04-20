@@ -12,8 +12,6 @@ import pytest
 from src.asr.recording_session import (
     RecordingSession,
     RecordingSessionManager,
-    get_recording_manager,
-    set_recording_manager,
 )
 
 

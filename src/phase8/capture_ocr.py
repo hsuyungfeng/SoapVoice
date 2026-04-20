@@ -8,14 +8,11 @@ SoapVoice Phase 8.2 - 螢幕擷取 + OCR 病患資訊模組
 - 解析姓名、身分證、生日、病歷號、時間、醫師
 """
 
-import os
-import sys
 import logging
 import time
 from pathlib import Path
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, List, Tuple
 from dataclasses import dataclass
-import json
 import re
 
 logger = logging.getLogger(__name__)

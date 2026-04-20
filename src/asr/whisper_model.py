@@ -6,7 +6,6 @@ WhisperModel: Faster-Whisper 模型封裝
 
 import os
 from typing import Optional
-from pathlib import Path
 
 import faster_whisper
 

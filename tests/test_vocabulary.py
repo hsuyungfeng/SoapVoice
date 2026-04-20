@@ -6,7 +6,6 @@
 
 import pytest
 import json
-from pathlib import Path
 
 
 class TestMedicalVocabulary:

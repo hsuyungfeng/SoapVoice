@@ -396,14 +396,14 @@ class SoapVoiceApp:
         soap = data.get("soap", {})
         
         # 2. 組合顯示內容 (僅保留精華資訊)
-        fmt = f"【 臨床分析結果 】\n"
+        fmt = "【 臨床分析結果 】\n"
         fmt += f"● 主要症狀: {', '.join(data.get('symptoms', []))}\n"
         icd = data.get("icd10_codes", [])
         if icd:
             fmt += f"● ICD-10 參考: {', '.join([f'{i.get('code')}' for i in icd[:3]])}\n"
         
         # 3. 核心 SOAP Note (English Only)
-        fmt += f"\n【 English SOAP Note 】\n"
+        fmt += "\n【 English SOAP Note 】\n"
         # 優先從單獨欄位讀取，若無則顯示 Pending
         s = soap.get('subjective', '').strip()
         o = soap.get('objective', '').strip()
@@ -418,14 +418,14 @@ class SoapVoiceApp:
         # 4. 建議醫囑 (已過濾行政雜項)
         orders = data.get("medical_orders", [])
         if orders:
-            fmt += f"\n【 建議醫囑 】\n"
+            fmt += "\n【 建議醫囑 】\n"
             for order in sorted(orders):
                 fmt += f"  - {order}\n"
         
         # 5. 建議藥物 (含適應症)
         drugs = data.get("drug_recommendations", [])
         if drugs:
-            fmt += f"\n【 建議用藥 】\n"
+            fmt += "\n【 建議用藥 】\n"
             for d in drugs:
                 ind = d.get('indication', '請參照仿單')
                 if len(ind) > 40: ind = ind[:37] + "..."
@@ -446,7 +446,7 @@ class SoapVoiceApp:
             self.root.after(0, lambda: self.status_var.set("📸 OCR 成功"))
             prompt = self.ocr_parser.build_extraction_prompt(ocr_text, ["王醫師", "陳醫師"])
             try:
-                res = requests.post(f"http://localhost:11434/api/generate", json={"model": model_name, "prompt": prompt, "stream": False, "format": "json"}, timeout=30)
+                res = requests.post("http://localhost:11434/api/generate", json={"model": model_name, "prompt": prompt, "stream": False, "format": "json"}, timeout=30)
                 if res.status_code == 200:
                     info = json.loads(res.json().get("response", "{}"))
                     def update():

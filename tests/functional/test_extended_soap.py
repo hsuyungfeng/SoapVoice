@@ -2,9 +2,7 @@
 測試 SOAP 生成與醫囑藥物建議功能
 """
 
-import os
 import sys
-import json
 import time
 from pathlib import Path
 

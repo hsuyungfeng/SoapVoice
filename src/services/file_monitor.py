@@ -5,7 +5,6 @@
 支援自動轉錄和 SOAP 生成
 """
 
-import os
 import logging
 import time
 import hashlib
@@ -13,7 +12,6 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-import asyncio
 import threading
 
 logger = logging.getLogger(__name__)

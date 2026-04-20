@@ -1,8 +1,26 @@
-🚀 啟動後端伺服器: uv run uvicorn src.main:app --host 127.0.0.1 --port 8010 --log-level warning
-Traceback (most recent call last):
-  File "/home/hsu/Desktop/SoapVoice/start_server_simple.py", line 83, in <module>
-    main()
-    ~~~~^^
-  File "/home/hsu/Desktop/SoapVoice/start_server_simple.py", line 52, in main
-    import requests
-ModuleNotFoundError: No module named 'requests'
+INFO:src.soap.soap_generator:使用 llama.cpp 引擎
+INFO:     Started server process [209556]
+INFO:     Waiting for application startup.
+INFO:src.main:Starting SoapVoice API...
+INFO:src.main:Pre-loading Extended SOAP Pipeline...
+INFO:src.api.extended_api:Initializing ExtendedSoapVoiceEngine (pre-loading)...
+INFO:term:Loaded 101 built-in term mappings
+INFO:term:Loaded external vocabulary from /home/hsu/Desktop/SoapVoice/keywords.json
+INFO:src.api.extended_api:ExtendedSoapVoiceEngine initialized and models loaded
+INFO:src.main:Extended SOAP Pipeline pre-loaded successfully (Whisper object: None)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8010 (Press CTRL+C to quit)
+🚀 正在初始化 ExtendedSoapVoiceEngine (Qwen3-ASR 模型: large-v3)...
+✅ ExtendedSoapVoiceEngine 初始化完成
+INFO:     127.0.0.1:40606 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60634 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41728 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33728 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37884 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58880 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41756 - "HEAD /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49584 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49600 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49614 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48200 - "HEAD /docs HTTP/1.1" 200 OK

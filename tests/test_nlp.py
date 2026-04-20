@@ -3,9 +3,9 @@
 """
 
 import pytest
-from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
-from src.nlp.icd10_classifier import ICD10Classifier, ICD10Match
-from src.nlp.soap_classifier import SOAPClassifier, SOAPClassification
+from src.nlp.terminology_mapper import MedicalTerminologyMapper
+from src.nlp.icd10_classifier import ICD10Classifier
+from src.nlp.soap_classifier import SOAPClassifier
 
 
 class TestMedicalTerminologyMapper:

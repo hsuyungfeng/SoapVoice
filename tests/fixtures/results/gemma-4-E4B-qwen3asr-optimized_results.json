@@ -1,0 +1,840 @@
+[
+  {
+    "name": "胸痛",
+    "file": "chest_pain.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "請做。今天有什麼不舒服？醫師，我昨天開始胸口很悶，呼吸不太順暢。這樣的情況持續多久了？有沒有發燒或咳嗽？大概兩天了，沒有發燒，但是走路快一點就會喘。之前有類似症狀嗎？有沒有心臟方面的病史？沒有，但是我有抽菸，大概抽了十年。好，我先幫你安排心電圖和胸部X光檢查。醫師，嚴重嗎？目前先做檢查確認，你不要緊張。",
+    "transcribe_time": 26.14,
+    "asr_model": "qwen3asr",
+    "llm_time": 52.5,
+    "total_time": 78.63,
+    "symptoms": [
+      "胸部X光",
+      "ECG",
+      "ECG",
+      "fever",
+      "cough",
+      "chest",
+      "heart",
+      "檢查",
+      "不要",
+      "dyspnea",
+      "咳嗽",
+      "發燒"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R05",
+        "description": "Cough",
+        "confidence": 0.9
+      },
+      {
+        "code": "R50.9",
+        "description": "Fever, unspecified",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "\"信東\"保爾泰濃縮輸注液",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "恩賦翠預充填式注射劑",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"優生\" 優爽錠６０公絲（鹽酸迪太贊）",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "悠護迅膜衣錠4毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "脈利錠１．２５公絲（因達拍邁）",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Patient presents with a chief complaint of chest tightness and dyspnea, onset approximately two days ago. Symptoms are not associated with fever or cough. Dyspnea is noted upon moderate exertion, while the patient denies any prior history of heart disease but reports a ten-year smoking history.",
+      "objective": "Physical examination deferred; diagnostic tests pending. The physician has ordered an ECG and a chest X-ray for confirmation.",
+      "assessment": "Dyspnea on exertion, Chest tightness. Potential diagnoses include R50.9 (Unspecified abdominal pain) or R06.02 (Shortness of breath). Further investigation is required to rule out cardiac etiology.",
+      "plan": "The plan includes immediate diagnostic testing: ECG and chest X-ray. The patient has been advised not to be anxious regarding the findings. Follow-up management will depend on the results of these investigations.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "\"信東\"保爾泰濃縮輸注液",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "恩賦翠預充填式注射劑",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"優生\" 優爽錠６０公絲（鹽酸迪太贊）",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "悠護迅膜衣錠4毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "脈利錠１．２５公絲（因達拍邁）",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nPatient presents with a chief complaint of chest tightness and dyspnea, onset approximately two days ago. Symptoms are not associated with fever or cough. Dyspnea is noted upon moderate exertion, while the patient denies any prior history of heart disease but reports a ten-year smoking history.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician has ordered an ECG and a chest X-ray for confirmation.\n\nA (Assessment):\nDyspnea on exertion, Chest tightness. Potential diagnoses include R50.9 (Unspecified abdominal pain) or R06.02 (Shortness of breath). Further investigation is required to rule out cardiac etiology.\n\nP (Plan):\nThe plan includes immediate diagnostic testing: ECG and chest X-ray. The patient has been advised not to be anxious regarding the findings. Follow-up management will depend on the results of these investigations.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nPatient presents with a chief complaint of chest tightness and dyspnea, onset approximately two days ago. Symptoms are not associated with fever or cough. Dyspnea is noted upon moderate exertion, while the patient denies any prior history of heart disease but reports a ten-year smoking history.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician has ordered an ECG and a chest X-ray for confirmation.\n\nA (Assessment):\nDyspnea on exertion, Chest tightness. Potential diagnoses include R50.9 (Unspecified abdominal pain) or R06.02 (Shortness of breath). Further investigation is required to rule out cardiac etiology.\n\nP (Plan):\nThe plan includes immediate diagnostic testing: ECG and chest X-ray. The patient has been advised not to be anxious regarding the findings. Follow-up management will depend on the results of these investigations.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "高血壓",
+    "file": "hypertension.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "張先生今天來血壓控制怎麼樣？醫生，最近血壓還是很高，早上都一百六十多。有按時喫藥嗎？鹽分有沒有控制？藥有喫，但是口味比較重，鹽放比較多。這樣不行哦，高血壓要好好控制，不然會影響腎臟和心臟。醫生，我有時候會頭暈，是不是血壓太高？對，血壓高的時候容易頭暈，我幫你調整一下用藥。好的，那我要注意什麼？少鹽，少油，多運動，每天量血壓記錄下來。",
+    "transcribe_time": 22.42,
+    "asr_model": "qwen3asr",
+    "llm_time": 39.84,
+    "total_time": 62.26,
+    "symptoms": [
+      "high blood pressure",
+      "hypertension",
+      "blood pressure measurement",
+      "dizziness",
+      "heart",
+      "血壓",
+      "運動",
+      "用藥",
+      "kidney"
+    ],
+    "icd10_codes": [
+      {
+        "code": "I10",
+        "description": "Essential (primary) hypertension",
+        "confidence": 0.9
+      },
+      {
+        "code": "R42",
+        "description": "Dizziness and giddiness",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "東健膜衣錠25毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"鴻汶\"安利錠10毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"優生\"立普樂膜衣錠10毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"生達\"樂抗敏膜衣錠 60 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "悠護迅膜衣錠4毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Patient presents with a history of elevated blood pressure, reporting morning readings frequently exceeding 160 mmHg. Patient admits to taking medication but notes the taste is heavy and salt intake has been excessive. The patient also reports occasional episodes of dizziness, questioning if this is related to high blood pressure.",
+      "objective": "Physical examination deferred; diagnostic tests pending. Vital signs were not explicitly recorded, other than the reported elevated blood pressure readings.",
+      "assessment": "Hypertension (I10). Potential for symptomatic hypotension or dyspnea secondary to uncontrolled hypertension (R42).",
+      "plan": "Patient advised to strictly control dietary sodium and fat intake, and increase physical activity levels. Patient instructed to maintain a daily log of blood pressure measurements. Medication adjustments were discussed; patient should adhere to the prescribed regimen while monitoring symptoms. Follow-up is required for continued blood pressure management.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "東健膜衣錠25毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"鴻汶\"安利錠10毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"優生\"立普樂膜衣錠10毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"生達\"樂抗敏膜衣錠 60 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "悠護迅膜衣錠4毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nPatient presents with a history of elevated blood pressure, reporting morning readings frequently exceeding 160 mmHg. Patient admits to taking medication but notes the taste is heavy and salt intake has been excessive. The patient also reports occasional episodes of dizziness, questioning if this is related to high blood pressure.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Vital signs were not explicitly recorded, other than the reported elevated blood pressure readings.\n\nA (Assessment):\nHypertension (I10). Potential for symptomatic hypotension or dyspnea secondary to uncontrolled hypertension (R42).\n\nP (Plan):\nPatient advised to strictly control dietary sodium and fat intake, and increase physical activity levels. Patient instructed to maintain a daily log of blood pressure measurements. Medication adjustments were discussed; patient should adhere to the prescribed regimen while monitoring symptoms. Follow-up is required for continued blood pressure management.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nPatient presents with a history of elevated blood pressure, reporting morning readings frequently exceeding 160 mmHg. Patient admits to taking medication but notes the taste is heavy and salt intake has been excessive. The patient also reports occasional episodes of dizziness, questioning if this is related to high blood pressure.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Vital signs were not explicitly recorded, other than the reported elevated blood pressure readings.\n\nA (Assessment):\nHypertension (I10). Potential for symptomatic hypotension or dyspnea secondary to uncontrolled hypertension (R42).\n\nP (Plan):\nPatient advised to strictly control dietary sodium and fat intake, and increase physical activity levels. Patient instructed to maintain a daily log of blood pressure measurements. Medication adjustments were discussed; patient should adhere to the prescribed regimen while monitoring symptoms. Follow-up is required for continued blood pressure management.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "糖尿病",
+    "file": "diabetes.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "李女士，你的血糖控制怎麼樣？醫師，這幾天血糖都比較高，空腹大概兩百多。飲食有沒有按時？水果喫多少？有喫飯，但是忍不住會喫水果，上午還喫了兩顆巴樂。巴樂雖然不甜，但是糖分還是有，要適量。醫師，那我可以喫什麼水果？巴樂、蓮霧、奇異果比較好，一次不要超過一碗。醫師，我的腳有時候會麻，是不是神經病變？有可能，這是糖尿病常見的併發症，我幫你安排神經檢查。",
+    "transcribe_time": 20.66,
+    "asr_model": "qwen3asr",
+    "llm_time": 50.7,
+    "total_time": 71.36,
+    "symptoms": [
+      "diabetes mellitus",
+      "檢查",
+      "血糖",
+      "可能",
+      "不要",
+      "飲食"
+    ],
+    "icd10_codes": [
+      {
+        "code": "E11.9",
+        "description": "Type 2 diabetes mellitus without complications",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "欣益糖錠 2.0 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "志樂恆膜衣錠50毫克(鋁箔)",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "思敏膠囊40毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"強生\"欣解 糖衣錠",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "佐得寧糖衣錠 25 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient reports persistently elevated blood glucose levels, with fasting readings around 200 mg/dL. She admits to consuming snacks, specifically mentioning two \"Bale\" fruits in the morning, despite dietary restrictions regarding sugar intake from fruit consumption. The patient also inquires about suitable alternatives for fruit intake and expresses concern regarding occasional numbness in her feet.",
+      "objective": "Physical examination deferred; diagnostic tests pending. The physician noted that foot numbness is a possible complication associated with diabetes mellitus, recommending a nerve conduction study to be arranged. No vital signs or specific test results were provided.",
+      "assessment": "1. Type 2 Diabetes Mellitus (E11.9) - Uncontrolled hyperglycemia.\n2. Diabetic Peripheral Neuropathy - Possible manifestation requiring further investigation.",
+      "plan": "1. **Dietary Modification**: Advised to consume only suitable fruits, such as \"Bale,\" lotus seeds, and kiwi, ensuring the total intake does not exceed one bowl per sitting. Strict adherence to moderate consumption of all sugary items is emphasized.\n2. **Diagnostic Testing**: A nerve conduction study (NCS) for peripheral neuropathy must be arranged.\n3. **Follow-up**: The patient should follow up with results from the scheduled NCS and maintain consistent blood glucose monitoring.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "欣益糖錠 2.0 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "志樂恆膜衣錠50毫克(鋁箔)",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "思敏膠囊40毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"強生\"欣解 糖衣錠",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "佐得寧糖衣錠 25 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nThe patient reports persistently elevated blood glucose levels, with fasting readings around 200 mg/dL. She admits to consuming snacks, specifically mentioning two \"Bale\" fruits in the morning, despite dietary restrictions regarding sugar intake from fruit consumption. The patient also inquires about suitable alternatives for fruit intake and expresses concern regarding occasional numbness in her feet.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician noted that foot numbness is a possible complication associated with diabetes mellitus, recommending a nerve conduction study to be arranged. No vital signs or specific test results were provided.\n\nA (Assessment):\n1. Type 2 Diabetes Mellitus (E11.9) - Uncontrolled hyperglycemia.\n2. Diabetic Peripheral Neuropathy - Possible manifestation requiring further investigation.\n\nP (Plan):\n1. **Dietary Modification**: Advised to consume only suitable fruits, such as \"Bale,\" lotus seeds, and kiwi, ensuring the total intake does not exceed one bowl per sitting. Strict adherence to moderate consumption of all sugary items is emphasized.\n2. **Diagnostic Testing**: A nerve conduction study (NCS) for peripheral neuropathy must be arranged.\n3. **Follow-up**: The patient should follow up with results from the scheduled NCS and maintain consistent blood glucose monitoring.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient reports persistently elevated blood glucose levels, with fasting readings around 200 mg/dL. She admits to consuming snacks, specifically mentioning two \"Bale\" fruits in the morning, despite dietary restrictions regarding sugar intake from fruit consumption. The patient also inquires about suitable alternatives for fruit intake and expresses concern regarding occasional numbness in her feet.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician noted that foot numbness is a possible complication associated with diabetes mellitus, recommending a nerve conduction study to be arranged. No vital signs or specific test results were provided.\n\nA (Assessment):\n1. Type 2 Diabetes Mellitus (E11.9) - Uncontrolled hyperglycemia.\n2. Diabetic Peripheral Neuropathy - Possible manifestation requiring further investigation.\n\nP (Plan):\n1. **Dietary Modification**: Advised to consume only suitable fruits, such as \"Bale,\" lotus seeds, and kiwi, ensuring the total intake does not exceed one bowl per sitting. Strict adherence to moderate consumption of all sugary items is emphasized.\n2. **Diagnostic Testing**: A nerve conduction study (NCS) for peripheral neuropathy must be arranged.\n3. **Follow-up**: The patient should follow up with results from the scheduled NCS and maintain consistent blood glucose monitoring.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "傷口護理",
+    "file": "wound_care.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "阿姨，我來幫你換藥。護理師：這傷口什麼時候會好？我看一下傷口，恢復的不錯，已經沒有發炎了。已經一個禮拜了，本來說三天就可以洗澡對吧？對，手術傷口十天後就可以碰水了，這兩天先擦澡。傷口旁邊有點癢，正常嗎？傷口在癒合會癢，儘量不要抓，我幫你塗止癢藥膏。請問傷口上的美容膠帶要撕掉嗎？讓它自然脫落就好，不用刻意撕，平時傷口保持乾燥。",
+    "transcribe_time": 21.67,
+    "asr_model": "qwen3asr",
+    "llm_time": 34.01,
+    "total_time": 55.68,
+    "symptoms": [
+      "inflammation",
+      "dressing change",
+      "不要",
+      "手術",
+      "癢"
+    ],
+    "icd10_codes": [
+      {
+        "code": "L29.9",
+        "description": "Pruritus, unspecified",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "瑰樂平膜衣錠25毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"新瑞\"納得復膜衣錠10毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Patient reports mild pruritus adjacent to the surgical wound. Duration of symptoms is not specified, but noted during dressing change today. Patient asks if the adhesive tape on the wound needs removal.",
+      "objective": "Physical examination reveals the surgical wound site. The wound appears well-healed with no signs of active inflammation noted upon inspection. Vital signs were not documented in the transcript. Dressing change performed today.",
+      "assessment": "Healing surgical incision site, currently experiencing mild pruritus secondary to healing process. No evidence of acute infection or dehiscence at this time.",
+      "plan": "Continue routine wound care and dressing changes as indicated. Apply topical anti-pruritic ointment for symptomatic relief; patient advised not to scratch the area. Adhesive tape should be allowed to detach naturally, avoiding forceful removal. Patient instructed to keep the wound site clean and dry. Wound can tolerate sponge baths but full immersion is restricted until ten days post-surgery. Follow up as needed.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "瑰樂平膜衣錠25毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"新瑞\"納得復膜衣錠10毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nPatient reports mild pruritus adjacent to the surgical wound. Duration of symptoms is not specified, but noted during dressing change today. Patient asks if the adhesive tape on the wound needs removal.\n\nO (Objective):\nPhysical examination reveals the surgical wound site. The wound appears well-healed with no signs of active inflammation noted upon inspection. Vital signs were not documented in the transcript. Dressing change performed today.\n\nA (Assessment):\nHealing surgical incision site, currently experiencing mild pruritus secondary to healing process. No evidence of acute infection or dehiscence at this time.\n\nP (Plan):\nContinue routine wound care and dressing changes as indicated. Apply topical anti-pruritic ointment for symptomatic relief; patient advised not to scratch the area. Adhesive tape should be allowed to detach naturally, avoiding forceful removal. Patient instructed to keep the wound site clean and dry. Wound can tolerate sponge baths but full immersion is restricted until ten days post-surgery. Follow up as needed.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nPatient reports mild pruritus adjacent to the surgical wound. Duration of symptoms is not specified, but noted during dressing change today. Patient asks if the adhesive tape on the wound needs removal.\n\nO (Objective):\nPhysical examination reveals the surgical wound site. The wound appears well-healed with no signs of active inflammation noted upon inspection. Vital signs were not documented in the transcript. Dressing change performed today.\n\nA (Assessment):\nHealing surgical incision site, currently experiencing mild pruritus secondary to healing process. No evidence of acute infection or dehiscence at this time.\n\nP (Plan):\nContinue routine wound care and dressing changes as indicated. Apply topical anti-pruritic ointment for symptomatic relief; patient advised not to scratch the area. Adhesive tape should be allowed to detach naturally, avoiding forceful removal. Patient instructed to keep the wound site clean and dry. Wound can tolerate sponge baths but full immersion is restricted until ten days post-surgery. Follow up as needed.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "呼吸道",
+    "file": "respiratory.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "怎麼了？咳嗽嗎？醫師，我咳嗽一個多禮拜了，有痰但是咳不出來。有沒有發燒？喉嚨痛不痛？有一點發燒，喉嚨很痛，痰是黃色的。先去照一下胸部X光，看一下肺部情況。醫師，我是不是肺炎？目前不確定，等X光結果出來再說。我先幫你抽血檢查。好，那需要住院嗎？先看檢查結果，如果肺部有發炎，可能需要住院治療。",
+    "transcribe_time": 18.03,
+    "asr_model": "qwen3asr",
+    "llm_time": 45.25,
+    "total_time": 63.28,
+    "symptoms": [
+      "胸部X光",
+      "喉嚨痛",
+      "fever",
+      "cough",
+      "severe pain",
+      "chest",
+      "throat",
+      "pneumonia",
+      "inflammation",
+      "blood draw",
+      "檢查",
+      "可能",
+      "住院",
+      "治療",
+      "lung",
+      "咳",
+      "痛",
+      "咳嗽",
+      "發燒"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R05",
+        "description": "Cough",
+        "confidence": 0.9
+      },
+      {
+        "code": "R50.9",
+        "description": "Fever, unspecified",
+        "confidence": 0.9
+      },
+      {
+        "code": "J18.9",
+        "description": "Pneumonia, unspecified organism",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "\"信東\"保爾泰濃縮輸注液",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "恩賦翠預充填式注射劑",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"新瑞\"邁慮煩 膜衣錠 15 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "莫憂平膜衣錠 30 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"優生\" 優爽錠６０公絲（鹽酸迪太贊）",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient reports a cough lasting over one week, associated with yellow sputum that is difficult to expectorate. The patient also complains of mild fever and severe throat pain. Physical examination revealed the presence of yellow sputum. The patient's chief complaint centers on persistent respiratory symptoms.\nAcute Bronchitis/Pneumonia, pending confirmation via imaging and lab work. Potential diagnosiPneumonia (J18.9). ICD-10 codes considered: R52 (Cough), R05 (Sore Throat).",
+      "objective": "Physical examination findings are limited to reported symptoms. Vital signs include a mild fever. Diagnostic plans initiated include a Chest X-ray to assess lung status and blood draw for laboratory investigation. No definitive physical exam data or test results were provided.",
+      "assessment": "",
+      "plan": "The patient is advised to undergo Chest X-ray examination for detailed assessment of the lung condition. Blood draw has been ordered. Further management, including potential hospitalization and specific anti-inflammatory/supportive treatment, will be determined based on the results of the imaging and laboratory tests.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "\"信東\"保爾泰濃縮輸注液",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "恩賦翠預充填式注射劑",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"新瑞\"邁慮煩 膜衣錠 15 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "莫憂平膜衣錠 30 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"優生\" 優爽錠６０公絲（鹽酸迪太贊）",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nThe patient reports a cough lasting over one week, associated with yellow sputum that is difficult to expectorate. The patient also complains of mild fever and severe throat pain. Physical examination revealed the presence of yellow sputum. The patient's chief complaint centers on persistent respiratory symptoms.\n\nO (Objective):\nPhysical examination findings are limited to reported symptoms. Vital signs include a mild fever. Diagnostic plans initiated include a Chest X-ray to assess lung status and blood draw for laboratory investigation. No definitive physical exam data or test results were provided.\n\nA (Assessment):\nAcute Bronchitis/Pneumonia, pending confirmation via imaging and lab work. Potential diagnosis: Pneumonia (J18.9). ICD-10 codes considered: R52 (Cough), R05 (Sore Throat).\n\nP (Plan):\nThe patient is advised to undergo Chest X-ray examination for detailed assessment of the lung condition. Blood draw has been ordered. Further management, including potential hospitalization and specific anti-inflammatory/supportive treatment, will be determined based on the results of the imaging and laboratory tests.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient reports a cough lasting over one week, associated with yellow sputum that is difficult to expectorate. The patient also complains of mild fever and severe throat pain. Physical examination revealed the presence of yellow sputum. The patient's chief complaint centers on persistent respiratory symptoms.\n\nO (Objective):\nPhysical examination findings are limited to reported symptoms. Vital signs include a mild fever. Diagnostic plans initiated include a Chest X-ray to assess lung status and blood draw for laboratory investigation. No definitive physical exam data or test results were provided.\n\nA (Assessment):\nAcute Bronchitis/Pneumonia, pending confirmation via imaging and lab work. Potential diagnosis: Pneumonia (J18.9). ICD-10 codes considered: R52 (Cough), R05 (Sore Throat).\n\nP (Plan):\nThe patient is advised to undergo Chest X-ray examination for detailed assessment of the lung condition. Blood draw has been ordered. Further management, including potential hospitalization and specific anti-inflammatory/supportive treatment, will be determined based on the results of the imaging and laboratory tests.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "醫囑",
+    "file": "drug_order.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "王先生，這是你的處方箋。醫師，這些藥怎麼喫？這包是降血壓藥，每天早餐後喫一顆。這包是利尿劑，下午喫，注意要多喝水。醫師，這個止痛藥什麼時候喫？痛的時候再喫，一天最多四顆，不要空腹喫，會傷胃。這些藥有沒有副作用？可能會有點頭暈或是手腳無力，如果有問題立刻回診。好的，這些藥要喫多久？血壓藥先喫一個月再回診，利尿劑看情況可以停。",
+    "transcribe_time": 21.36,
+    "asr_model": "qwen3asr",
+    "llm_time": 57.3,
+    "total_time": 78.66,
+    "symptoms": [
+      "多喝水",
+      "dizziness",
+      "無力",
+      "血壓",
+      "可能",
+      "不要",
+      "回診",
+      "止痛",
+      "stomach",
+      "痛"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R42",
+        "description": "Dizziness and giddiness",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "\"國嘉\"德利治癒膠囊250毫克（硝基甲嘧唑乙醇）",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"優生\"立普樂膜衣錠10毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"生達\"樂抗敏膜衣錠 60 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"生達\"思律復錠10毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"應元\"安妥錠40毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient is advised on the regimen for several prescribed medications. These include an antihypertensive agent to be taken daily after breakfast, a diuretic to be administered in the afternoon with instructions to maintain high fluid intake. Regarding pain management, the patient was instructed to take the analgesic only when experiencing pain, limiting intake to four tablets per day and ensuring it is not taken on an empty stomach due to potential gastric irritation. The patient also noted possible side effects such as dizziness or limb weakness and was advised to return immediately if these occur.",
+      "objective": "Physical examination deferred; diagnostic tests pending. The prescribed medications include \"Guojia\" De-liji Capsules 250mg (Nitrosyl-pyrimidine ethyl alcohol), \"Yousheng\" Lipule Film Tablets 10mg, \"Senda\" Lekangmin Film Tablets 60mg, \"Senda\" Silufo Tablets 10mg, and \"Yingyuan\" Antuo Tablets 40mg.",
+      "assessment": "The patient is stable on current medication management for chronic conditions such as hypertension and potential fluid imbalance. Potential diagnoses include R42 (Chronic Obstructive Pulmonary Disease/Fluid Imbalance).",
+      "plan": "The antihypertensive agent should be continued for one month, with a follow-up appointment scheduled thereafter. The diuretic use can be discontinued based on clinical assessment. For pain management, the analgesic should only be taken as needed, not empty stomach. Patients must maintain high fluid intake and return to clinic immediately if experiencing dizziness or limb weakness.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "\"國嘉\"德利治癒膠囊250毫克（硝基甲嘧唑乙醇）",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"優生\"立普樂膜衣錠10毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"生達\"樂抗敏膜衣錠 60 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"生達\"思律復錠10毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"應元\"安妥錠40毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nThe patient is advised on the regimen for several prescribed medications. These include an antihypertensive agent to be taken daily after breakfast, a diuretic to be administered in the afternoon with instructions to maintain high fluid intake. Regarding pain management, the patient was instructed to take the analgesic only when experiencing pain, limiting intake to four tablets per day and ensuring it is not taken on an empty stomach due to potential gastric irritation. The patient also noted possible side effects such as dizziness or limb weakness and was advised to return immediately if these occur.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The prescribed medications include \"Guojia\" De-liji Capsules 250mg (Nitrosyl-pyrimidine ethyl alcohol), \"Yousheng\" Lipule Film Tablets 10mg, \"Senda\" Lekangmin Film Tablets 60mg, \"Senda\" Silufo Tablets 10mg, and \"Yingyuan\" Antuo Tablets 40mg.\n\nA (Assessment):\nThe patient is stable on current medication management for chronic conditions such as hypertension and potential fluid imbalance. Potential diagnoses include R42 (Chronic Obstructive Pulmonary Disease/Fluid Imbalance).\n\nP (Plan):\nThe antihypertensive agent should be continued for one month, with a follow-up appointment scheduled thereafter. The diuretic use can be discontinued based on clinical assessment. For pain management, the analgesic should only be taken as needed, not empty stomach. Patients must maintain high fluid intake and return to clinic immediately if experiencing dizziness or limb weakness.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient is advised on the regimen for several prescribed medications. These include an antihypertensive agent to be taken daily after breakfast, a diuretic to be administered in the afternoon with instructions to maintain high fluid intake. Regarding pain management, the patient was instructed to take the analgesic only when experiencing pain, limiting intake to four tablets per day and ensuring it is not taken on an empty stomach due to potential gastric irritation. The patient also noted possible side effects such as dizziness or limb weakness and was advised to return immediately if these occur.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The prescribed medications include \"Guojia\" De-liji Capsules 250mg (Nitrosyl-pyrimidine ethyl alcohol), \"Yousheng\" Lipule Film Tablets 10mg, \"Senda\" Lekangmin Film Tablets 60mg, \"Senda\" Silufo Tablets 10mg, and \"Yingyuan\" Antuo Tablets 40mg.\n\nA (Assessment):\nThe patient is stable on current medication management for chronic conditions such as hypertension and potential fluid imbalance. Potential diagnoses include R42 (Chronic Obstructive Pulmonary Disease/Fluid Imbalance).\n\nP (Plan):\nThe antihypertensive agent should be continued for one month, with a follow-up appointment scheduled thereafter. The diuretic use can be discontinued based on clinical assessment. For pain management, the analgesic should only be taken as needed, not empty stomach. Patients must maintain high fluid intake and return to clinic immediately if experiencing dizziness or limb weakness.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "手術記錄",
+    "file": "surgery_record.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "手術開始時間上午九點二十分。確認病人姓名：陳大明。手術項目是腹腔鏡膽囊切除術。確認麻醉完成，開始消毒手術部位。建立第一個穿刺孔於肚臍上方，插入腹腔鏡。確認膽囊位置，發現有輕微發炎粘連。出血量約五十cc，手術進行中。分離膽囊與周圍組織，準備夾住膽管。確認沒有其他異常，開始切除膽囊。取出膽囊，手術傷口縫合。手術時間四十五分鐘。病人生命徵項穩定，手術完成。",
+    "transcribe_time": 22.67,
+    "asr_model": "qwen3asr",
+    "llm_time": 43.62,
+    "total_time": 66.29,
+    "symptoms": [
+      "bleeding",
+      "inflammation",
+      "suturing",
+      "手術",
+      "麻醉"
+    ],
+    "icd10_codes": [],
+    "drug_recommendations": [
+      {
+        "name": "\"培力\"婦安蒙軟膠囊100毫克",
+        "dosage": "】",
+        "indication": "】",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"井田\" 拿能寧糖衣錠（乙烯羥化雌烯酮）",
+        "dosage": "】",
+        "indication": "】",
+        "category": "建議用藥"
+      },
+      {
+        "name": "瑰樂平膜衣錠25毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"新瑞\"納得復膜衣錠10毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "千痔康栓劑",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient, identified as Chen Daming, underwent a laparoscopic cholecystectomy. The procedure was initiated at 9:20 AM. No specific subjective complaints were detailed in the provided transcript; the focus remained on the procedural steps and findings during surgery.\nAcute cholecystitis/Cholecystectomy status post laparoscopic intervention. Potential diagnosiInflammation and adhesion noted around the gallbladder structure. ICD-10 code reference may include R58 for unspecified abdominal pain/disorder related to inflammation.",
+      "objective": "Physical examination deferred; diagnostic tests pending. Intra-operative notes documented minor inflammation and adhesions involving the gallbladder, resulting in an estimated bleeding of 50cc during the procedure. The surgical duration was 45 minutes, with stable vital signs upon completion.",
+      "assessment": "",
+      "plan": "The procedure was completed with successful removal of the gallbladder and subsequent suturing of the surgical site. Monitoring of vital signs confirmed stability post-operation. No specific medications or further diagnostic tests were recommended in the transcript; discharge planning should focus on monitoring for recurrence of inflammation/adhesions.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "\"培力\"婦安蒙軟膠囊100毫克",
+          "dosage": "】",
+          "indication": "】",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"井田\" 拿能寧糖衣錠（乙烯羥化雌烯酮）",
+          "dosage": "】",
+          "indication": "】",
+          "category": "建議用藥"
+        },
+        {
+          "name": "瑰樂平膜衣錠25毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"新瑞\"納得復膜衣錠10毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "千痔康栓劑",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nThe patient, identified as Chen Daming, underwent a laparoscopic cholecystectomy. The procedure was initiated at 9:20 AM. No specific subjective complaints were detailed in the provided transcript; the focus remained on the procedural steps and findings during surgery.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Intra-operative notes documented minor inflammation and adhesions involving the gallbladder, resulting in an estimated bleeding of 50cc during the procedure. The surgical duration was 45 minutes, with stable vital signs upon completion.\n\nA (Assessment):\nAcute cholecystitis/Cholecystectomy status post laparoscopic intervention. Potential diagnosis: Inflammation and adhesion noted around the gallbladder structure. ICD-10 code reference may include R58 for unspecified abdominal pain/disorder related to inflammation.\n\nP (Plan):\nThe procedure was completed with successful removal of the gallbladder and subsequent suturing of the surgical site. Monitoring of vital signs confirmed stability post-operation. No specific medications or further diagnostic tests were recommended in the transcript; discharge planning should focus on monitoring for recurrence of inflammation/adhesions.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient, identified as Chen Daming, underwent a laparoscopic cholecystectomy. The procedure was initiated at 9:20 AM. No specific subjective complaints were detailed in the provided transcript; the focus remained on the procedural steps and findings during surgery.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Intra-operative notes documented minor inflammation and adhesions involving the gallbladder, resulting in an estimated bleeding of 50cc during the procedure. The surgical duration was 45 minutes, with stable vital signs upon completion.\n\nA (Assessment):\nAcute cholecystitis/Cholecystectomy status post laparoscopic intervention. Potential diagnosis: Inflammation and adhesion noted around the gallbladder structure. ICD-10 code reference may include R58 for unspecified abdominal pain/disorder related to inflammation.\n\nP (Plan):\nThe procedure was completed with successful removal of the gallbladder and subsequent suturing of the surgical site. Monitoring of vital signs confirmed stability post-operation. No specific medications or further diagnostic tests were recommended in the transcript; discharge planning should focus on monitoring for recurrence of inflammation/adhesions.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "醫病對話",
+    "file": "doctor_patient.wav",
+    "model": "gemma-4-E4B-qwen3asr-optimized",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "醫師，我最近很容易疲倦，晚上睡不好。這樣多久了？壓力大嗎？大概一個月了，工作很忙，然後一直加班。會不會心悸，手抖？有一點，有時候脾氣很不好。我幫你驗血，看一下甲狀腺功能。醫師，我是不是甲狀腺有問題？先檢查再說，甲狀腺亢進會造成這些症狀。如果真的是甲狀腺問題，要怎麼治療？先喫藥控制，嚴重的話可能需要開刀或是做放射點治療。",
+    "transcribe_time": 19.08,
+    "asr_model": "qwen3asr",
+    "llm_time": 38.15,
+    "total_time": 57.23,
+    "symptoms": [
+      "甲狀腺亢進",
+      "甲狀腺",
+      "fatigue",
+      "palpitation",
+      "檢查",
+      "可能",
+      "治療",
+      "開刀"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R53.83",
+        "description": "Other fatigue",
+        "confidence": 0.85
+      },
+      {
+        "code": "R00.2",
+        "description": "Palpitations",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [
+      {
+        "name": "\"晟德\" 康停 懸液劑",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "安保思定膠囊40毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "思敏膠囊40毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "\"強生\"欣解 糖衣錠",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      },
+      {
+        "name": "佐得寧糖衣錠 25 毫克",
+        "dosage": "",
+        "indication": "",
+        "category": "建議用藥"
+      }
+    ],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Patient reports experiencing significant fatigue and difficulty with sleep for approximately one month. He notes that the symptoms correlate with a busy work schedule involving frequent overtime. He also mentions occasional palpitations, hand tremors, and irritability. Physical examination was deferred; diagnostic tests pending.\nThe patient presents with symptoms suggestive of possible hyperthyroidism, which may account for the fatigue, sleep disturbance, palpitations, and irritability. Preliminary diagnosiHyperthyroidism (ICD-10 R00.2).",
+      "objective": "Physical examination deferred; diagnostic tests pending. The physician ordered blood tests to evaluate thyroid function.",
+      "assessment": "",
+      "plan": "Management plan includes initiating oral medications to control thyroid function. The physician advised that if the condition proves severe, further treatment options such as surgery or radioiodine therapy may be necessary. Follow up is required after reviewing the results of the thyroid panel blood tests.",
+      "medical_orders": [],
+      "drug_recommendations": [
+        {
+          "name": "\"晟德\" 康停 懸液劑",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "安保思定膠囊40毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "思敏膠囊40毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "\"強生\"欣解 糖衣錠",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        },
+        {
+          "name": "佐得寧糖衣錠 25 毫克",
+          "dosage": "",
+          "indication": "",
+          "category": "建議用藥"
+        }
+      ],
+      "en": "S (Subjective):\nPatient reports experiencing significant fatigue and difficulty with sleep for approximately one month. He notes that the symptoms correlate with a busy work schedule involving frequent overtime. He also mentions occasional palpitations, hand tremors, and irritability. Physical examination was deferred; diagnostic tests pending.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician ordered blood tests to evaluate thyroid function.\n\nA (Assessment):\nThe patient presents with symptoms suggestive of possible hyperthyroidism, which may account for the fatigue, sleep disturbance, palpitations, and irritability. Preliminary diagnosis: Hyperthyroidism (ICD-10 R00.2).\n\nP (Plan):\nManagement plan includes initiating oral medications to control thyroid function. The physician advised that if the condition proves severe, further treatment options such as surgery or radioiodine therapy may be necessary. Follow up is required after reviewing the results of the thyroid panel blood tests.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nPatient reports experiencing significant fatigue and difficulty with sleep for approximately one month. He notes that the symptoms correlate with a busy work schedule involving frequent overtime. He also mentions occasional palpitations, hand tremors, and irritability. Physical examination was deferred; diagnostic tests pending.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician ordered blood tests to evaluate thyroid function.\n\nA (Assessment):\nThe patient presents with symptoms suggestive of possible hyperthyroidism, which may account for the fatigue, sleep disturbance, palpitations, and irritability. Preliminary diagnosis: Hyperthyroidism (ICD-10 R00.2).\n\nP (Plan):\nManagement plan includes initiating oral medications to control thyroid function. The physician advised that if the condition proves severe, further treatment options such as surgery or radioiodine therapy may be necessary. Follow up is required after reviewing the results of the thyroid panel blood tests.",
+      "raw_zh": ""
+    }
+  }
+]

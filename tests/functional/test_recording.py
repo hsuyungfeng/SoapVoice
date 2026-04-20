@@ -2,9 +2,7 @@
 測試錄音功能
 """
 
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 # 添加專案根目錄到 Python 路徑

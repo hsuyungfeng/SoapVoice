@@ -7,11 +7,10 @@ SoapVoice Typer CLI 介面
 """
 
 import sys
-import re
 import os
 import logging
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional
 
 import typer
 from rich.console import Console
@@ -22,7 +21,6 @@ from rich.table import Table
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.soap.soap_generator import SOAPGenerator, SOAPConfig, initialize_generator
-from src.llm import LlamaEngine, LlamaConfig
 from src.asr.whisper_model import WhisperModel
 
 app = typer.Typer(
@@ -183,7 +181,6 @@ def process(
     result["transcript"] = transcript
 
     if json_output:
-        import json
         console.print_json(data=result)
     else:
         console.print(f"\n[bold blue]轉錄文字:[/bold blue]\n{transcript}")

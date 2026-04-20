@@ -7,7 +7,6 @@
 - 會話結束時寫入原始音檔 + ASR 逐字稿
 """
 
-import io
 import json
 import wave
 import uuid

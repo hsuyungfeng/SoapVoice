@@ -7,7 +7,6 @@ from src.soap.soap_generator import (
     SOAPGenerator,
     SOAPConfig,
     get_generator,
-    initialize_generator,
     SOAP_KEYWORDS,
 )
 
@@ -185,7 +184,6 @@ class TestSingletonGenerator:
     def test_get_generator_with_config(self):
         """測試帶配置的生成器"""
         # 清除全域快取以測試新配置
-        from src.soap.soap_generator import _generator
         import src.soap.soap_generator as soap_mod
 
         soap_mod._generator = None
@@ -200,7 +198,6 @@ class TestSingletonGenerator:
     def test_initialize_generator(self):
         """測試初始化生成器（不實際載入模型）"""
         # 僅測試函數可呼叫，不實際初始化 LLM
-        from src.soap.soap_generator import _generator
         import src.soap.soap_generator as soap_mod
 
         soap_mod._generator = None

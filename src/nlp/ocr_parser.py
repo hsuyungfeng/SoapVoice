@@ -1,6 +1,5 @@
 import logging
 import json
-import time
 import os
 
 import numpy as np
@@ -78,7 +77,7 @@ class OCRParser:
             self.HAS_OLLAMA_VISION = False
             self.HAS_EASYOCR = False  # EasyOCR 需要下載模型，且不再是主力引擎
             logging.getLogger(__name__).info(
-                f"離線模式啟用: 使用 Tesseract-OCR (主力離線引擎)"
+                "離線模式啟用: 使用 Tesseract-OCR (主力離線引擎)"
             )
 
     def _get_reader(self):

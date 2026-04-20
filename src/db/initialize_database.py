@@ -16,9 +16,8 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Iterator, Dict, Any, Optional
+from typing import Optional
 from dataclasses import dataclass
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

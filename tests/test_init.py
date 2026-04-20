@@ -2,7 +2,6 @@
 測試 __init__.py 模組
 """
 
-import pytest
 
 
 class TestSrcInit:

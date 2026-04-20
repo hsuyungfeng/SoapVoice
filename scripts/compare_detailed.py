@@ -83,13 +83,14 @@ def process_single(model: str, audio_file: str, name: str) -> dict:
         # Transcribe
         with open(audio_path, "rb") as f:
             files = {"audio": (audio_file, f, "audio/wav")}
-            resp = httpx.post(f"{API_BASE}/api/v1/extended/transcribe", files=files, timeout=180)
+            data = {"backend": "qwen3asr"}
+            resp = httpx.post(f"{API_BASE}/api/v1/extended/transcribe", files=files, data=data, timeout=180)
 
         if resp.status_code == 200:
             data = resp.json()
             result["transcript"] = data.get("transcript", "")
             result["transcribe_time"] = round(time.time() - start_time, 2)
-            result["asr_model"] = "whisper"
+            result["asr_model"] = "qwen3asr"
         else:
             result["error"] = f"Transcribe failed: {resp.status_code}"
             result["total_time"] = round(time.time() - start_time, 2)

@@ -1,0 +1,380 @@
+[
+  {
+    "name": "胸痛",
+    "file": "chest_pain.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "請做。今天有什麼不舒服？醫師，我昨天開始胸口很悶，呼吸不太順暢。這樣的情況持續多久了？有沒有發燒或咳嗽？大概兩天了，沒有發燒，但是走路快一點就會喘。之前有類似症狀嗎？有沒有心臟方面的病史？沒有，但是我有抽菸，大概抽了十年。好，我先幫你安排心電圖和胸部X光檢查。醫師，嚴重嗎？目前先做檢查確認，你不要緊張。",
+    "transcribe_time": 26.16,
+    "asr_model": "whisper",
+    "llm_time": 56.82,
+    "total_time": 82.98,
+    "symptoms": [
+      "胸部X光",
+      "ECG",
+      "ECG",
+      "fever",
+      "cough",
+      "chest",
+      "heart",
+      "檢查",
+      "不要",
+      "dyspnea",
+      "咳嗽",
+      "發燒"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R05",
+        "description": "Cough",
+        "confidence": 0.9
+      },
+      {
+        "code": "R50.9",
+        "description": "Fever, unspecified",
+        "confidence": 0.9
+      },
+      {
+        "code": "R06.02",
+        "description": "Shortness of breath",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Patient reports onset of chest tightness and dyspnea approximately two days ago. Denies fever or cough. Dyspnea is noted upon increased ambulation, but denies history of similar symptoms or known cardiac conditions. Patient admits to a smoking history of ten years duration.",
+      "objective": "Physical examination deferred; diagnostic tests pending. The physician has ordered an ECG and a Chest X-ray for confirmation. Vital signs were not explicitly recorded in the consultation.",
+      "assessment": "Dyspnea on exertion (DOE) and chest tightness, requiring further investigation to rule out cardiac or pulmonary etiology. Preliminary considerations include R06.02 (Dyspnea).",
+      "plan": "The plan involves immediate diagnostic workup including an ECG and a Chest X-ray. The patient was advised not to be overly anxious regarding the findings. Follow-up management will depend on the results of these scheduled investigations.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nPatient reports onset of chest tightness and dyspnea approximately two days ago. Denies fever or cough. Dyspnea is noted upon increased ambulation, but denies history of similar symptoms or known cardiac conditions. Patient admits to a smoking history of ten years duration.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician has ordered an ECG and a Chest X-ray for confirmation. Vital signs were not explicitly recorded in the consultation.\n\nA (Assessment):\nDyspnea on exertion (DOE) and chest tightness, requiring further investigation to rule out cardiac or pulmonary etiology. Preliminary considerations include R06.02 (Dyspnea).\n\nP (Plan):\nThe plan involves immediate diagnostic workup including an ECG and a Chest X-ray. The patient was advised not to be overly anxious regarding the findings. Follow-up management will depend on the results of these scheduled investigations.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nPatient reports onset of chest tightness and dyspnea approximately two days ago. Denies fever or cough. Dyspnea is noted upon increased ambulation, but denies history of similar symptoms or known cardiac conditions. Patient admits to a smoking history of ten years duration.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The physician has ordered an ECG and a Chest X-ray for confirmation. Vital signs were not explicitly recorded in the consultation.\n\nA (Assessment):\nDyspnea on exertion (DOE) and chest tightness, requiring further investigation to rule out cardiac or pulmonary etiology. Preliminary considerations include R06.02 (Dyspnea).\n\nP (Plan):\nThe plan involves immediate diagnostic workup including an ECG and a Chest X-ray. The patient was advised not to be overly anxious regarding the findings. Follow-up management will depend on the results of these scheduled investigations.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "高血壓",
+    "file": "hypertension.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "張先生今天來血壓控制怎麼樣？醫生，最近血壓還是很高，早上都一百六十多。有按時喫藥嗎？鹽分有沒有控制？藥有喫，但是口味比較重，鹽放比較多。這樣不行哦，高血壓要好好控制，不然會影響腎臟和心臟。醫生，我有時候會頭暈，是不是血壓太高？對，血壓高的時候容易頭暈，我幫你調整一下用藥。好的，那我要注意什麼？少鹽，少油，多運動，每天量血壓記錄下來。",
+    "transcribe_time": 17.17,
+    "asr_model": "whisper",
+    "llm_time": 41.63,
+    "total_time": 58.8,
+    "symptoms": [
+      "high blood pressure",
+      "hypertension",
+      "blood pressure measurement",
+      "dizziness",
+      "heart",
+      "血壓",
+      "運動",
+      "用藥",
+      "kidney"
+    ],
+    "icd10_codes": [
+      {
+        "code": "I10",
+        "description": "Essential (primary) hypertension",
+        "confidence": 0.9
+      },
+      {
+        "code": "R42",
+        "description": "Dizziness and giddiness",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Mr. Zhang presents with concerns regarding his persistently elevated blood pressure, reporting morning readings often exceeding 160 mmHg. He acknowledges taking medication but notes the diet is high in sodium and heavy in flavor. He also reports occasional episodes of dizziness, questioning if this relates to his hypertension.\nPatient advised on lifestyle modificationlow sodium, low fat diet, and increased physical activity. He must maintain a daily blood pressure measurement log for monitoring. Medication adjustment will be made by the physician. Follow-up is required for continued hypertension management.",
+      "objective": "Physical examination deferred; diagnostic tests pending. Vital signs noted: Blood pressure elevated at morning readings (>160 mmHg). Patient reported symptoms include occasional dizziness.",
+      "assessment": "Hypertension (I10); R42 (Dizziness/Presyncope). The patient's current management requires strict control due to risks to the kidney and heart.",
+      "plan": "",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nMr. Zhang presents with concerns regarding his persistently elevated blood pressure, reporting morning readings often exceeding 160 mmHg. He acknowledges taking medication but notes the diet is high in sodium and heavy in flavor. He also reports occasional episodes of dizziness, questioning if this relates to his hypertension.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Vital signs noted: Blood pressure elevated at morning readings (>160 mmHg). Patient reported symptoms include occasional dizziness.\n\nA (Assessment):\nHypertension (I10); R42 (Dizziness/Presyncope). The patient's current management requires strict control due to risks to the kidney and heart.\n\nP (Plan):\nPatient advised on lifestyle modifications: low sodium, low fat diet, and increased physical activity. He must maintain a daily blood pressure measurement log for monitoring. Medication adjustment will be made by the physician. Follow-up is required for continued hypertension management.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nMr. Zhang presents with concerns regarding his persistently elevated blood pressure, reporting morning readings often exceeding 160 mmHg. He acknowledges taking medication but notes the diet is high in sodium and heavy in flavor. He also reports occasional episodes of dizziness, questioning if this relates to his hypertension.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Vital signs noted: Blood pressure elevated at morning readings (>160 mmHg). Patient reported symptoms include occasional dizziness.\n\nA (Assessment):\nHypertension (I10); R42 (Dizziness/Presyncope). The patient's current management requires strict control due to risks to the kidney and heart.\n\nP (Plan):\nPatient advised on lifestyle modifications: low sodium, low fat diet, and increased physical activity. He must maintain a daily blood pressure measurement log for monitoring. Medication adjustment will be made by the physician. Follow-up is required for continued hypertension management.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "糖尿病",
+    "file": "diabetes.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "李女士，你的血糖控制怎麼樣？醫師，這幾天血糖都比較高，空腹大概兩百多。飲食有沒有按時？水果喫多少？有喫飯，但是忍不住會喫水果，上午還喫了兩顆巴樂。巴樂雖然不甜，但是糖分還是有，要適量。醫師，那我可以喫什麼水果？巴樂、蓮霧、奇異果比較好，一次不要超過一碗。醫師，我的腳有時候會麻，是不是神經病變？有可能，這是糖尿病常見的併發症，我幫你安排神經檢查。",
+    "transcribe_time": 17.6,
+    "asr_model": "whisper",
+    "llm_time": 47.22,
+    "total_time": 64.82,
+    "symptoms": [
+      "diabetes mellitus",
+      "檢查",
+      "血糖",
+      "可能",
+      "不要",
+      "飲食"
+    ],
+    "icd10_codes": [
+      {
+        "code": "E11.9",
+        "description": "Type 2 diabetes mellitus without complications",
+        "confidence": 0.9
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient reports persistently elevated blood glucose levels, with fasting readings around 200 mg/dL. She admits to consuming fruits beyond dietary guidelines, specifically mentioning two pieces of 'Bale' in the morning. The patient inquired about suitable fruit options, and was advised that a mixture of 'Bale', lotus mist, and kiwi are acceptable, but intake should not exceed one bowl per occasion.",
+      "objective": "Physical examination deferred; diagnostic tests pending. The patient noted occasional numbness in her feet, prompting an inquiry regarding potential peripheral neuropathy related to diabetes mellitus complications.",
+      "assessment": "1. Type 2 Diabetes Mellitus (ICD-10: E11.9) - Uncontrolled hyperglycemia and risk of peripheral neuropathy.\n2. Potential Peripheral Neuropathy secondary to Diabetes Mellitus.",
+      "plan": "1. **Dietary Modification:** Strict limitation of fruit intake; advised maximum one bowl per occasion from acceptable sources ('Bale', lotus mist, kiwi).\n2. **Diagnostic Testing:** Referral for comprehensive nerve examination as planned by the physician.\n3. **Follow-uPatient to monitor blood glucose levels and adhere strictly to dietary restrictions.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nThe patient reports persistently elevated blood glucose levels, with fasting readings around 200 mg/dL. She admits to consuming fruits beyond dietary guidelines, specifically mentioning two pieces of 'Bale' in the morning. The patient inquired about suitable fruit options, and was advised that a mixture of 'Bale', lotus mist, and kiwi are acceptable, but intake should not exceed one bowl per occasion.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The patient noted occasional numbness in her feet, prompting an inquiry regarding potential peripheral neuropathy related to diabetes mellitus complications.\n\nA (Assessment):\n1. Type 2 Diabetes Mellitus (ICD-10: E11.9) - Uncontrolled hyperglycemia and risk of peripheral neuropathy.\n2. Potential Peripheral Neuropathy secondary to Diabetes Mellitus.\n\nP (Plan):\n1. **Dietary Modification:** Strict limitation of fruit intake; advised maximum one bowl per occasion from acceptable sources ('Bale', lotus mist, kiwi).\n2. **Diagnostic Testing:** Referral for comprehensive nerve examination as planned by the physician.\n3. **Follow-up:** Patient to monitor blood glucose levels and adhere strictly to dietary restrictions.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient reports persistently elevated blood glucose levels, with fasting readings around 200 mg/dL. She admits to consuming fruits beyond dietary guidelines, specifically mentioning two pieces of 'Bale' in the morning. The patient inquired about suitable fruit options, and was advised that a mixture of 'Bale', lotus mist, and kiwi are acceptable, but intake should not exceed one bowl per occasion.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. The patient noted occasional numbness in her feet, prompting an inquiry regarding potential peripheral neuropathy related to diabetes mellitus complications.\n\nA (Assessment):\n1. Type 2 Diabetes Mellitus (ICD-10: E11.9) - Uncontrolled hyperglycemia and risk of peripheral neuropathy.\n2. Potential Peripheral Neuropathy secondary to Diabetes Mellitus.\n\nP (Plan):\n1. **Dietary Modification:** Strict limitation of fruit intake; advised maximum one bowl per occasion from acceptable sources ('Bale', lotus mist, kiwi).\n2. **Diagnostic Testing:** Referral for comprehensive nerve examination as planned by the physician.\n3. **Follow-up:** Patient to monitor blood glucose levels and adhere strictly to dietary restrictions.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "傷口護理",
+    "file": "wound_care.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "阿姨，我來幫你換藥。護理師：這傷口什麼時候會好？我看一下傷口，恢復的不錯，已經沒有發炎了。已經一個禮拜了，本來說三天就可以洗澡對吧？對，手術傷口十天後就可以碰水了，這兩天先擦澡。傷口旁邊有點癢，正常嗎？傷口在癒合會癢，儘量不要抓，我幫你塗止癢藥膏。請問傷口上的美容膠帶要撕掉嗎？讓它自然脫落就好，不用刻意撕，平時傷口保持乾燥。",
+    "transcribe_time": 18.71,
+    "asr_model": "whisper",
+    "llm_time": 37.65,
+    "total_time": 56.36,
+    "symptoms": [
+      "inflammation",
+      "dressing change",
+      "不要",
+      "手術",
+      "癢"
+    ],
+    "icd10_codes": [
+      {
+        "code": "L29.9",
+        "description": "Pruritus, unspecified",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient reports mild pruritus adjacent to the surgical wound. The duration of healing is noted, with previous expectations for bathing after three days post-operation. The primary concern addressed during this visit was the management and care of the dressing change at the surgical site.",
+      "objective": "Physical examination revealed that the surgical wound appears well-healed, with no evidence of active inflammation. The wound dressing was assessed during the procedure. Vital signs were not explicitly recorded. Diagnostic tests pending.",
+      "assessment": "Healing surgical incision site; mild localized pruritus secondary to wound healing. No acute infection noted at this time. ICD-10 codes are not applicable based on provided information.",
+      "plan": "Continue local wound care and dressing changes as scheduled. Advised the patient that the adhesive tape on the wound should be allowed to detach naturally, avoiding forceful removal. Applied an anti-pruritic ointment to manage localized itching. Instructed the patient regarding water exposure: showering is permitted with precautions for the next couple of days; full immersion is advised after ten days post-surgery. Advised keeping the surgical site clean and dry in the interim. Follow up as needed.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nThe patient reports mild pruritus adjacent to the surgical wound. The duration of healing is noted, with previous expectations for bathing after three days post-operation. The primary concern addressed during this visit was the management and care of the dressing change at the surgical site.\n\nO (Objective):\nPhysical examination revealed that the surgical wound appears well-healed, with no evidence of active inflammation. The wound dressing was assessed during the procedure. Vital signs were not explicitly recorded. Diagnostic tests pending.\n\nA (Assessment):\nHealing surgical incision site; mild localized pruritus secondary to wound healing. No acute infection noted at this time. ICD-10 codes are not applicable based on provided information.\n\nP (Plan):\nContinue local wound care and dressing changes as scheduled. Advised the patient that the adhesive tape on the wound should be allowed to detach naturally, avoiding forceful removal. Applied an anti-pruritic ointment to manage localized itching. Instructed the patient regarding water exposure: showering is permitted with precautions for the next couple of days; full immersion is advised after ten days post-surgery. Advised keeping the surgical site clean and dry in the interim. Follow up as needed.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient reports mild pruritus adjacent to the surgical wound. The duration of healing is noted, with previous expectations for bathing after three days post-operation. The primary concern addressed during this visit was the management and care of the dressing change at the surgical site.\n\nO (Objective):\nPhysical examination revealed that the surgical wound appears well-healed, with no evidence of active inflammation. The wound dressing was assessed during the procedure. Vital signs were not explicitly recorded. Diagnostic tests pending.\n\nA (Assessment):\nHealing surgical incision site; mild localized pruritus secondary to wound healing. No acute infection noted at this time. ICD-10 codes are not applicable based on provided information.\n\nP (Plan):\nContinue local wound care and dressing changes as scheduled. Advised the patient that the adhesive tape on the wound should be allowed to detach naturally, avoiding forceful removal. Applied an anti-pruritic ointment to manage localized itching. Instructed the patient regarding water exposure: showering is permitted with precautions for the next couple of days; full immersion is advised after ten days post-surgery. Advised keeping the surgical site clean and dry in the interim. Follow up as needed.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "呼吸道",
+    "file": "respiratory.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "怎麼了？咳嗽嗎？醫師，我咳嗽一個多禮拜了，有痰但是咳不出來。有沒有發燒？喉嚨痛不痛？有一點發燒，喉嚨很痛，痰是黃色的。先去照一下胸部X光，看一下肺部情況。醫師，我是不是肺炎？目前不確定，等X光結果出來再說。我先幫你抽血檢查。好，那需要住院嗎？先看檢查結果，如果肺部有發炎，可能需要住院治療。",
+    "transcribe_time": 15.66,
+    "asr_model": "whisper",
+    "llm_time": 44.85,
+    "total_time": 60.52,
+    "symptoms": [
+      "胸部X光",
+      "喉嚨痛",
+      "fever",
+      "cough",
+      "severe pain",
+      "chest",
+      "throat",
+      "pneumonia",
+      "inflammation",
+      "blood draw",
+      "檢查",
+      "可能",
+      "住院",
+      "治療",
+      "lung",
+      "咳",
+      "痛",
+      "咳嗽",
+      "發燒"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R05",
+        "description": "Cough",
+        "confidence": 0.9
+      },
+      {
+        "code": "R50.9",
+        "description": "Fever, unspecified",
+        "confidence": 0.9
+      },
+      {
+        "code": "J18.9",
+        "description": "Pneumonia, unspecified organism",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient reports a persistent cough for over one week, associated with yellow sputum that is difficult to expectorate. The patient also complains of mild fever and severe throat pain. Physical examination reveals the presence of yellow sputum. The patient's chief complaint centers on respiratory symptoms and pharyngitis.",
+      "objective": "Physical examination revealed signs consistent with upper respiratory tract infection, including reported fever and visible yellow sputum. Diagnostic plan includes a Chest X-ray to assess lung status and a blood draw for further investigation. Vital signs are not explicitly documented beyond the report of mild fever.",
+      "assessment": "Acute Upper Respiratory Tract Infection (ICD-10: J06.9). Differential diagnosis includes Pneumonia (ICD-10: J18.9), pending Chest X-ray results.",
+      "plan": "The patient is advised to undergo a Chest X-ray and blood draw for comprehensive evaluation of lung inflammation. Management plan will be determined based on the results; potential hospitalization may be necessary if significant pulmonary inflammation is confirmed, requiring further anti-inflammatory and supportive treatment.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nThe patient reports a persistent cough for over one week, associated with yellow sputum that is difficult to expectorate. The patient also complains of mild fever and severe throat pain. Physical examination reveals the presence of yellow sputum. The patient's chief complaint centers on respiratory symptoms and pharyngitis.\n\nO (Objective):\nPhysical examination revealed signs consistent with upper respiratory tract infection, including reported fever and visible yellow sputum. Diagnostic plan includes a Chest X-ray to assess lung status and a blood draw for further investigation. Vital signs are not explicitly documented beyond the report of mild fever.\n\nA (Assessment):\nAcute Upper Respiratory Tract Infection (ICD-10: J06.9). Differential diagnosis includes Pneumonia (ICD-10: J18.9), pending Chest X-ray results.\n\nP (Plan):\nThe patient is advised to undergo a Chest X-ray and blood draw for comprehensive evaluation of lung inflammation. Management plan will be determined based on the results; potential hospitalization may be necessary if significant pulmonary inflammation is confirmed, requiring further anti-inflammatory and supportive treatment.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient reports a persistent cough for over one week, associated with yellow sputum that is difficult to expectorate. The patient also complains of mild fever and severe throat pain. Physical examination reveals the presence of yellow sputum. The patient's chief complaint centers on respiratory symptoms and pharyngitis.\n\nO (Objective):\nPhysical examination revealed signs consistent with upper respiratory tract infection, including reported fever and visible yellow sputum. Diagnostic plan includes a Chest X-ray to assess lung status and a blood draw for further investigation. Vital signs are not explicitly documented beyond the report of mild fever.\n\nA (Assessment):\nAcute Upper Respiratory Tract Infection (ICD-10: J06.9). Differential diagnosis includes Pneumonia (ICD-10: J18.9), pending Chest X-ray results.\n\nP (Plan):\nThe patient is advised to undergo a Chest X-ray and blood draw for comprehensive evaluation of lung inflammation. Management plan will be determined based on the results; potential hospitalization may be necessary if significant pulmonary inflammation is confirmed, requiring further anti-inflammatory and supportive treatment.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "醫囑",
+    "file": "drug_order.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "王先生，這是你的處方箋。醫師，這些藥怎麼喫？這包是降血壓藥，每天早餐後喫一顆。這包是利尿劑，下午喫，注意要多喝水。醫師，這個止痛藥什麼時候喫？痛的時候再喫，一天最多四顆，不要空腹喫，會傷胃。這些藥有沒有副作用？可能會有點頭暈或是手腳無力，如果有問題立刻回診。好的，這些藥要喫多久？血壓藥先喫一個月再回診，利尿劑看情況可以停。",
+    "transcribe_time": 18.26,
+    "asr_model": "whisper",
+    "llm_time": 42.9,
+    "total_time": 61.16,
+    "symptoms": [
+      "多喝水",
+      "dizziness",
+      "無力",
+      "血壓",
+      "可能",
+      "不要",
+      "回診",
+      "止痛",
+      "stomach",
+      "痛"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R42",
+        "description": "Dizziness and giddiness",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient is advised on the use of multiple medications. Specific instructions include taking one pill for blood pressure every morning after breakfast, and another diuretic in the afternoon. For pain management, the patient should take the analgesic only when experiencing pain, not on an empty stomach, with a maximum dosage of four pills per day. The patient was warned about potential side effects such as dizziness or limb weakness, requiring immediate follow-up if symptoms occur.",
+      "objective": "Physical examination deferred; diagnostic tests pending.",
+      "assessment": "Potential for mild hypotension and fluid imbalance related to medication regimen. R42 (Chronic/Acute Symptom).",
+      "plan": "The patient is prescribed blood pressure medication to be taken for one month, with a follow-up appointment scheduled afterward. The diuretic should be continued based on clinical assessment and the patient must ensure adequate hydration. Analgesics are to be taken only as needed. Patients are advised to monitor for dizziness or limb weakness and return immediately if symptoms arise.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nThe patient is advised on the use of multiple medications. Specific instructions include taking one pill for blood pressure every morning after breakfast, and another diuretic in the afternoon. For pain management, the patient should take the analgesic only when experiencing pain, not on an empty stomach, with a maximum dosage of four pills per day. The patient was warned about potential side effects such as dizziness or limb weakness, requiring immediate follow-up if symptoms occur.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending.\n\nA (Assessment):\nPotential for mild hypotension and fluid imbalance related to medication regimen. R42 (Chronic/Acute Symptom).\n\nP (Plan):\nThe patient is prescribed blood pressure medication to be taken for one month, with a follow-up appointment scheduled afterward. The diuretic should be continued based on clinical assessment and the patient must ensure adequate hydration. Analgesics are to be taken only as needed. Patients are advised to monitor for dizziness or limb weakness and return immediately if symptoms arise.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient is advised on the use of multiple medications. Specific instructions include taking one pill for blood pressure every morning after breakfast, and another diuretic in the afternoon. For pain management, the patient should take the analgesic only when experiencing pain, not on an empty stomach, with a maximum dosage of four pills per day. The patient was warned about potential side effects such as dizziness or limb weakness, requiring immediate follow-up if symptoms occur.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending.\n\nA (Assessment):\nPotential for mild hypotension and fluid imbalance related to medication regimen. R42 (Chronic/Acute Symptom).\n\nP (Plan):\nThe patient is prescribed blood pressure medication to be taken for one month, with a follow-up appointment scheduled afterward. The diuretic should be continued based on clinical assessment and the patient must ensure adequate hydration. Analgesics are to be taken only as needed. Patients are advised to monitor for dizziness or limb weakness and return immediately if symptoms arise.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "手術記錄",
+    "file": "surgery_record.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "手術開始時間上午九點二十分。確認病人姓名：陳大明。手術項目是腹腔鏡膽囊切除術。確認麻醉完成，開始消毒手術部位。建立第一個穿刺孔於肚臍上方，插入腹腔鏡。確認膽囊位置，發現有輕微發炎粘連。出血量約五十cc，手術進行中。分離膽囊與周圍組織，準備夾住膽管。確認沒有其他異常，開始切除膽囊。取出膽囊，手術傷口縫合。手術時間四十五分鐘。病人生命徵項穩定，手術完成。",
+    "transcribe_time": 20.65,
+    "asr_model": "whisper",
+    "llm_time": 39.52,
+    "total_time": 60.18,
+    "symptoms": [
+      "bleeding",
+      "inflammation",
+      "suturing",
+      "手術",
+      "麻醉"
+    ],
+    "icd10_codes": [],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "The patient, Mr. Chen Daming, underwent a laparoscopic cholecystectomy procedure. The chief complaint relates to the surgical findings during the operation, which noted mild inflammation and adhesions involving the gallbladder area. No specific pre-operative symptoms were detailed in the transcript.",
+      "objective": "Physical examination deferred; diagnostic tests pending. Intra-operative notes indicate bleeding volume of approximately 50cc during the procedure. Vital signs remained stable throughout the surgery.",
+      "assessment": "Acute cholecystitis with associated adhesions requiring laparoscopic cholecystectomy. (ICD-10: K81.9)",
+      "plan": "The gallbladder was successfully excised via laparoscopic technique, and the surgical site was thoroughly sutured. The patient is stable post-operatively. Follow-up care includes monitoring the incision site for signs of infection or bleeding. No further medications or diagnostic tests were recommended at this time.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nThe patient, Mr. Chen Daming, underwent a laparoscopic cholecystectomy procedure. The chief complaint relates to the surgical findings during the operation, which noted mild inflammation and adhesions involving the gallbladder area. No specific pre-operative symptoms were detailed in the transcript.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Intra-operative notes indicate bleeding volume of approximately 50cc during the procedure. Vital signs remained stable throughout the surgery.\n\nA (Assessment):\nAcute cholecystitis with associated adhesions requiring laparoscopic cholecystectomy. (ICD-10: K81.9)\n\nP (Plan):\nThe gallbladder was successfully excised via laparoscopic technique, and the surgical site was thoroughly sutured. The patient is stable post-operatively. Follow-up care includes monitoring the incision site for signs of infection or bleeding. No further medications or diagnostic tests were recommended at this time.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nThe patient, Mr. Chen Daming, underwent a laparoscopic cholecystectomy procedure. The chief complaint relates to the surgical findings during the operation, which noted mild inflammation and adhesions involving the gallbladder area. No specific pre-operative symptoms were detailed in the transcript.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Intra-operative notes indicate bleeding volume of approximately 50cc during the procedure. Vital signs remained stable throughout the surgery.\n\nA (Assessment):\nAcute cholecystitis with associated adhesions requiring laparoscopic cholecystectomy. (ICD-10: K81.9)\n\nP (Plan):\nThe gallbladder was successfully excised via laparoscopic technique, and the surgical site was thoroughly sutured. The patient is stable post-operatively. Follow-up care includes monitoring the incision site for signs of infection or bleeding. No further medications or diagnostic tests were recommended at this time.",
+      "raw_zh": ""
+    }
+  },
+  {
+    "name": "醫病對話",
+    "file": "doctor_patient.wav",
+    "model": "gemma-4-E4B",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "transcript": "醫師，我最近很容易疲倦，晚上睡不好。這樣多久了？壓力大嗎？大概一個月了，工作很忙，然後一直加班。會不會心悸，手抖？有一點，有時候脾氣很不好。我幫你驗血，看一下甲狀腺功能。醫師，我是不是甲狀腺有問題？先檢查再說，甲狀腺亢進會造成這些症狀。如果真的是甲狀腺問題，要怎麼治療？先喫藥控制，嚴重的話可能需要開刀或是做放射點治療。",
+    "transcribe_time": 16.67,
+    "asr_model": "whisper",
+    "llm_time": 44.18,
+    "total_time": 60.85,
+    "symptoms": [
+      "甲狀腺亢進",
+      "甲狀腺",
+      "fatigue",
+      "palpitation",
+      "檢查",
+      "可能",
+      "治療",
+      "開刀"
+    ],
+    "icd10_codes": [
+      {
+        "code": "R53.83",
+        "description": "Other fatigue",
+        "confidence": 0.85
+      },
+      {
+        "code": "R00.2",
+        "description": "Palpitations",
+        "confidence": 0.85
+      }
+    ],
+    "drug_recommendations": [],
+    "medical_orders": [],
+    "soap": {
+      "subjective": "Patient reports experiencing significant fatigue and difficulty with sleep for approximately one month. He notes feeling palpitations and occasional irritability, attributing these symptoms to high work stress and frequent overtime. The patient is concerned about underlying thyroid dysfunction based on the discussion.\n2. Management will be initiated upon diagnosimedication control is recommended; severe cases may require surgical intervention or radioiodine therapy.\n3. Follow-up plan pending results of the TFT investigation.",
+      "objective": "Physical examination deferred; diagnostic tests pending. Thyroid function testing was discussed as a necessary investigation to rule out hyperthyroidism causing the reported symptoms. No vital signs or specific physical findings were documented.",
+      "assessment": "1. Fatigue, palpitations, and irritability related to stress/potential thyroid dysfunction (R53.83).\n2. Potential Hyperthyroidism requiring further investigation (ICD-10 code pending based on test results).",
+      "plan": "1. Complete comprehensive blood tests, specifically focusing on Thyroid Function Tests (TFTs), to evaluate for hyperthyroidism.",
+      "medical_orders": [],
+      "drug_recommendations": [],
+      "en": "S (Subjective):\nPatient reports experiencing significant fatigue and difficulty with sleep for approximately one month. He notes feeling palpitations and occasional irritability, attributing these symptoms to high work stress and frequent overtime. The patient is concerned about underlying thyroid dysfunction based on the discussion.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Thyroid function testing was discussed as a necessary investigation to rule out hyperthyroidism causing the reported symptoms. No vital signs or specific physical findings were documented.\n\nA (Assessment):\n1. Fatigue, palpitations, and irritability related to stress/potential thyroid dysfunction (R53.83).\n2. Potential Hyperthyroidism requiring further investigation (ICD-10 code pending based on test results).\n\nP (Plan):\n1. Complete comprehensive blood tests, specifically focusing on Thyroid Function Tests (TFTs), to evaluate for hyperthyroidism.\n2. Management will be initiated upon diagnosis: medication control is recommended; severe cases may require surgical intervention or radioiodine therapy.\n3. Follow-up plan pending results of the TFT investigation.",
+      "zh": "",
+      "raw_en": "S (Subjective):\nPatient reports experiencing significant fatigue and difficulty with sleep for approximately one month. He notes feeling palpitations and occasional irritability, attributing these symptoms to high work stress and frequent overtime. The patient is concerned about underlying thyroid dysfunction based on the discussion.\n\nO (Objective):\nPhysical examination deferred; diagnostic tests pending. Thyroid function testing was discussed as a necessary investigation to rule out hyperthyroidism causing the reported symptoms. No vital signs or specific physical findings were documented.\n\nA (Assessment):\n1. Fatigue, palpitations, and irritability related to stress/potential thyroid dysfunction (R53.83).\n2. Potential Hyperthyroidism requiring further investigation (ICD-10 code pending based on test results).\n\nP (Plan):\n1. Complete comprehensive blood tests, specifically focusing on Thyroid Function Tests (TFTs), to evaluate for hyperthyroidism.\n2. Management will be initiated upon diagnosis: medication control is recommended; severe cases may require surgical intervention or radioiodine therapy.\n3. Follow-up plan pending results of the TFT investigation.",
+      "raw_zh": ""
+    }
+  }
+]

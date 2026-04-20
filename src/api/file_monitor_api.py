@@ -5,11 +5,10 @@
 """
 
 import logging
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from pydantic import BaseModel
 
 from src.services.file_monitor import get_file_monitor, initialize_file_monitor
 

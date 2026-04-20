@@ -65,9 +65,7 @@ class MedicalTerminologyMapper:
         "皮膚癢": ("pruritus", "symptom", ["L29.9"]),
         "流血": ("bleeding", "symptom", ["R58"]),
         "出血": ("bleeding", "symptom", ["R58"]),
-        "頭痛": ("headache", "symptom", ["R51"]),
         "頭很痛": ("headache", "symptom", ["R51"]),
-        "頭暈": ("dizziness", "symptom", ["R42"]),
         "頭很暈": ("dizziness", "symptom", ["R42"]),
         "頭暈目眩": ("vertigo", "symptom", ["R42"]),
         "暈眩": ("vertigo", "symptom", ["R42"]),
@@ -79,9 +77,7 @@ class MedicalTerminologyMapper:
         "胃痛": ("stomach ache", "symptom", ["R10.13"]),
 
         "水泡": ("blister", "symptom", ["L10.9"]),
-        "起水泡": ("blister formation", "symptom", ["L10.9"]),
         "燙傷": ("scald burn", "symptom", ["T30.0"]),
-        "二度燙傷": ("second-degree burn", "symptom", ["T30.2"]),
         "傷口外圍癢": ("peri-wound pruritus", "symptom", ["L29.9"]),
         
         # 解剖部位
@@ -139,10 +135,8 @@ class MedicalTerminologyMapper:
         "點滴": ("IV infusion", "procedure", []),
         # 新增來自 prompt.md 的術語
         "眩暈": ("vertigo", "symptom", ["R42"]),
-        "噁心": ("nausea", "symptom", ["R11.0"]),
         "撕裂傷": ("laceration", "symptom", ["S01"]),
         "擦傷": ("abrasion", "symptom", ["T14.0"]),
-        "二度燙傷": ("second-degree burn", "symptom", ["T30.2"]),
         "紅腫": ("redness and swelling", "objective", []),
         "起水泡": ("blister formation", "objective", []),
     }

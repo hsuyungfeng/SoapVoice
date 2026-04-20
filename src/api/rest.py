@@ -11,10 +11,10 @@ from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
-from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
-from src.nlp.icd10_classifier import ICD10Classifier, ICD10Match
-from src.nlp.soap_classifier import SOAPClassifier, SOAPClassification
-from src.soap.soap_generator import SOAPGenerator, SOAPConfig
+from src.nlp.terminology_mapper import MedicalTerminologyMapper
+from src.nlp.icd10_classifier import ICD10Classifier
+from src.nlp.soap_classifier import SOAPClassifier
+from src.soap.soap_generator import SOAPGenerator
 from src.db.clinical_db import ClinicalDatabase
 
 

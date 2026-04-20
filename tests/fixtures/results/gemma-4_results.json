@@ -1,0 +1,74 @@
+[
+  {
+    "name": "胸痛",
+    "file": "chest_pain.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.03
+  },
+  {
+    "name": "高血壓",
+    "file": "hypertension.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  },
+  {
+    "name": "糖尿病",
+    "file": "diabetes.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  },
+  {
+    "name": "傷口護理",
+    "file": "wound_care.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  },
+  {
+    "name": "呼吸道",
+    "file": "respiratory.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  },
+  {
+    "name": "醫囑",
+    "file": "drug_order.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  },
+  {
+    "name": "手術記錄",
+    "file": "surgery_record.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  },
+  {
+    "name": "醫病對話",
+    "file": "doctor_patient.wav",
+    "model": "gemma-4",
+    "audio_duration": 0,
+    "audio_size": 0,
+    "error": "[Errno 111] Connection refused",
+    "total_time": 0.0
+  }
+]

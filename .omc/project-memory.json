@@ -1,0 +1,268 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775644068768,
+  "projectRoot": "/home/hsu/Desktop/SoapVoice",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml",
+          "requirements.txt"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "fastapi",
+        "version": null,
+        "category": "backend"
+      },
+      {
+        "name": "pytest",
+        "version": null,
+        "category": "testing"
+      }
+    ],
+    "packageManager": "pip",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": "pytest",
+    "lintCommand": "ruff check",
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": "snake_case",
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "examples",
+      "scripts",
+      "src",
+      "static",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "__pycache__": {
+      "path": "__pycache__",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775644068763,
+      "keyFiles": [
+        "conftest.cpython-313-pytest-9.0.2.pyc",
+        "start_server.cpython-313.pyc"
+      ]
+    },
+    "config": {
+      "path": "config",
+      "purpose": "Configuration files",
+      "fileCount": 5,
+      "lastAccessed": 1775644068764,
+      "keyFiles": [
+        "medical_vocabulary.json",
+        "models.yaml",
+        "nginx.conf",
+        "prometheus.yml",
+        "websocket.yaml"
+      ]
+    },
+    "data": {
+      "path": "data",
+      "purpose": "Data files",
+      "fileCount": 0,
+      "lastAccessed": 1775644068765,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 7,
+      "lastAccessed": 1775644068765,
+      "keyFiles": [
+        "API_INTEGRATION.md",
+        "CLI_USAGE.md",
+        "DEPLOYMENT.md",
+        "MODEL_BENCHMARK_REPORT.md",
+        "OPEN_SOURCE_MODELS_REPORT.md"
+      ]
+    },
+    "examples": {
+      "path": "examples",
+      "purpose": "Example code",
+      "fileCount": 1,
+      "lastAccessed": 1775644068766,
+      "keyFiles": [
+        "cli_example_input.txt"
+      ]
+    },
+    "models": {
+      "path": "models",
+      "purpose": "Data models",
+      "fileCount": 6,
+      "lastAccessed": 1775644068766,
+      "keyFiles": [
+        "Bonsai-8B.gguf",
+        "LICENSE",
+        "NOTICE.txt",
+        "README.md",
+        "qwen2.5-3b-instruct-q4_k_m.gguf"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 21,
+      "lastAccessed": 1775644068766,
+      "keyFiles": [
+        "benchmark_llama.py",
+        "benchmark_ollama.py",
+        "build_windows.sh",
+        "compare_detailed.py",
+        "compare_models.py"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 5,
+      "lastAccessed": 1775644068766,
+      "keyFiles": [
+        "__init__.py",
+        "cli.py",
+        "cli_typer.py",
+        "main.py",
+        "offline_server.py"
+      ]
+    },
+    "static": {
+      "path": "static",
+      "purpose": "Static files",
+      "fileCount": 10,
+      "lastAccessed": 1775644068766,
+      "keyFiles": [
+        "chest_pain.wav",
+        "diabetes.wav",
+        "doctor_patient.wav",
+        "drug_order.wav",
+        "hypertension.wav"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 9,
+      "lastAccessed": 1775644068766,
+      "keyFiles": [
+        "__init__.py",
+        "test_asr.py",
+        "test_init.py",
+        "test_llm_benchmark.py",
+        "test_nlp.py"
+      ]
+    },
+    "watch": {
+      "path": "watch",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1775644068766,
+      "keyFiles": []
+    },
+    "models/assets": {
+      "path": "models/assets",
+      "purpose": "Static assets",
+      "fileCount": 6,
+      "lastAccessed": 1775644068767,
+      "keyFiles": [
+        "bonsai-logo.svg",
+        "energy_8B.png",
+        "frontier.png"
+      ]
+    },
+    "src/api": {
+      "path": "src/api",
+      "purpose": "API routes",
+      "fileCount": 9,
+      "lastAccessed": 1775644068768,
+      "keyFiles": [
+        "__init__.py",
+        "cloud_api.py",
+        "consultation_api.py"
+      ]
+    },
+    "tests/fixtures": {
+      "path": "tests/fixtures",
+      "purpose": "Test fixtures",
+      "fileCount": 2,
+      "lastAccessed": 1775644068768,
+      "keyFiles": [
+        "asr_comparison_result.json",
+        "sample_zh.wav"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/soap/soap_generator.py",
+      "accessCount": 8,
+      "lastAccessed": 1775699168053,
+      "type": "file"
+    },
+    {
+      "path": ".planning/phases/p7.1-vision-ocr/.continue-here.md",
+      "accessCount": 5,
+      "lastAccessed": 1775699188958,
+      "type": "file"
+    },
+    {
+      "path": "src/api/rest.py",
+      "accessCount": 3,
+      "lastAccessed": 1775644122409,
+      "type": "file"
+    },
+    {
+      "path": "src/llm/llama_engine.py",
+      "accessCount": 3,
+      "lastAccessed": 1775644190783,
+      "type": "file"
+    },
+    {
+      "path": ".planning/STATE.md",
+      "accessCount": 3,
+      "lastAccessed": 1775644776323,
+      "type": "file"
+    },
+    {
+      "path": "src/main.py",
+      "accessCount": 2,
+      "lastAccessed": 1775644217501,
+      "type": "file"
+    },
+    {
+      "path": "src/db/clinical_db.py",
+      "accessCount": 1,
+      "lastAccessed": 1775644186475,
+      "type": "file"
+    },
+    {
+      "path": "test_soap_generation.py",
+      "accessCount": 1,
+      "lastAccessed": 1775699106161,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

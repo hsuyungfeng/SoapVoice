@@ -112,14 +112,18 @@ class SOAPGenerator:
                 model_path = env_path
             else:
                 model_path = str(get_resource_path("models/Qwen2.5-7B-Instruct-Q4_K_M.gguf"))
+            
+            n_threads = int(os.getenv("LLAMA_THREADS", "16"))
             model_config = EngineConfig(
                 model_path=model_path,
                 n_ctx=self.config.num_ctx,
                 max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
                 n_gpu_layers=0,
-                n_threads=int(os.getenv("LLAMA_THREADS", "8")),
+                n_threads=n_threads,
+                n_threads_batch=n_threads,
                 n_batch=512,
+                n_ubatch=512,
                 flash_attn=True
             )
         else:

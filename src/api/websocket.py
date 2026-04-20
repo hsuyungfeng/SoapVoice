@@ -9,15 +9,14 @@ import json
 import asyncio
 import logging
 from typing import Optional, Dict, Any
-from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 
 from src.asr.whisper_model import WhisperModel
 from src.asr.stream_transcriber import StreamTranscriber
-from src.asr.asr_factory import create_asr_model, ChineseConverter, ASRBackendFactory
-from src.asr.recording_session import get_recording_manager, RecordingSessionManager
+from src.asr.asr_factory import create_asr_model, ASRBackendFactory
+from src.asr.recording_session import get_recording_manager
 
 
 # 配置日誌

@@ -8,13 +8,10 @@ SoapVoice Phase 8 - 主整合模組
 - 結果浮動視窗 (results_window.py)
 """
 
-import os
-import sys
 import logging
 import json
 import time
 from pathlib import Path
-from typing import Optional, Dict
 import threading
 
 logger = logging.getLogger(__name__)

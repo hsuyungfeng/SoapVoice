@@ -10,7 +10,6 @@ import numpy as np
 from typing import Optional
 from collections import deque
 
-import faster_whisper
 from faster_whisper import WhisperModel
 import logging
 

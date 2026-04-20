@@ -1,0 +1,4 @@
+Resume from Phase 8: Windows Final Compilation.
+Backend is running on http://127.0.0.1:8010
+GUI is ready with Tray integration.
+Next: Run pyinstaller soapvoice.spec
