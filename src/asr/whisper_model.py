@@ -19,7 +19,7 @@ class WhisperModel:
 
     def __init__(
         self,
-        model_id: str = "large-v3",
+        model_id: str = "medium",
         device: Optional[str] = None,
         compute_type: Optional[str] = None,
         download_root: Optional[str] = None,
@@ -27,7 +27,7 @@ class WhisperModel:
         """初始化 Whisper 模型
 
         Args:
-            model_id: 模型大小，可選 tiny, base, small, medium, large-v2, large-v3
+            model_id: 模型大小，可選 tiny, base, small, medium, large-v2, large-v3（預設: medium）
             device: 設備類型，cuda 或 cpu（預設從環境變數 WHISPER_DEVICE 讀取，若無則為 cuda）
             compute_type: 計算精度，float16, int8, int8_float16（預設從環境變數 WHISPER_COMPUTE_TYPE 讀取，若無則為 float16）
             download_root: 模型下載目錄

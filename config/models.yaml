@@ -3,17 +3,17 @@
 
 whisper:
   # Faster-Whisper 模型配置
-  model_id: "large-v3"
+  model_id: "medium"
   device: "cuda"
   compute_type: "float16"
   language: "auto"  # 自動偵測語言
   task: "transcribe"
   beam_size: 5
   vad_filter: true
-  
+
   # 下載配置
   download_root: null  # 使用預設路徑 ~/.cache/huggingface/hub
-  
+
   # 支援的語言
   supported_languages:
     - "en"  # English
@@ -23,6 +23,34 @@ whisper:
     - "es"  # Spanish
     - "fr"  # French
     - "de"  # German
+
+ocr:
+  # OCR 引擎配置
+  primary_engine: "tesseract"  # 主力引擎：Tesseract-OCR（離線，輕量）
+  fallback_engines:
+    - "vision"  # 備用：Ollama Vision (glm-ocr)
+    - "easyocr"  # 備用：EasyOCR（需 PyTorch CUDA）
+
+  # Tesseract 配置
+  tesseract:
+    languages: "chi_tra+eng"  # 繁體中文 + 英文
+    config: ""  # 額外 Tesseract 參數（可選）
+
+  # Ollama Vision 配置
+  ollama_vision:
+    model: "glm-ocr"  # 預設視覺模型
+    fallback_models:
+      - "gemma4:e4b"
+      - "gemma4:e2b"
+      - "qwen3-vl:4b"
+    api_base: "http://localhost:11434"
+
+  # EasyOCR 配置（備用）
+  easyocr:
+    languages:
+      - "ch_tra"  # 繁體中文
+      - "en"      # 英文
+    gpu: false  # CPU 推理
 
 llm:
   # LLM 模型配置 (Ollama 本地部署)
