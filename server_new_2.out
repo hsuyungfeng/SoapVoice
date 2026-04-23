@@ -1,0 +1,12 @@
+INFO:src.soap.soap_generator:使用 llama.cpp 引擎
+INFO:     Started server process [22292]
+INFO:     Waiting for application startup.
+INFO:src.main:Starting SoapVoice API...
+INFO:src.main:Pre-loading Extended SOAP Pipeline...
+INFO:src.api.extended_api:Initializing ExtendedSoapVoiceEngine (pre-loading)...
+INFO:term:Loaded 100 built-in term mappings
+INFO:term:Loaded external vocabulary from /home/hsu/Desktop/SoapVoice/keywords.json
+INFO:src.api.extended_api:ExtendedSoapVoiceEngine initialized and models loaded
+INFO:src.main:Extended SOAP Pipeline pre-loaded successfully (Whisper object: None)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8010 (Press CTRL+C to quit)

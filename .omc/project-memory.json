@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1775644068768,
+  "lastScanned": 1776842216004,
   "projectRoot": "/home/hsu/Desktop/SoapVoice",
   "techStack": {
     "languages": [
@@ -61,17 +61,24 @@
       "path": "__pycache__",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1775644068763,
+      "lastAccessed": 1776842215999,
       "keyFiles": [
         "conftest.cpython-313-pytest-9.0.2.pyc",
         "start_server.cpython-313.pyc"
       ]
     },
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1776842215999,
+      "keyFiles": []
+    },
     "config": {
       "path": "config",
       "purpose": "Configuration files",
       "fileCount": 5,
-      "lastAccessed": 1775644068764,
+      "lastAccessed": 1776842216000,
       "keyFiles": [
         "medical_vocabulary.json",
         "models.yaml",
@@ -84,14 +91,23 @@
       "path": "data",
       "purpose": "Data files",
       "fileCount": 0,
-      "lastAccessed": 1775644068765,
+      "lastAccessed": 1776842216001,
       "keyFiles": []
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 1,
+      "lastAccessed": 1776842216001,
+      "keyFiles": [
+        "SoapVoice.exe"
+      ]
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
-      "fileCount": 7,
-      "lastAccessed": 1775644068765,
+      "fileCount": 10,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
         "API_INTEGRATION.md",
         "CLI_USAGE.md",
@@ -104,42 +120,52 @@
       "path": "examples",
       "purpose": "Example code",
       "fileCount": 1,
-      "lastAccessed": 1775644068766,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
         "cli_example_input.txt"
+      ]
+    },
+    "installer": {
+      "path": "installer",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1776842216002,
+      "keyFiles": [
+        "is-unicode.exe",
+        "soapvoice.iss"
       ]
     },
     "models": {
       "path": "models",
       "purpose": "Data models",
-      "fileCount": 6,
-      "lastAccessed": 1775644068766,
+      "fileCount": 7,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
-        "Bonsai-8B.gguf",
         "LICENSE",
         "NOTICE.txt",
+        "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
         "README.md",
-        "qwen2.5-3b-instruct-q4_k_m.gguf"
+        "gemma-4-E4B-it-Q4_K_M.gguf"
       ]
     },
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
-      "fileCount": 21,
-      "lastAccessed": 1775644068766,
+      "fileCount": 33,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
         "benchmark_llama.py",
         "benchmark_ollama.py",
         "build_windows.sh",
-        "compare_detailed.py",
-        "compare_models.py"
+        "compare_cli.py",
+        "compare_cli_final.py"
       ]
     },
     "src": {
       "path": "src",
       "purpose": "Source code",
-      "fileCount": 5,
-      "lastAccessed": 1775644068766,
+      "fileCount": 6,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
         "__init__.py",
         "cli.py",
@@ -151,8 +177,8 @@
     "static": {
       "path": "static",
       "purpose": "Static files",
-      "fileCount": 10,
-      "lastAccessed": 1775644068766,
+      "fileCount": 12,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
         "chest_pain.wav",
         "diabetes.wav",
@@ -165,7 +191,7 @@
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 9,
-      "lastAccessed": 1775644068766,
+      "lastAccessed": 1776842216002,
       "keyFiles": [
         "__init__.py",
         "test_asr.py",
@@ -178,14 +204,14 @@
       "path": "watch",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1775644068766,
+      "lastAccessed": 1776842216002,
       "keyFiles": []
     },
     "models/assets": {
       "path": "models/assets",
       "purpose": "Static assets",
       "fileCount": 6,
-      "lastAccessed": 1775644068767,
+      "lastAccessed": 1776842216003,
       "keyFiles": [
         "bonsai-logo.svg",
         "energy_8B.png",
@@ -196,7 +222,7 @@
       "path": "src/api",
       "purpose": "API routes",
       "fileCount": 9,
-      "lastAccessed": 1775644068768,
+      "lastAccessed": 1776842216003,
       "keyFiles": [
         "__init__.py",
         "cloud_api.py",
@@ -207,7 +233,7 @@
       "path": "tests/fixtures",
       "purpose": "Test fixtures",
       "fileCount": 2,
-      "lastAccessed": 1775644068768,
+      "lastAccessed": 1776842216004,
       "keyFiles": [
         "asr_comparison_result.json",
         "sample_zh.wav"
@@ -228,6 +254,12 @@
       "type": "file"
     },
     {
+      "path": ".planning/STATE.md",
+      "accessCount": 5,
+      "lastAccessed": 1776910107539,
+      "type": "file"
+    },
+    {
       "path": "src/api/rest.py",
       "accessCount": 3,
       "lastAccessed": 1775644122409,
@@ -240,15 +272,27 @@
       "type": "file"
     },
     {
-      "path": ".planning/STATE.md",
+      "path": "config/models.yaml",
       "accessCount": 3,
-      "lastAccessed": 1775644776323,
+      "lastAccessed": 1776842534103,
       "type": "file"
     },
     {
       "path": "src/main.py",
       "accessCount": 2,
       "lastAccessed": 1775644217501,
+      "type": "file"
+    },
+    {
+      "path": "src/asr/whisper_model.py",
+      "accessCount": 2,
+      "lastAccessed": 1776842539455,
+      "type": "file"
+    },
+    {
+      "path": "WINDOWS_DEPLOYMENT_SUMMARY.md",
+      "accessCount": 2,
+      "lastAccessed": 1776910107996,
       "type": "file"
     },
     {
@@ -261,6 +305,84 @@
       "path": "test_soap_generation.py",
       "accessCount": 1,
       "lastAccessed": 1775699106161,
+      "type": "file"
+    },
+    {
+      "path": ".planning/ROADMAP.md",
+      "accessCount": 1,
+      "lastAccessed": 1776842269197,
+      "type": "file"
+    },
+    {
+      "path": ".planning/phases/09-windows/09-02-SUMMARY.md",
+      "accessCount": 1,
+      "lastAccessed": 1776842269493,
+      "type": "file"
+    },
+    {
+      "path": ".planning/phases/09-windows/09-03-checkpoint.md",
+      "accessCount": 1,
+      "lastAccessed": 1776842269624,
+      "type": "file"
+    },
+    {
+      "path": "scripts/windows_package.ps1",
+      "accessCount": 1,
+      "lastAccessed": 1776842394735,
+      "type": "file"
+    },
+    {
+      "path": "scripts/windows_package.bat",
+      "accessCount": 1,
+      "lastAccessed": 1776842394958,
+      "type": "file"
+    },
+    {
+      "path": ".planning/phases/09-windows/09-windows-USER-SETUP.md",
+      "accessCount": 1,
+      "lastAccessed": 1776842395439,
+      "type": "file"
+    },
+    {
+      "path": "soapvoice.spec",
+      "accessCount": 1,
+      "lastAccessed": 1776842398582,
+      "type": "file"
+    },
+    {
+      "path": "installer/soapvoice.iss",
+      "accessCount": 1,
+      "lastAccessed": 1776842406892,
+      "type": "file"
+    },
+    {
+      "path": "src/nlp/ocr_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1776842525575,
+      "type": "file"
+    },
+    {
+      "path": "src/api/ocr_api.py",
+      "accessCount": 1,
+      "lastAccessed": 1776842525664,
+      "type": "file"
+    },
+    {
+      "path": ".planning/phases/09-windows/MODEL_CONFIG_UPDATE.md",
+      "accessCount": 1,
+      "lastAccessed": 1776842563874,
+      "type": "file"
+    },
+    {
+      "path": ".planning/phases/09-windows/USB_DEPLOYMENT_GUIDE.md",
+      "accessCount": 1,
+      "lastAccessed": 1776843203095,
+      "type": "file"
+    },
+    {
+      "path": "WINDOWS_QUICK_START.md",
+      "accessCount": 1,
+      "lastAccessed": 1776910255169,
       "type": "file"
     }
   ],

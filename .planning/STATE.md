@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-04-22T07:35:32.104Z"
+progress:
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 3
+  percent: 100
+---
+
 # SoapVoice 專案狀態
 
 ## 專案概述
@@ -55,5 +69,6 @@
 **上次工作**: 2026-04-15
 **停止位置**: 完成 NLP 擴展功能修復與 GUI 顯示優化
 **下一步**: 
+
 1. 繼續 ASR 優化 (Faster-Whisper 模型預加載)
 2. 進行 Windows 最終打包與 PyInstaller 資源路徑驗證
