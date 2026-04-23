@@ -44,8 +44,9 @@ def start_server(port=8010):
 
     try:
         # 啟動伺服器
+        _host = os.environ.get("HOST", "0.0.0.0")
         config = uvicorn.Config(
-            "src.main:app", host="127.0.0.1", port=port, reload=False, log_level="info"
+            "src.main:app", host=_host, port=port, reload=False, log_level="info"
         )
         server = uvicorn.Server(config)
 

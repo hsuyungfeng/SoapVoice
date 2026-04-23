@@ -119,7 +119,7 @@ class SOAPGenerator:
                 n_ctx=self.config.num_ctx,
                 max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
-                n_gpu_layers=0,
+                n_gpu_layers=int(os.getenv("LLAMA_N_GPU_LAYERS", "0")),
                 n_threads=n_threads,
                 n_threads_batch=n_threads,
                 n_batch=512,

@@ -29,7 +29,7 @@ class LlamaConfig:
     """Llama.cpp 模型配置"""
 
     model_path: str = field(default_factory=_get_default_model_path)
-    n_gpu_layers: int = 0  # CPU-only for 3b model
+    n_gpu_layers: int = field(default_factory=lambda: int(os.getenv("LLAMA_N_GPU_LAYERS", "0")))
     n_ctx: int = 4096
     n_threads: int = 8
     n_threads_batch: int = 8

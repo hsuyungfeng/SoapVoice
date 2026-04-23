@@ -63,12 +63,12 @@ class ExtendedSoapVoiceEngine:
         self,
         whisper_model: Optional[str] = None,
         llm_model: Optional[str] = None,
-        compute_mode: str = "cpu",
+        compute_mode: Optional[str] = None,
     ):
         self.whisper_model = whisper_model or os.getenv("ASR_MODEL", "Qwen/Qwen3-ASR-0.6B")
         self.llm_model = llm_model or os.getenv("LLM_MODEL", "qwen2.5:7b")
         self.asr_backend = os.getenv("ASR_BACKEND", "qwen3asr")
-        self.compute_mode = compute_mode
+        self.compute_mode = compute_mode or os.environ.get("WHISPER_DEVICE", "cuda")
         self._whisper = None
         self._icd_classifier = None
         self._term_mapper = None

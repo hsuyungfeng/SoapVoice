@@ -14,11 +14,8 @@ load_dotenv()
 
 # Forced reload trigger
 
-# **重要：在 import faster_whisper 相關模組之前設定環境變數**
-# 強制使用 CPU 模式，避免 cuDNN 錯誤
-os.environ.setdefault("WHISPER_DEVICE", "cpu")
-os.environ.setdefault("WHISPER_COMPUTE_TYPE", "int8")
-os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
+# GPU 模式現已支援 — 環境變數由 .env 控制
+# 見 config/models.yaml 與 .env 中的 WHISPER_DEVICE、WHISPER_COMPUTE_TYPE、LLAMA_N_GPU_LAYERS
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

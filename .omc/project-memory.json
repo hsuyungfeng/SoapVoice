@@ -243,8 +243,26 @@
   "hotPaths": [
     {
       "path": "src/soap/soap_generator.py",
-      "accessCount": 8,
-      "lastAccessed": 1775699168053,
+      "accessCount": 13,
+      "lastAccessed": 1776927789795,
+      "type": "file"
+    },
+    {
+      "path": "src/main.py",
+      "accessCount": 7,
+      "lastAccessed": 1776927767322,
+      "type": "file"
+    },
+    {
+      "path": "src/llm/llama_engine.py",
+      "accessCount": 7,
+      "lastAccessed": 1776927794581,
+      "type": "file"
+    },
+    {
+      "path": ".planning/STATE.md",
+      "accessCount": 6,
+      "lastAccessed": 1776917757287,
       "type": "file"
     },
     {
@@ -254,45 +272,63 @@
       "type": "file"
     },
     {
-      "path": ".planning/STATE.md",
+      "path": "config/models.yaml",
       "accessCount": 5,
-      "lastAccessed": 1776910107539,
+      "lastAccessed": 1776919464101,
       "type": "file"
     },
     {
       "path": "src/api/rest.py",
-      "accessCount": 3,
-      "lastAccessed": 1775644122409,
-      "type": "file"
-    },
-    {
-      "path": "src/llm/llama_engine.py",
-      "accessCount": 3,
-      "lastAccessed": 1775644190783,
-      "type": "file"
-    },
-    {
-      "path": "config/models.yaml",
-      "accessCount": 3,
-      "lastAccessed": 1776842534103,
-      "type": "file"
-    },
-    {
-      "path": "src/main.py",
-      "accessCount": 2,
-      "lastAccessed": 1775644217501,
+      "accessCount": 4,
+      "lastAccessed": 1776918463140,
       "type": "file"
     },
     {
       "path": "src/asr/whisper_model.py",
-      "accessCount": 2,
-      "lastAccessed": 1776842539455,
+      "accessCount": 4,
+      "lastAccessed": 1776919484224,
       "type": "file"
     },
     {
       "path": "WINDOWS_DEPLOYMENT_SUMMARY.md",
+      "accessCount": 3,
+      "lastAccessed": 1776917760362,
+      "type": "file"
+    },
+    {
+      "path": ".env",
+      "accessCount": 3,
+      "lastAccessed": 1776927773900,
+      "type": "file"
+    },
+    {
+      "path": "scripts/extended_soapvoice.py",
+      "accessCount": 3,
+      "lastAccessed": 1776927801054,
+      "type": "file"
+    },
+    {
+      "path": "src/phase8/voice_recording.py",
+      "accessCount": 3,
+      "lastAccessed": 1776928105527,
+      "type": "file"
+    },
+    {
+      "path": "start_server.py",
+      "accessCount": 3,
+      "lastAccessed": 1776928123869,
+      "type": "file"
+    },
+    {
+      "path": "src/api/extended_api.py",
       "accessCount": 2,
-      "lastAccessed": 1776910107996,
+      "lastAccessed": 1776919475410,
+      "type": "file"
+    },
+    {
+      "path": "src/asr/asr_factory.py",
+      "accessCount": 2,
+      "lastAccessed": 1776919483842,
       "type": "file"
     },
     {
@@ -383,6 +419,102 @@
       "path": "WINDOWS_QUICK_START.md",
       "accessCount": 1,
       "lastAccessed": 1776910255169,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 1,
+      "lastAccessed": 1776918459119,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "accessCount": 1,
+      "lastAccessed": 1776918459243,
+      "type": "file"
+    },
+    {
+      "path": "src/llm/ollama_engine.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918463746,
+      "type": "file"
+    },
+    {
+      "path": "src/api/websocket.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918467420,
+      "type": "file"
+    },
+    {
+      "path": "src/llm/llamacpp_engine.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918468180,
+      "type": "file"
+    },
+    {
+      "path": "src/llm/vllm_engine.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918468560,
+      "type": "file"
+    },
+    {
+      "path": "src/llm/dual_engine.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918468901,
+      "type": "file"
+    },
+    {
+      "path": "src/gui/desktop_app.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918469749,
+      "type": "file"
+    },
+    {
+      "path": "src/offline_server.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918469950,
+      "type": "file"
+    },
+    {
+      "path": "src/phase8/main.py",
+      "accessCount": 1,
+      "lastAccessed": 1776918476673,
+      "type": "file"
+    },
+    {
+      "path": "src/api/cloud_api.py",
+      "accessCount": 1,
+      "lastAccessed": 1776919468180,
+      "type": "file"
+    },
+    {
+      "path": "start_server.sh",
+      "accessCount": 1,
+      "lastAccessed": 1776919471485,
+      "type": "file"
+    },
+    {
+      "path": ".env.example",
+      "accessCount": 1,
+      "lastAccessed": 1776919471867,
+      "type": "file"
+    },
+    {
+      "path": "config/nginx.conf",
+      "accessCount": 1,
+      "lastAccessed": 1776919472051,
+      "type": "file"
+    },
+    {
+      "path": "src/security/auth.py",
+      "accessCount": 1,
+      "lastAccessed": 1776919475048,
+      "type": "file"
+    },
+    {
+      "path": "scripts/backup.sh",
+      "accessCount": 1,
+      "lastAccessed": 1776928131573,
       "type": "file"
     }
   ],

@@ -175,7 +175,9 @@ class TranscriptEngine:
         """使用 Faster-Whisper 轉文字"""
         from faster_whisper import WhisperModel
 
-        model = WhisperModel("small", device="cpu", compute_type="int8")
+        _device = os.environ.get("WHISPER_DEVICE", "cuda")
+        _ctype = os.environ.get("WHISPER_COMPUTE_TYPE", "float16")
+        model = WhisperModel("small", device=_device, compute_type=_ctype)
         segments, info = model.transcribe(audio_file)
 
         text = " ".join([seg.text for seg in segments])
