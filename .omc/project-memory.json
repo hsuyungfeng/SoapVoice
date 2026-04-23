@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1776842216004,
+  "lastScanned": 1776937653865,
   "projectRoot": "/home/hsu/Desktop/SoapVoice",
   "techStack": {
     "languages": [
@@ -61,24 +61,33 @@
       "path": "__pycache__",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1776842215999,
+      "lastAccessed": 1776937653860,
       "keyFiles": [
         "conftest.cpython-313-pytest-9.0.2.pyc",
         "start_server.cpython-313.pyc"
+      ]
+    },
+    "benchmarks": {
+      "path": "benchmarks",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1776937653860,
+      "keyFiles": [
+        "GPUllmcompare.md"
       ]
     },
     "build": {
       "path": "build",
       "purpose": "Build output",
       "fileCount": 0,
-      "lastAccessed": 1776842215999,
+      "lastAccessed": 1776937653860,
       "keyFiles": []
     },
     "config": {
       "path": "config",
       "purpose": "Configuration files",
       "fileCount": 5,
-      "lastAccessed": 1776842216000,
+      "lastAccessed": 1776937653861,
       "keyFiles": [
         "medical_vocabulary.json",
         "models.yaml",
@@ -91,14 +100,14 @@
       "path": "data",
       "purpose": "Data files",
       "fileCount": 0,
-      "lastAccessed": 1776842216001,
+      "lastAccessed": 1776937653862,
       "keyFiles": []
     },
     "dist": {
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 1,
-      "lastAccessed": 1776842216001,
+      "lastAccessed": 1776937653862,
       "keyFiles": [
         "SoapVoice.exe"
       ]
@@ -107,7 +116,7 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 10,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653862,
       "keyFiles": [
         "API_INTEGRATION.md",
         "CLI_USAGE.md",
@@ -120,7 +129,7 @@
       "path": "examples",
       "purpose": "Example code",
       "fileCount": 1,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653862,
       "keyFiles": [
         "cli_example_input.txt"
       ]
@@ -129,7 +138,7 @@
       "path": "installer",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653862,
       "keyFiles": [
         "is-unicode.exe",
         "soapvoice.iss"
@@ -139,7 +148,7 @@
       "path": "models",
       "purpose": "Data models",
       "fileCount": 7,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653862,
       "keyFiles": [
         "LICENSE",
         "NOTICE.txt",
@@ -151,21 +160,21 @@
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
-      "fileCount": 33,
-      "lastAccessed": 1776842216002,
+      "fileCount": 36,
+      "lastAccessed": 1776937653862,
       "keyFiles": [
+        "backup.sh",
         "benchmark_llama.py",
         "benchmark_ollama.py",
         "build_windows.sh",
-        "compare_cli.py",
-        "compare_cli_final.py"
+        "compare_cli.py"
       ]
     },
     "src": {
       "path": "src",
       "purpose": "Source code",
       "fileCount": 6,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653863,
       "keyFiles": [
         "__init__.py",
         "cli.py",
@@ -178,7 +187,7 @@
       "path": "static",
       "purpose": "Static files",
       "fileCount": 12,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653863,
       "keyFiles": [
         "chest_pain.wav",
         "diabetes.wav",
@@ -191,7 +200,7 @@
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 9,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653863,
       "keyFiles": [
         "__init__.py",
         "test_asr.py",
@@ -204,14 +213,14 @@
       "path": "watch",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1776842216002,
+      "lastAccessed": 1776937653863,
       "keyFiles": []
     },
     "models/assets": {
       "path": "models/assets",
       "purpose": "Static assets",
       "fileCount": 6,
-      "lastAccessed": 1776842216003,
+      "lastAccessed": 1776937653864,
       "keyFiles": [
         "bonsai-logo.svg",
         "energy_8B.png",
@@ -222,7 +231,7 @@
       "path": "src/api",
       "purpose": "API routes",
       "fileCount": 9,
-      "lastAccessed": 1776842216003,
+      "lastAccessed": 1776937653864,
       "keyFiles": [
         "__init__.py",
         "cloud_api.py",
@@ -233,7 +242,7 @@
       "path": "tests/fixtures",
       "purpose": "Test fixtures",
       "fileCount": 2,
-      "lastAccessed": 1776842216004,
+      "lastAccessed": 1776937653865,
       "keyFiles": [
         "asr_comparison_result.json",
         "sample_zh.wav"
@@ -248,21 +257,21 @@
       "type": "file"
     },
     {
+      "path": ".planning/STATE.md",
+      "accessCount": 9,
+      "lastAccessed": 1776928226981,
+      "type": "file"
+    },
+    {
       "path": "src/main.py",
-      "accessCount": 7,
-      "lastAccessed": 1776927767322,
+      "accessCount": 8,
+      "lastAccessed": 1776937660449,
       "type": "file"
     },
     {
       "path": "src/llm/llama_engine.py",
       "accessCount": 7,
       "lastAccessed": 1776927794581,
-      "type": "file"
-    },
-    {
-      "path": ".planning/STATE.md",
-      "accessCount": 6,
-      "lastAccessed": 1776917757287,
       "type": "file"
     },
     {
@@ -290,15 +299,21 @@
       "type": "file"
     },
     {
-      "path": "WINDOWS_DEPLOYMENT_SUMMARY.md",
-      "accessCount": 3,
-      "lastAccessed": 1776917760362,
+      "path": "scripts/quick_benchmark.py",
+      "accessCount": 4,
+      "lastAccessed": 1776934916791,
       "type": "file"
     },
     {
       "path": ".env",
+      "accessCount": 4,
+      "lastAccessed": 1776937660405,
+      "type": "file"
+    },
+    {
+      "path": "WINDOWS_DEPLOYMENT_SUMMARY.md",
       "accessCount": 3,
-      "lastAccessed": 1776927773900,
+      "lastAccessed": 1776917760362,
       "type": "file"
     },
     {
@@ -515,6 +530,24 @@
       "path": "scripts/backup.sh",
       "accessCount": 1,
       "lastAccessed": 1776928131573,
+      "type": "file"
+    },
+    {
+      "path": "scripts/gpu_llm_benchmark.py",
+      "accessCount": 1,
+      "lastAccessed": 1776929024173,
+      "type": "file"
+    },
+    {
+      "path": "BENCHMARK_GUIDE.md",
+      "accessCount": 1,
+      "lastAccessed": 1776929049540,
+      "type": "file"
+    },
+    {
+      "path": "scripts/full_benchmark.py",
+      "accessCount": 1,
+      "lastAccessed": 1776934949727,
       "type": "file"
     }
   ],
