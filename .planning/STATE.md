@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-04-22T07:35:32.104Z"
+status: gpu-lan-backup-enabled
+last_updated: "2026-04-23T14:30:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -31,6 +31,12 @@ progress:
 - Phase 8.0: ✅ 完成（NLP 提取與擴展 API 修復）
 
 ## 最近更新
+
+- **2026-04-23**: GPU 加速 + 區域網路伺服器 + 備份系統 (Session 5)
+  - ✅ **GPU 加速啟用**：移除 CPU 強制覆蓋，ASR（Faster-Whisper）與 LLM（llama.cpp）現可使用 CUDA；支援 3060 12GB GPU，全部層數卸載至 GPU
+  - ✅ **區域網路伺服器**：修改 `start_server.py` 綁定 0.0.0.0，區網電腦可直接呼叫 `http://GPU_IP:8010/api/v1/extended/process`
+  - ✅ **備份系統**：建立 `scripts/backup.sh`，每日 02:00 自動 rsync 至本地 NAS + rclone 同步至 Google Cloud Storage
+  - ✅ **環境變數設定**：`.env` 新增 GPU 配置（WHISPER_DEVICE=cuda, LLAMA_N_GPU_LAYERS=-1）、LAN 設定（HOST=0.0.0.0）、API Key
 
 - **2026-04-16**: 穩定性與效能優化 (Session 4)
   - ✅ **修復 GUI 啟動段錯誤**：延遲初始化 `OCRParser` 與 `AudioRecorder` 等重量級組件，防止主執行緒資源競爭導致的 Segmentation Fault。
