@@ -1,72 +1,65 @@
----
-gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: 網路部署與資料管理
-status: defining-requirements
-last_updated: "2026-04-24T09:00:00.000Z"
-progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
----
+# Project State
 
-# SoapVoice 專案狀態
+## Project Reference
 
-## 專案概述
+See: .planning/PROJECT.md (updated 2026-04-24)
 
-**專案名稱**: SoapVoice - 醫療語音轉 SOAP 病歷系統
-**當前里程碑**: v1.1 網路部署與資料管理
-**當前焦點**: 定義需求 → 研究 → 路線圖
+**Core value:** 語音自動轉錄為專業 SOAP 病歷，讓醫師專注問診而非打字
+**Current focus:** Phase 10 — 資料持久化
 
-## 當前位置
+## Current Position
 
-**階段**: 尚未開始（定義需求中）
-**計畫**: —
-**狀態**: 定義需求
-**最後活動**: 2026-04-24 — 里程碑 v1.1 啟動
+Phase: 10 of 14 (資料持久化)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-04-24 — v1.1 roadmap created, 5 phases defined with 100% requirement coverage
 
-## 進度
+Progress: [░░░░░░░░░░] 0% (0/TBD plans across v1.1 phases)
 
-- Phase 1-9 (v1.0): ✅ 全部完成
-- v1.1: ○ 尚未開始
+## Performance Metrics
 
-## 累積背景（來自 v1.0）
+**Velocity:**
+- Total plans completed: 0 (v1.1 started)
+- Average duration: N/A
+- Total execution time: 0 hours
 
-### v1.0 已完成核心功能
+**By Phase:**
 
-- ✅ 語音錄製與 Faster-Whisper ASR 轉錄
-- ✅ 術語標準化（80+ 醫療術語）
-- ✅ ICD-10 代碼分類（50+ 症狀）
-- ✅ LLM SOAP 病歷生成（Gemma 4:E4B）
-- ✅ 桌面側邊欄 GUI（ttkbootstrap Superhero）
-- ✅ OCR 患者資訊擷取（Tesseract）
-- ✅ GPU 加速（CUDA RTX 3060）
-- ✅ LAN 伺服器（0.0.0.0:8010 + API Key）
-- ✅ 備份系統（rsync + rclone）
-- ✅ Windows 打包腳本（PyInstaller + Inno Setup）
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| — | — | — | — |
 
-### v1.1 目標
+**Recent Trend:**
+- v1.0 baseline: 9 phases completed with research-verified architecture
+- v1.1: Starting fresh, no plans executed yet
 
-1. **LAN 瘦客戶端架構**：Windows EXE 僅截圖/錄音 → GPU 伺服器生成 SOAP → 回傳顯示
-2. **儀表板重寫**：資料持久化儲存 + 病患記錄搜尋 + 即時監控圖表
-3. **Wine EXE 打包驗證**：於 Linux 用 Wine 測試 Windows EXE 相容性
-4. **技術文件**：README.md 完整重寫
+*Updated after each plan completion*
 
-### 遺留待辦（來自 v1.0）
+## Accumulated Context
 
-| # | 標題 | 領域 | 建立日期 |
-|---|------|------|----------|
-| 1 | 前端整合與開發測試網頁整合麥克風收音 | ui | 2026-03-24 |
-| 2 | Compare CPU vs GPU model performance for Windows Docker | tooling | 2026-03-25 |
-| 3 | SoapVoice Phase 7 Windows Desktop GUI 與雲端整合 | ui | 2026-04-02 |
-| 4 | 深入專案研究 (README) 為 v1.1 需求規劃做準備 | planning | 2026-04-24 |
-| 5 | 儀表板重寫 — 資料儲存、病患記錄搜尋與 LAN 服務 | ui | 2026-04-24 |
-| 6 | LAN 瘦客戶端架構 — Windows EXE 截圖+收音 → GPU 伺服器 SOAP | api | 2026-04-24 |
+### Decisions
 
-## 會話連續性
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
 
-**上次工作**: 2026-04-24
-**停止位置**: v1.0 里程碑完成，v1.1 需求定義中
-**下一步**: 確認研究策略 → 定義需求 → 建立路線圖
+- **Phase 10**: 資料持久化使用 aiosqlite + raw SQL（非 ORM），保持與既有程式碼一致；審計追蹤採 append-only 設計
+- **Phase 11**: 客戶端 `client/` 目錄與 `src/` 完全隔離，不 import 任何推理模組；LLM 推理必須用獨立 process + asyncio.Semaphore(1) 解耦
+- **Phase 12**: 儀表板用 SSE 非 WebSocket（單向推送，瀏覽器原生自動重連）
+- **Phase 13**: Wine 驗證僅做語法/啟動測試，明確標註不可替代 Windows 實機驗證
+
+### Pending Todos
+
+None yet. (Use `/gsd-add-todo` to capture ideas)
+
+### Blockers/Concerns
+
+- **Phase 10**: 審計追蹤 schema 需與醫師討論台灣《醫療法》合規需求（保留年限、簽章格式）
+- **Phase 11**: LLM 推理 process 隔離模式需 spike 驗證（`ProcessPoolExecutor` vs `multiprocessing.Queue`）
+- **Phase 11**: PyInstaller 輕量打包（排除推理模組與 GGUF 模型）的 hook 設定需驗證
+- **Phase 12**: pynvml 可用性 — 若未來改用非 NVIDIA GPU，需 fallback 至 psutil
+
+## Session Continuity
+
+Last session: 2026-04-24
+Stopped at: ROADMAP.md / STATE.md created, REQUIREMENTS.md traceability updated — ready for Phase 10 planning
+Resume file: None
