@@ -45,8 +45,13 @@ PyInstaller + Inno Setup 腳本建置
   2. 醫師可依病患姓名關鍵字搜尋歷史記錄，結果支援分頁瀏覽（每頁 20 筆），依時間倒序排列
   3. 醫師可依問診日期範圍篩選記錄（起始日～結束日），並支援組合搜尋（姓名 + 日期範圍）
   4. 任何對 SOAP 記錄的修改均留有不可變審計追蹤（建立時間、作者、操作類型），原始記錄採 append-only 設計，不可被直接覆寫
-  5. SQLite 使用 WAL 模式 + busy_timeout 5000ms，多醫師同時寫入時不出現記錄流失
-**Plans**: TBD
+   5. SQLite 使用 WAL 模式 + busy_timeout 5000ms，多醫師同時寫入時不出現記錄流失
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — 資料庫 Schema 與連線基礎（aiosqlite 模組 + 四張表初始化 + lifespan 整合）
+- [ ] 10-02-PLAN.md — SOAP 儲存整合（SessionManager 雙軌寫入 + consultation_api 自動儲存）
+- [ ] 10-03-PLAN.md — 搜尋 API 與審計追蹤端點（姓名/日期搜尋 + 分頁 + SOAP 修改審計）
 
 ### Phase 11: LAN 瘦客戶端
 **Goal**: 醫師可從 Windows 精簡客戶端錄音並截圖，透過 LAN HTTP 上傳至 GPU 伺服器，接收並在 GUI 中查看結構化 SOAP 病歷
@@ -99,7 +104,7 @@ Phases execute in numeric order: 10 → 11 ∥ 12 → 13 → 14
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 10. 資料持久化 | v1.1 | 0/TBD | Not started | — |
+| 10. 資料持久化 | v1.1 | 0/3 | Not started | — |
 | 11. LAN 瘦客戶端 | v1.1 | 0/TBD | Not started | — |
 | 12. 監控儀表板 | v1.1 | 0/TBD | Not started | — |
 | 13. Wine EXE 驗證 | v1.1 | 0/TBD | Not started | — |
