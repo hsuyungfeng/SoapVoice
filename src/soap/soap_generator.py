@@ -15,6 +15,7 @@ from src.utils.resource_path import get_resource_path
 from src.nlp.soap_classifier import SOAPClassifier
 from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
 from src.nlp.compliance_guard import ClinicalComplianceGuard
+from src.db.llm_db_cli import LLMDatabaseCLI, create_llm_db_cli
 
 # 引擎選擇：使用 llama.cpp 或 Ollama
 USE_LLAMA_CPP = os.getenv("USE_LLAMA_CPP", "false").lower() == "true"
@@ -67,6 +68,7 @@ class SOAPGenerator:
         self._engine: Optional[Engine] = None
         self._mapper: MedicalTerminologyMapper = MedicalTerminologyMapper()
         self._compliance_guard: ClinicalComplianceGuard = ClinicalComplianceGuard()
+        self._llm_db_cli: Optional[LLMDatabaseCLI] = None
 
         # RAG 系統初始化
         self._rag_client = None
@@ -74,6 +76,12 @@ class SOAPGenerator:
         self._embedding_model = None
         if self.config.enable_rag:
             self._init_rag()
+
+        # LLM Database CLI 初始化
+        try:
+            self._llm_db_cli = create_llm_db_cli(Path("data/local_db/medical.db"))
+        except Exception as e:
+            logger.warning(f"LLM Database CLI 初始化失敗: {e}")
 
     def _init_rag(self) -> None:
         """初始化 RAG 系統"""
@@ -153,6 +161,67 @@ class SOAPGenerator:
         # 預設提示詞 (Fallback)
         return "You are a professional medical scribe. Convert the transcript into a concise English SOAP note."
 
+    def _enrich_icd10_details(self, icd10_candidates: Optional[List[str]]) -> str:
+        """從資料庫查詢 ICD-10 詳細資訊
+
+        Args:
+            icd10_candidates: ICD-10 代碼列表
+
+        Returns:
+            格式化的 ICD-10 詳細資訊
+        """
+        if not icd10_candidates or not self._llm_db_cli:
+            return "無"
+
+        details = []
+        for code in set(icd10_candidates):
+            try:
+                result = self._llm_db_cli.get_icd10_by_code(code)
+                if result.get("status") == "success":
+                    details.append(
+                        f"  • {result['code']}: {result['name_en']} ({result['name_cn']})"
+                    )
+            except Exception as e:
+                logger.warning(f"查詢 ICD-10 {code} 失敗: {e}")
+
+        return "\n".join(details) if details else "無"
+
+    def _enrich_drug_details(self, drug_recommendations: Optional[List[Dict[str, str]]]) -> str:
+        """從資料庫查詢用藥詳細資訊
+
+        Args:
+            drug_recommendations: 用藥建議列表
+
+        Returns:
+            格式化的用藥詳細資訊
+        """
+        if not drug_recommendations or not self._llm_db_cli:
+            return "無"
+
+        details = []
+        seen_drugs = set()
+
+        for drug in drug_recommendations:
+            drug_name = drug.get("name", "")
+            if drug_name in seen_drugs:
+                continue
+            seen_drugs.add(drug_name)
+
+            try:
+                result = self._llm_db_cli.query_drugs(drug_name, limit=1)
+                if result.get("status") == "success" and result.get("results"):
+                    drug_info = result["results"][0]
+                    dosage = drug.get("dosage", "遵醫囑")
+                    details.append(
+                        f"  • {drug_info['drug_name_en']} ({drug_info['drug_name_cn']})\n"
+                        f"    ATC: {drug_info['atc_code']} | 劑型: {drug_info['dosage_form']} | "
+                        f"建議用量: {dosage}"
+                    )
+            except Exception as e:
+                logger.warning(f"查詢藥品 {drug_name} 失敗: {e}")
+
+        return "\n".join(details) if details else "無"
+
     def _build_prompt(
         self,
         transcript: str,
@@ -172,13 +241,14 @@ class SOAPGenerator:
             if term_mappings
             else "無"
         )
-        icd_str = ", ".join(list(set(icd10_candidates))) if icd10_candidates else "無"
+
+        # 增強 ICD-10 詳細資訊
+        icd_details = self._enrich_icd10_details(icd10_candidates)
+
         orders_str = ", ".join(medical_orders) if medical_orders else "無"
-        drugs_str = (
-            ", ".join([f"{d['name']} ({d['dosage']})" for d in drug_recommendations])
-            if drug_recommendations
-            else "無"
-        )
+
+        # 增強用藥詳細資訊
+        drug_details = self._enrich_drug_details(drug_recommendations)
 
         # 準備病例範本 (RAG)
         case_templates_str = "無"
@@ -190,28 +260,32 @@ class SOAPGenerator:
         # 載入指令
         system_instruction = self._load_system_prompt()
 
-        # 組合最終 Prompt
+        # 組合最終 Prompt，含詳細 ICD-10 和藥品資訊
         prompt = f"""{system_instruction}
 
-醫療對話：
+PATIENT TRANSCRIPT:
 {normalized_text if normalized_text else transcript}
 
-術語標準化參考：
+STANDARDIZED MEDICAL TERMS:
 {term_list}
 
-預期診斷代碼 (ICD-10)：
-{icd_str}
+SUGGESTED DIAGNOSIS CODES (ICD-10):
+{icd_details}
 
-醫囑/處置建議：
+RECOMMENDED MEDICAL ORDERS/PROCEDURES:
 {orders_str}
 
-藥物建議：
-{drugs_str}
+RECOMMENDED MEDICATIONS:
+{drug_details}
 
-參考病例範本：
+REFERENCE CASE TEMPLATES (RAG):
 {case_templates_str}
 
-請嚴格遵循上述格式規範進行輸出。
+INSTRUCTIONS:
+- Generate a concise, professional SOAP note in English
+- Use the ICD-10 codes and medications provided as clinical guidance
+- Format: S (Subjective) / O (Objective) / A (Assessment) / P (Plan)
+- Ensure all medical terminology is accurate and evidence-based
 """
         return prompt
 

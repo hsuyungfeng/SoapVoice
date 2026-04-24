@@ -252,26 +252,26 @@
   "hotPaths": [
     {
       "path": "src/soap/soap_generator.py",
-      "accessCount": 13,
-      "lastAccessed": 1776927789795,
+      "accessCount": 23,
+      "lastAccessed": 1776998896361,
       "type": "file"
     },
     {
       "path": ".planning/STATE.md",
-      "accessCount": 9,
-      "lastAccessed": 1776928226981,
+      "accessCount": 10,
+      "lastAccessed": 1776998448525,
       "type": "file"
     },
     {
       "path": "src/main.py",
-      "accessCount": 8,
-      "lastAccessed": 1776937660449,
+      "accessCount": 9,
+      "lastAccessed": 1776998799985,
       "type": "file"
     },
     {
       "path": "src/llm/llama_engine.py",
-      "accessCount": 7,
-      "lastAccessed": 1776927794581,
+      "accessCount": 8,
+      "lastAccessed": 1776998803093,
       "type": "file"
     },
     {
@@ -348,8 +348,8 @@
     },
     {
       "path": "src/db/clinical_db.py",
-      "accessCount": 1,
-      "lastAccessed": 1775644186475,
+      "accessCount": 2,
+      "lastAccessed": 1776998802884,
       "type": "file"
     },
     {
