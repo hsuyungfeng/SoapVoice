@@ -77,15 +77,18 @@ progress:
 | 1 | 前端整合與開發測試網頁整合麥克風收音 | ui | 2026-03-24 |
 | 2 | Compare CPU vs GPU model performance for Windows Docker | tooling | 2026-03-25 |
 | 3 | SoapVoice Phase 7 Windows Desktop GUI 與雲端整合 | ui | 2026-04-02 |
-| 4 | Deep research README project for v1.1 planning | planning | 2026-04-24 |
-| 5 | Dashboard improvement plan and serve at local network | ui | 2026-04-24 |
+| 4 | 深入專案研究 (README) 為 v1.1 需求規劃做準備 | planning | 2026-04-24 |
+| 5 | 儀表板重寫 — 資料儲存、病患記錄搜尋與 LAN 服務 | ui | 2026-04-24 |
+| 6 | LAN 瘦客戶端架構 — Windows EXE 截圖+收音 → GPU 伺服器 SOAP | api | 2026-04-24 |
 
 ## 會話連續性
 
 **上次工作**: 2026-04-24
-**停止位置**: v1.0 里程碑完成，Phase 9 標記完成（Wine EXE 缺口留待後續處理）
+**停止位置**: v1.0 里程碑完成，已擷取 v1.1 核心需求
 **下一步**: 啟動 v1.1 規劃 — `/gsd-new-milestone`
 
-1. 深入專案研究（README.md）→ 產出 v1.1 需求
-2. Dashboard 改進與 LAN 伺服器設定
-3. Wine EXE 打包（Phase 9 遺留缺口）
+v1.1 核心需求已擷取：
+1. **LAN 瘦客戶端架構**：Windows EXE 僅截圖/錄音 → GPU 伺服器生成 SOAP → 回傳 → 本地+雲端雙儲存
+2. **儀表板重寫**：資料持久化儲存、病患記錄搜尋、即時監控圖表
+3. 深入專案研究（README.md）
+4. Wine EXE 打包（Phase 9 遺留缺口）
