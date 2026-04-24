@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: gpu-lan-backup-enabled
-last_updated: "2026-04-23T14:30:00.000Z"
+status: completed-transitioning-to-v1_1
+last_updated: "2026-04-24T08:37:21.431Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 5
   total_plans: 3
   completed_plans: 3
   percent: 100
@@ -70,11 +70,22 @@ progress:
 | qwen2.5-3b-instruct-q4_k_m.gguf | 2.1GB | 備用 LLM |
 | models/whisper/medium.pt | - | Faster-Whisper ASR |
 
+## 待辦事項 (Pending Todos)
+
+| # | 標題 | 領域 | 建立日期 |
+|---|------|------|----------|
+| 1 | 前端整合與開發測試網頁整合麥克風收音 | ui | 2026-03-24 |
+| 2 | Compare CPU vs GPU model performance for Windows Docker | tooling | 2026-03-25 |
+| 3 | SoapVoice Phase 7 Windows Desktop GUI 與雲端整合 | ui | 2026-04-02 |
+| 4 | Deep research README project for v1.1 planning | planning | 2026-04-24 |
+| 5 | Dashboard improvement plan and serve at local network | ui | 2026-04-24 |
+
 ## 會話連續性
 
-**上次工作**: 2026-04-15
-**停止位置**: 完成 NLP 擴展功能修復與 GUI 顯示優化
-**下一步**: 
+**上次工作**: 2026-04-24
+**停止位置**: v1.0 里程碑完成，Phase 9 標記完成（Wine EXE 缺口留待後續處理）
+**下一步**: 啟動 v1.1 規劃 — `/gsd-new-milestone`
 
-1. 繼續 ASR 優化 (Faster-Whisper 模型預加載)
-2. 進行 Windows 最終打包與 PyInstaller 資源路徑驗證
+1. 深入專案研究（README.md）→ 產出 v1.1 需求
+2. Dashboard 改進與 LAN 伺服器設定
+3. Wine EXE 打包（Phase 9 遺留缺口）
