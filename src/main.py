@@ -30,6 +30,7 @@ from src.api.webhook_api import router as webhook_router
 from src.api.file_monitor_api import router as file_monitor_router
 from src.api.cloud_api import router as cloud_router
 from src.api.ocr_api import router as ocr_router
+from src.api.patient_records_api import router as patient_records_router
 from src.llm.ollama_engine import initialize_engine, ModelConfig
 
 # 配置日誌
@@ -140,6 +141,7 @@ app.include_router(webhook_router, tags=["Webhooks"])
 app.include_router(file_monitor_router, tags=["File Monitor"])
 app.include_router(cloud_router, prefix="/api/v1", tags=["Cloud Integration"])
 app.include_router(ocr_router, prefix="/api/v1", tags=["OCR"])
+app.include_router(patient_records_router, prefix="/api/v1", tags=["Patient Records"])
 
 
 @app.get("/")
@@ -197,6 +199,12 @@ async def api_v1_root():
                 "stats": "/api/v1/consultation/stats",
                 "sessions": "/api/v1/consultation/sessions",
                 "websocket": "/api/v1/consultation/ws",
+            },
+            "records": {
+                "search": "/api/v1/records/search?name=&date_from=&date_to=&page=1&page_size=20",
+                "detail": "/api/v1/records/{id}",
+                "audit": "/api/v1/records/{id}/audit",
+                "amend_soap": "/api/v1/records/{id}/soap",
             },
         },
     }
