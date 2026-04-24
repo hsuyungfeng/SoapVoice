@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 from src.consultation.consultation_flow import ConsultationFlow, ConsultationResult
+from src.db.patient_records_db import save_consultation_record, get_or_create_patient
 from src.utils.resource_path import get_user_data_dir
 
 
@@ -137,6 +138,75 @@ class SessionManager:
 
         logger.info(f"會話已完成: {session_id}")
         return True
+
+    async def _save_to_sqlite(self, session: Session) -> bool:
+        """將問診記錄寫入 SQLite 資料庫（獨立方法，由 API 層呼叫）
+
+        從 session.result 提取所有欄位資料，建構 record_data 字典後，
+        委派至 save_consultation_record() 寫入 consultation_records 表。
+
+        Args:
+            session: 已完成且含 result 的會話
+
+        Returns:
+            True（寫入成功）或 False（寫入失敗）
+        """
+        try:
+            if not session.result:
+                logger.warning("_save_to_sqlite: 會話沒有 result，跳過")
+                return False
+
+            result = session.result
+            summary = result.session_summary
+            patient_ctx = session.patient_context or {}
+
+            # 自動關聯病患記錄（不重複建立）
+            patient_name = patient_ctx.get("name", "未知病患")
+            patient_id = await get_or_create_patient(patient_name)
+
+            # 建構 record_data 字典
+            record_data: dict = {
+                "session_id": session.session_id,
+                "patient_id": patient_id if patient_id > 0 else None,
+                "patient_name": patient_name,
+                "doctor_name": patient_ctx.get("doctor_name", ""),
+                "clinic_name": patient_ctx.get("clinic_name", ""),
+                "audio_file_path": result.metadata.get("audio_path", ""),
+                "audio_duration_ms": result.metadata.get("audio_duration_ms", 0),
+                "transcript_text": summary.transcript
+                if hasattr(summary, "transcript")
+                else result.metadata.get("transcript", ""),
+                "transcript_segments_json": json.dumps(
+                    summary.segments if hasattr(summary, "segments") else [], ensure_ascii=False
+                ),
+                # 傳遞 dict（save_consultation_record 內部做 json.dumps，避免雙重編碼）
+                "soap_json": result.soap,
+                "status": "completed",
+                "asr_model": result.metadata.get("asr_model", ""),
+                "asr_time_ms": result.metadata.get("asr_time_ms", 0),
+                "llm_model": result.metadata.get("llm_model", ""),
+                "llm_time_ms": result.metadata.get("llm_time_ms", 0),
+                "total_time_ms": int(result.processing_time_ms),
+                "created_by": patient_ctx.get("doctor_name", "system"),
+            }
+
+            # 委派至 save_consultation_record
+            record_id = await save_consultation_record(record_data)
+            if record_id > 0:
+                logger.info(
+                    f"問診記錄已寫入 SQLite: session_id={session.session_id}, "
+                    f"patient={patient_name}, record_id={record_id}"
+                )
+                return True
+            else:
+                logger.warning(
+                    f"問診記錄寫入 SQLite 失敗（可能重複）: session_id={session.session_id}"
+                )
+                return False
+
+        except Exception as e:
+            logger.warning(f"_save_to_sqlite 失敗（不影響其他流程）: {e}")
+            return False
 
     def cancel_session(self, session_id: str) -> bool:
         """取消會話
