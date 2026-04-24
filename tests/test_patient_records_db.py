@@ -102,7 +102,6 @@ class TestSavePatient:
         })
         assert pid > 0, f"預期 pid > 0，實際為 {pid}"
 
-        record = await get_consultation_by_id(pid)
         # pid 指向 patient_records，另須直接查詢
         cursor = await test_db.execute("SELECT name, gender FROM patient_records WHERE id = ?", (pid,))
         row = await cursor.fetchone()
@@ -303,7 +302,7 @@ class TestAuditLog:
         # 驗證審計記錄含 before/after 值
         logs = await get_audit_log(rid)
         assert len(logs) >= 1
-        amend_logs = [l for l in logs if l["action"] == "AMEND"]
+        amend_logs = [log for log in logs if log["action"] == "AMEND"]
         assert len(amend_logs) >= 1
         assert amend_logs[0]["user_id"] == "醫師B"
         assert "原始主訴" in amend_logs[0]["before_value"]

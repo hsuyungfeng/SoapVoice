@@ -17,10 +17,10 @@ load_dotenv()
 # GPU 模式現已支援 — 環境變數由 .env 控制
 # 見 config/models.yaml 與 .env 中的 WHISPER_DEVICE、WHISPER_COMPUTE_TYPE、LLAMA_N_GPU_LAYERS
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from src.api.websocket import router as websocket_router
 from src.api.rest import router as rest_router
@@ -84,10 +84,27 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Failed to pre-load Extended SOAP Pipeline: {e}")
 
+    # 初始化病患記錄 DB
+    try:
+        from src.db.patient_records_db import get_patient_records_db, init_schema
+        db = await get_patient_records_db()
+        await init_schema(db)
+        logger.info("Patient records DB initialized (WAL mode, 4 tables)")
+    except Exception as e:
+        logger.warning(f"Patient records DB init failed (non-fatal): {e}")
+
     yield
 
     # 關閉時清理
     logger.info("Shutting down SoapVoice API...")
+
+    # 關閉病患記錄 DB
+    try:
+        from src.db.patient_records_db import close_patient_records_db
+        await close_patient_records_db()
+        logger.info("Patient records DB closed")
+    except Exception as e:
+        logger.warning(f"Patient records DB close failed: {e}")
 
 
 # 建立 FastAPI 應用程式
