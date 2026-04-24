@@ -76,14 +76,15 @@ async def close_patient_records_db():
 
 
 def set_db_path_for_test(path: Path):
-    """測試輔助：設定測試用資料庫路徑並重置連線
+    """測試輔助：設定測試用資料庫路徑並重置連線與寫入鎖
 
     Args:
         path: 測試用資料庫檔案路徑（可為 :memory: 或 tmp_path）
     """
-    global _db_path, _db
+    global _db_path, _db, _write_lock
     _db_path = Path(path)
     _db = None
+    _write_lock = asyncio.Lock()
 
 
 # ── Schema 初始化 ──────────────────────────────────────────────
@@ -113,7 +114,8 @@ async def init_schema(db: aiosqlite.Connection):
             notes       TEXT DEFAULT '',
             created_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
             updated_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-            created_by  TEXT NOT NULL DEFAULT 'system'
+            created_by  TEXT NOT NULL DEFAULT 'system',
+            UNIQUE(name, medical_id)
         )
         """
     )
