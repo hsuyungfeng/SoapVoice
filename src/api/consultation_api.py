@@ -226,9 +226,23 @@ async def generate_soap():
         # 生成 SOAP
         result = flow.generate_soap()
 
-        # 保存會話
+        # 保存會話（JSON 持久化）
         session_manager = get_session_manager()
         session_manager.complete_session(result.session_id, result)
+
+        # 將問診記錄寫入 SQLite（唯一持久化路徑，不影響 API 回應）
+        try:
+            session = session_manager.get_session(result.session_id)
+            if session:
+                saved = await session_manager._save_to_sqlite(session)
+                if saved:
+                    logger.info(f"問診記錄已寫入 SQLite: session={result.session_id}")
+                else:
+                    logger.warning(f"問診記錄寫入 SQLite 失敗: session={result.session_id}")
+            else:
+                logger.warning(f"找不到會話以寫入 SQLite: {result.session_id}")
+        except Exception as e:
+            logger.warning(f"寫入 SQLite 失敗（不影響 API 回應）: {e}")
 
         processing_time = (time.time() - start_time) * 1000
 
