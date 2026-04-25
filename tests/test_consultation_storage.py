@@ -513,3 +513,60 @@ class TestGracefulDegradation:
         assert row["llm_time_ms"] == 0
         assert row["audio_file_path"] == ""
         assert row["audio_duration_ms"] == 0
+
+
+class TestWebSocketSOAPStorage:
+    """驗證 WebSocket 路徑 SOAP 儲存（gap closure）"""
+
+    @pytest.mark.asyncio
+    async def test_websocket_soap_storage(self, test_db, session_manager_with_db):
+        """驗證 WebSocket generate_soap 動作儲存 SOAP 記錄至 SQLite
+
+        模擬 WebSocket handler 邏輯：
+        1. flow.generate_soap() 生成結果
+        2. session_manager.complete_session() 保存 JSON
+        3. session_manager._save_to_sqlite() 寫入 SQLite
+        """
+        sm = session_manager_with_db
+        session = sm.create_session({"name": "WebSocket 測試病患", "doctor_name": "李醫師"})
+
+        # 模擬 flow.generate_soap() 結果
+        result = _make_fake_result(
+            session_id=session.session_id,
+            transcript="咳嗽一週，有痰，呼吸困難",
+            soap={
+                "S": "患者主訴咳嗽一週，有痰，呼吸困難",
+                "O": "體溫 37.5°C，心率 88 bpm",
+                "A": "支氣管炎",
+                "P": "開立抗生素處方",
+            },
+        )
+
+        # WebSocket handler 邏輯：complete_session + _save_to_sqlite
+        sm.complete_session(session.session_id, result)
+        session_after_complete = sm.get_session(session.session_id)
+        assert session_after_complete is not None
+        assert session_after_complete.result is not None
+
+        # 呼叫 _save_to_sqlite（與 REST 端點相同的邏輯）
+        saved = await sm._save_to_sqlite(session_after_complete)
+        assert saved is True, "WebSocket SOAP 應該成功寫入 SQLite"
+
+        # 驗證 consultation_records 表含新記錄
+        cursor = await test_db.execute(
+            "SELECT session_id, patient_name, soap_json, doctor_name, status "
+            "FROM consultation_records WHERE session_id = ?",
+            (session.session_id,),
+        )
+        row = await cursor.fetchone()
+        assert row is not None, "WebSocket SOAP 記錄應在 consultation_records 中"
+        assert row["patient_name"] == "WebSocket 測試病患"
+        assert row["doctor_name"] == "李醫師"
+        assert row["status"] == "completed"
+
+        # 驗證 SOAP 內容正確
+        soap_json = json.loads(row["soap_json"])
+        assert soap_json["S"] == "患者主訴咳嗽一週，有痰，呼吸困難"
+        assert soap_json["A"] == "支氣管炎"
+        assert soap_json["O"] == "體溫 37.5°C，心率 88 bpm"
+        assert soap_json["P"] == "開立抗生素處方"

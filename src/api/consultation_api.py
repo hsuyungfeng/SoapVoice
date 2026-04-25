@@ -491,6 +491,25 @@ async def websocket_endpoint(websocket: WebSocket):
         elif data.get("action") == "generate_soap":
             # 生成 SOAP
             result = flow.generate_soap()
+
+            # 將問診記錄寫入 SQLite（與 REST 端點邏輯相同）
+            try:
+                session_manager = get_session_manager()
+                session_manager.complete_session(result.session_id, result)
+                session = session_manager.get_session(result.session_id)
+                if session:
+                    saved = await session_manager._save_to_sqlite(session)
+                    if saved:
+                        logger.info(
+                            f"WebSocket: 問診記錄已寫入 SQLite: session={result.session_id}"
+                        )
+                    else:
+                        logger.warning(
+                            f"WebSocket: 問診記錄寫入 SQLite 失敗: {result.session_id}"
+                        )
+            except Exception as e:
+                logger.warning(f"WebSocket: 寫入 SQLite 失敗（不影響 WebSocket 回應）: {e}")
+
             await websocket.send_json(
                 {
                     "type": "soap_generated",
