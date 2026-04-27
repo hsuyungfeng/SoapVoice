@@ -31,6 +31,8 @@ from src.api.file_monitor_api import router as file_monitor_router
 from src.api.cloud_api import router as cloud_router
 from src.api.ocr_api import router as ocr_router
 from src.api.patient_records_api import router as patient_records_router
+from src.api.lan_health_api import router as lan_health_router
+from src.api.lan_process_api import router as lan_process_router
 from src.llm.ollama_engine import initialize_engine, ModelConfig
 
 # 配置日誌
@@ -48,9 +50,13 @@ APP_CONFIG = {
     "version": "0.1.0",
     "cors_origins": os.getenv(
         "CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://192.168.1.100:3000"
-    ).split(","),
+    ).split(",") + [
+        "https://doctor-toolbox.com",
+        "https://www.doctor-toolbox.com",
+    ],
     "llm_model": os.getenv("LLM_MODEL", "Qwen/Qwen3-32B-Instruct"),
     "llm_gpu_memory": float(os.getenv("LLM_GPU_MEMORY", "0.9")),
+    "api_key": os.getenv("SOAPVOICE_API_KEY", ""),
 }
 
 
@@ -125,6 +131,92 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ── LAN 白名單 IP 驗證 ─────────────────────────────────────────
+# 只允許區域網路（192.168.x.x / 10.x.x.x / 127.0.0.1）呼叫 /api/v1/lan/* 端點
+# 對應 threat_model T-11-01 (Spoofing) 緩解
+def is_lan_ip(ip: str) -> bool:
+    """檢查 IP 是否屬於允許的 LAN 範圍
+
+    允許範圍：
+    - 192.168.0.0 - 192.168.255.255
+    - 10.0.0.0 - 10.255.255.255
+    - 127.0.0.1（本機開發/測試）
+    - localhost（測試環境別名）
+
+    Args:
+        ip: 客戶端 IP 字串（從 request.client.host 取得）
+
+    Returns:
+        True 表示在白名單內，False 表示應拒絕
+    """
+    if not ip:
+        return False
+    # 本機別名（含 FastAPI TestClient 預設 'testclient' 主機名）
+    if ip in {"127.0.0.1", "localhost", "::1", "testclient"}:
+        return True
+    # 192.168.x.x
+    if ip.startswith("192.168."):
+        return True
+    # 10.x.x.x
+    if ip.startswith("10."):
+        return True
+    return False
+
+
+@app.middleware("http")
+async def lan_whitelist_middleware(request: Request, call_next):
+    """LAN 端點白名單 middleware
+
+    僅針對 /api/v1/lan/* 與 /api/v1/health 端點檢查 IP 白名單。
+    其他端點（websocket、clinical、records）走既有的 api_key_middleware 路徑。
+
+    決策邏輯：
+    - 路徑非 /api/v1/lan/* 也非 /api/v1/health → 直接放行
+    - 客戶端 IP 屬 LAN 範圍 → 放行
+    - 否則回傳 403 含明確錯誤訊息
+    """
+    path = request.url.path
+    # 只攔截 LAN 相關路徑
+    if path.startswith("/api/v1/lan") or path == "/api/v1/health":
+        client_ip = request.client.host if request.client else ""
+        if not is_lan_ip(client_ip):
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": "lan_whitelist_denied",
+                    "detail": f"IP {client_ip} not in LAN whitelist",
+                    "allowed_ranges": ["192.168.x.x", "10.x.x.x", "127.0.0.1"],
+                },
+            )
+    return await call_next(request)
+
+
+# API Key 驗證中間件
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    """驗證 /api/v1/clinical/* 端點的 API Key（本地網路免驗證）"""
+    # 跳過不需要驗證的路徑
+    skip_paths = {"/health", "/api/v1/health", "/", "/test.html", "/api/v1"}
+    if request.url.path in skip_paths or request.url.path.startswith("/static"):
+        return await call_next(request)
+
+    # 只檢查 /api/v1/clinical/* 端點
+    if request.url.path.startswith("/api/v1/clinical"):
+        # 本地網路（localhost, 127.0.0.1, 192.168.x.x）免驗證
+        client_host = request.client.host if request.client else ""
+        is_local = client_host in {"localhost", "127.0.0.1"} or client_host.startswith("192.168.") or client_host.startswith("10.")
+
+        if not is_local:
+            api_key = request.headers.get("X-API-Key", "")
+            if not api_key or api_key != APP_CONFIG["api_key"]:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Invalid or missing API key"},
+                )
+
+    return await call_next(request)
+
 # 靜態檔案服務
 import pathlib
 
@@ -133,6 +225,8 @@ if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # 註冊路由
+# Phase 11-01：LAN 健康檢查必須優先註冊，搶在 websocket_router 之前佔用 /api/v1/health
+app.include_router(lan_health_router, prefix="/api/v1", tags=["LAN Health"])
 app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
 app.include_router(rest_router, prefix="/api/v1", tags=["Clinical NLP"])
 app.include_router(consultation_router, prefix="/api/v1", tags=["Consultation Flow"])
@@ -142,6 +236,8 @@ app.include_router(file_monitor_router, tags=["File Monitor"])
 app.include_router(cloud_router, prefix="/api/v1", tags=["Cloud Integration"])
 app.include_router(ocr_router, prefix="/api/v1", tags=["OCR"])
 app.include_router(patient_records_router, prefix="/api/v1", tags=["Patient Records"])
+# Phase 11-01：LAN 瘦客戶端 process 端點（健康檢查已於頂端優先註冊）
+app.include_router(lan_process_router, prefix="/api/v1", tags=["LAN Processing"])
 
 
 @app.get("/")
