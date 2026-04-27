@@ -641,9 +641,14 @@
             });
             document.getElementById('selectAllBtn').addEventListener('click', selectAllPatients);
             document.getElementById('clearSelBtn').addEventListener('click', clearSelection);
-            document.getElementById('downloadBtn').addEventListener('click', downloadPatients);
             document.getElementById('downloadSoapBtn').addEventListener('click', downloadCurrentSoap);
             document.getElementById('refreshStatsBtn').addEventListener('click', loadStats);
+
+            // 雲端下載按鈕
+            document.getElementById('downloadLocalBtn').addEventListener('click', downloadLocalBtn);
+            document.getElementById('downloadGoogleBtn').addEventListener('click', downloadGoogleBtn);
+            document.getElementById('downloadDropboxBtn').addEventListener('click', downloadDropboxBtn);
+            document.getElementById('downloadS3Btn').addEventListener('click', downloadS3Btn);
         }
 
         // 搜尋患者（進階篩選）
@@ -801,10 +806,11 @@
 
         // 更新下載按鈕狀態
         function updateDownloadButtonsState() {
-            const downloadBtn = document.getElementById('downloadBtn');
-            if (downloadBtn) {
-                downloadBtn.disabled = selectedPatients.size === 0;
-            }
+            const hasSelection = selectedPatients.size > 0;
+            document.getElementById('downloadLocalBtn').disabled = !hasSelection;
+            document.getElementById('downloadGoogleBtn').disabled = !hasSelection;
+            document.getElementById('downloadDropboxBtn').disabled = !hasSelection;
+            document.getElementById('downloadS3Btn').disabled = !hasSelection;
         }
 
         // 下載患者記錄
@@ -870,6 +876,200 @@
                     <div style="font-size: 12px; color: #999; margin-top: 4px;">${c.time}</div>
                 </div>
             `).join('');
+        }
+
+        // ============ 下載函數實現 ============
+
+        // 本地 CSV 下載
+        function downloadLocalBtn() {
+            if (selectedPatients.size === 0) {
+                alert('請先選擇患者');
+                return;
+            }
+
+            const patients = allPatients.filter(p => selectedPatients.has(p.id));
+            const headers = ['ID', '姓名', '日期', '眼科篩檢'];
+            const rows = patients.map(p => [
+                p.id,
+                `"${p.name}"`,
+                p.date,
+                p.eye_screen ? '是' : '否'
+            ]);
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `患者記錄_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Google Drive 上傳
+        function downloadGoogleBtn() {
+            if (selectedPatients.size === 0) {
+                alert('請先選擇患者');
+                return;
+            }
+
+            const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+                `client_id=YOUR_GOOGLE_CLIENT_ID&` +
+                `redirect_uri=${encodeURIComponent(window.location.origin + '/auth/google')}&` +
+                `response_type=code&` +
+                `scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.file')}&` +
+                `state=google_drive_upload`;
+
+            const popup = window.open(oauthUrl, 'google_auth', 'width=500,height=600');
+            if (!popup) {
+                alert('授權窗口開啟失敗，請檢查彈窗設定');
+                return;
+            }
+
+            // 等待授權完成後上傳
+            const checkPopup = setInterval(() => {
+                if (popup.closed) {
+                    clearInterval(checkPopup);
+                    uploadToGoogleDrive();
+                }
+            }, 1000);
+        }
+
+        // 上傳到 Google Drive（OAuth 授權後）
+        async function uploadToGoogleDrive() {
+            try {
+                if (selectedPatients.size === 0) return;
+
+                const patients = allPatients.filter(p => selectedPatients.has(p.id));
+                const csv = generateCSV(patients);
+
+                const response = await fetch(`${API_BASE}/extended/upload/google-drive`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: `患者記錄_${new Date().toISOString().split('T')[0]}.csv`,
+                        content: csv
+                    })
+                });
+
+                if (response.ok) {
+                    alert('已成功上傳至 Google Drive');
+                } else {
+                    alert('上傳失敗');
+                }
+            } catch (error) {
+                console.error('Google Drive upload error:', error);
+                alert('上傳出錯: ' + error.message);
+            }
+        }
+
+        // Dropbox 上傳
+        function downloadDropboxBtn() {
+            if (selectedPatients.size === 0) {
+                alert('請先選擇患者');
+                return;
+            }
+
+            const oauthUrl = `https://www.dropbox.com/oauth2/authorize?` +
+                `client_id=YOUR_DROPBOX_APP_KEY&` +
+                `redirect_uri=${encodeURIComponent(window.location.origin + '/auth/dropbox')}&` +
+                `response_type=code&` +
+                `state=dropbox_upload`;
+
+            const popup = window.open(oauthUrl, 'dropbox_auth', 'width=500,height=600');
+            if (!popup) {
+                alert('授權窗口開啟失敗，請檢查彈窗設定');
+                return;
+            }
+
+            const checkPopup = setInterval(() => {
+                if (popup.closed) {
+                    clearInterval(checkPopup);
+                    uploadToDropbox();
+                }
+            }, 1000);
+        }
+
+        // 上傳到 Dropbox（OAuth 授權後）
+        async function uploadToDropbox() {
+            try {
+                if (selectedPatients.size === 0) return;
+
+                const patients = allPatients.filter(p => selectedPatients.has(p.id));
+                const csv = generateCSV(patients);
+
+                const response = await fetch(`${API_BASE}/extended/upload/dropbox`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: `患者記錄_${new Date().toISOString().split('T')[0]}.csv`,
+                        content: csv
+                    })
+                });
+
+                if (response.ok) {
+                    alert('已成功上傳至 Dropbox');
+                } else {
+                    alert('上傳失敗');
+                }
+            } catch (error) {
+                console.error('Dropbox upload error:', error);
+                alert('上傳出錯: ' + error.message);
+            }
+        }
+
+        // AWS S3 上傳
+        async function downloadS3Btn() {
+            if (selectedPatients.size === 0) {
+                alert('請先選擇患者');
+                return;
+            }
+
+            try {
+                const patients = allPatients.filter(p => selectedPatients.has(p.id));
+                const csv = generateCSV(patients);
+                const filename = `患者記錄_${new Date().toISOString().split('T')[0]}.csv`;
+
+                // 1. 請求後端生成簽署 URL
+                const signedUrlResponse = await fetch(`${API_BASE}/extended/upload/s3-signed-url`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+
+                if (!signedUrlResponse.ok) {
+                    alert('無法取得 S3 上傳授權');
+                    return;
+                }
+
+                const { signedUrl } = await signedUrlResponse.json();
+
+                // 2. 使用簽署 URL 上傳 CSV
+                const uploadResponse = await fetch(signedUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'text/csv' },
+                    body: csv
+                });
+
+                if (uploadResponse.ok) {
+                    alert('已成功上傳至 AWS S3');
+                } else {
+                    alert('上傳失敗');
+                }
+            } catch (error) {
+                console.error('S3 upload error:', error);
+                alert('上傳出錯: ' + error.message);
+            }
+        }
+
+        // 輔助函數：生成 CSV
+        function generateCSV(patients) {
+            const headers = ['ID', '姓名', '日期', '眼科篩檢'];
+            const rows = patients.map(p => [
+                p.id,
+                `"${p.name}"`,
+                p.date,
+                p.eye_screen ? '是' : '否'
+            ]);
+            return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
         }
     </script>
 </body>
