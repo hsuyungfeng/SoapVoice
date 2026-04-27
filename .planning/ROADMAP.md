@@ -28,7 +28,7 @@ PyInstaller + Inno Setup 腳本建置
 
 **Milestone Goal:** LAN 瘦客戶端架構 — Windows EXE 可透過區網上傳錄音/截圖至 GPU 伺服器、接收 SOAP、資料持久化、監控儀表板。
 
-- [ ] **Phase 10: 資料持久化** — SQLite 結構化儲存病歷/音檔/逐字稿、審計追蹤、病患搜尋與分頁瀏覽
+- [x] **Phase 10: 資料持久化** — SQLite 結構化儲存病歷/音檔/逐字稿、審計追蹤、病患搜尋與分頁瀏覽
 - [ ] **Phase 11: LAN 瘦客戶端** — Windows 精簡 EXE 錄音+截圖上傳、接收並顯示 SOAP、LAN 斷線容錯
 - [ ] **Phase 12: 監控儀表板** — SSE 即時 GPU 指標推送、處理時間趨勢圖、看診次數統計
 - [ ] **Phase 13: Wine EXE 驗證** — Linux Wine 下 EXE 煙霧測試、GitHub Actions CI 自動化
@@ -49,9 +49,9 @@ PyInstaller + Inno Setup 腳本建置
 **Plans**: 3 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — 資料庫 Schema 與連線基礎（aiosqlite 模組 + 四張表初始化 + lifespan 整合）
-- [ ] 10-02-PLAN.md — SOAP 儲存整合（SessionManager 雙軌寫入 + consultation_api 自動儲存）
-- [ ] 10-03-PLAN.md — 搜尋 API 與審計追蹤端點（姓名/日期搜尋 + 分頁 + SOAP 修改審計）
+- [x] 10-01-PLAN.md — 資料庫 Schema 與連線基礎（aiosqlite 模組 + 四張表初始化 + lifespan 整合）
+- [x] 10-02-PLAN.md — SOAP 儲存整合（SessionManager 雙軌寫入 + consultation_api 自動儲存）
+- [x] 10-03-PLAN.md — 搜尋 API 與審計追蹤端點（姓名/日期搜尋 + 分頁 + SOAP 修改審計）
 
 ### Phase 11: LAN 瘦客戶端
 **Goal**: 醫師可從 Windows 精簡客戶端錄音並截圖，透過 LAN HTTP 上傳至 GPU 伺服器，接收並在 GUI 中查看結構化 SOAP 病歷
@@ -62,8 +62,13 @@ Plans:
   2. 伺服器處理完成後，客戶端 GUI 自動展開面板，結構化顯示臨床摘要、雙語 SOAP（中/英）、醫囑與用藥建議
   3. LAN 斷線時，客戶端 GUI 顯示紅色連線指示燈與明確錯誤訊息；連線恢復後自動指數退避重試（最多 3 次），每 3 秒更新連線狀態燈號（綠/黃/紅）
   4. 錄音過程中若未成功上傳至伺服器，音檔以時間戳命名（`YYYYMMDD_HHMMSS_sessionid.wav`）暫存於本地目錄，待連線恢復後自動補傳
-  5. 客戶端啟動時自動呼叫 `GET /api/v1/version` 檢查伺服器 API 版本相容性，不相容時強制彈窗提示更新
-**Plans**: TBD
+  5. 客戶端啟動時自動呼叫 `GET /api/v1/health` 檢查伺服器 API 版本相容性，不相容時強制彈窗提示更新
+**Plans**: 3 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — 伺服器端 LAN API（multipart 端點、Opus 壓縮、IP 白名單、健康檢查）
+- [ ] 11-02-PLAN.md — Windows 瘦客戶端 GUI（錄音+截圖、LAN 上傳、連線狀態指示燈、SOAP 展示面板）
+- [ ] 11-03-PLAN.md — 本機暫存與恢復機制（失敗上傳隊列、指數退避重試、應用重啟後自動恢復）
 
 ### Phase 12: 監控儀表板
 **Goal**: 診所 IT 人員可透過瀏覽器即時監控 GPU 伺服器健康狀態，並查看歷史處理效能趨勢
@@ -104,8 +109,8 @@ Phases execute in numeric order: 10 → 11 ∥ 12 → 13 → 14
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 10. 資料持久化 | v1.1 | 0/3 | Not started | — |
-| 11. LAN 瘦客戶端 | v1.1 | 0/TBD | Not started | — |
+| 10. 資料持久化 | v1.1 | 3/3 | ✅ Complete | 2026-04-25 |
+| 11. LAN 瘦客戶端 | v1.1 | 0/3 | Planning | — |
 | 12. 監控儀表板 | v1.1 | 0/TBD | Not started | — |
 | 13. Wine EXE 驗證 | v1.1 | 0/TBD | Not started | — |
 | 14. 技術文件 | v1.1 | 0/TBD | Not started | — |
