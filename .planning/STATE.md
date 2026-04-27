@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: 網路部署與資料管理
-status: planning
-stopped_at: Phase 11 planning complete (2026-04-27)
-last_updated: "2026-04-27T12:00:00.000Z"
-last_activity: 2026-04-27 — Phase 11 規劃完成（3 個計畫：伺服器 API、客戶端 GUI、本機暫存機制）
+status: in_progress
+stopped_at: Phase 11-01 complete (2026-04-27)
+last_updated: "2026-04-27T13:00:00.000Z"
+last_activity: 2026-04-27 — Phase 11-01 完成（伺服器端 LAN API + Opus 壓縮 + 49 測試通過）
 progress:
   total_phases: 5
   completed_phases: 1
   planned_phases: 1
   total_plans: 13
-  completed_plans: 3
-  planned_plans: 3
-  percent: 23
+  completed_plans: 4
+  planned_plans: 2
+  percent: 31
 ---
 
 # Project State
@@ -28,11 +28,45 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 11 of 14 (LAN 瘦客戶端)
-Plan: Planning phase 11 (3 計畫已規劃)
-Status: Ready for execution
-Last activity: 2026-04-27 — Phase 11 規劃完成
+Plan: 11-01 完成 → 下一步 11-02 (Windows 瘦客戶端 GUI)
+Status: in_progress
+Last activity: 2026-04-27 — Phase 11-01 執行完成（49/49 tests pass）
 
-Progress: [██████░░░░░] 23% (3/13 v1.1 計畫已完成，3/13 已規劃)
+Progress: [████████░░░] 31% (4/13 v1.1 計畫已完成，2/13 已規劃)
+
+## Phase 11-01 Completion Summary (2026-04-27)
+
+✅ **Phase 11-01: 伺服器端 LAN API — COMPLETE**
+
+**Deliverables:**
+- `src/api/lan_health_api.py` — `/api/v1/health` + `/api/v1/version` 端點（172 行）
+- `src/api/lan_process_api.py` — `/api/v1/lan/process` multipart 端點（361 行）
+- `src/utils/audio_compress.py` — Opus 32kbps 壓縮工具（187 行）
+- `src/main.py` — `is_lan_ip()` + `lan_whitelist_middleware` + 路由註冊
+- `tests/test_lan_api.py` — 49 個單元/整合測試（834 行）
+
+**Commits:**
+- cdca251 — feat(11-01): add LAN whitelist middleware and register LAN routers
+- 2e37758 — feat(11-01): add Opus 32kbps audio compression utility
+- d35d80e — test(11-01): add 49 unit/integration tests for LAN API
+
+**Test Coverage:** 49/49 通過 (8.13s)
+- TestAudioCompress (11) ✓
+- TestLANWhitelist (8) ✓
+- TestHealthEndpoint (5) ✓
+- TestLANProcessEndpoint (10) ✓
+- TestLANProcessIntegration (5) ✓
+- TestLANProcessErrorPaths (5) ✓
+- TestResponseModels (5) ✓
+
+**Key Decisions:**
+- `/api/v1/health` 採直接路徑（無 /lan 子路徑），便於客戶端版本檢查慣例
+- `lan_health_router` 須早於 `websocket_router` 註冊以避免路由衝突
+- FastAPI TestClient `testclient` 主機名加入 LAN 白名單（生產環境不可達）
+- Opus 壓縮失敗 graceful fallback 至原 WAV bytes
+- 任一下游（ASR/SOAP/SQLite）失敗皆回 200 + status='partial'
+
+---
 
 ## Phase 10 Completion Summary
 
