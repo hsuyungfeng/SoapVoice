@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: 網路部署與資料管理
 status: in_progress
-stopped_at: Phase 11-01 complete (2026-04-27)
-last_updated: "2026-04-27T13:00:00.000Z"
-last_activity: 2026-04-27 — Phase 11-01 完成（伺服器端 LAN API + Opus 壓縮 + 49 測試通過）
+stopped_at: Phase 11-02 complete (2026-04-27)
+last_updated: "2026-04-27T15:00:00.000Z"
+last_activity: 2026-04-27 — Phase 11-02 完成（Windows 瘦客戶端 GUI + 38 測試通過）
 progress:
   total_phases: 5
   completed_phases: 1
   planned_phases: 1
   total_plans: 13
-  completed_plans: 4
-  planned_plans: 2
-  percent: 31
+  completed_plans: 5
+  planned_plans: 1
+  percent: 38
 ---
 
 # Project State
@@ -23,16 +23,61 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** 語音自動轉錄為專業 SOAP 病歷，讓醫師專注問診而非打字
-**Current focus:** Phase 11 — LAN 瘦客戶端（規劃完成，待執行）
+**Current focus:** Phase 11 — LAN 瘦客戶端（11-01 + 11-02 完成 → 11-03 待執行）
 
 ## Current Position
 
 Phase: 11 of 14 (LAN 瘦客戶端)
-Plan: 11-01 完成 → 下一步 11-02 (Windows 瘦客戶端 GUI)
+Plan: 11-02 完成 → 下一步 11-03 (整合測試 + Windows 部署)
 Status: in_progress
-Last activity: 2026-04-27 — Phase 11-01 執行完成（49/49 tests pass）
+Last activity: 2026-04-27 — Phase 11-02 執行完成（38/38 client tests pass，總計 87/87）
 
-Progress: [████████░░░] 31% (4/13 v1.1 計畫已完成，2/13 已規劃)
+Progress: [█████████░░] 38% (5/13 v1.1 計畫已完成，1/13 已規劃)
+
+## Phase 11-02 Completion Summary (2026-04-27)
+
+✅ **Phase 11-02: Windows 瘦客戶端 GUI — COMPLETE**
+
+**Deliverables:**
+- `client/__init__.py` — 套件入口（15 行）
+- `client/lan_config.py` — `LANConfig` dataclass（92 行）
+- `client/http_client.py` — `AsyncHTTPClient` + tenacity 重試（190 行）
+- `client/lan_client.py` — `LANClient` 健康狀態機 + 上傳 + 暫存佇列（381 行）
+- `client/audio_recorder.py` — `AudioRecorder` PyAudio 16kHz mono（194 行）
+- `client/screenshot_capture.py` — `ScreenshotCapture` PIL/mss（100 行）
+- `client/gui.py` — Tkinter `SOAPVoiceGUI` + `ConnectionIndicator` + `SOAPPanel`（420 行）
+- `client/main.py` — `App` 控制器 + `AsyncRunner` 背景事件迴圈（410 行）
+- `tests/test_client.py` — 38 個 client 單元/整合測試（997 行）
+
+**Commits:**
+- c650402 — feat(11-02): add LAN client core (config, HTTP client, LANClient + 21 tests)
+- 3b917b1 — feat(11-02): add Tkinter GUI (ConnectionIndicator, SOAPPanel, SOAPVoiceGUI)
+- a8fda61 — feat(11-02): add client entrypoint App + AsyncRunner + 14 new tests
+
+**Test Coverage:** 38/38 通過 (0.43s)
+- TestLANConfig (4) ✓
+- TestAsyncHTTPClient (3) ✓
+- TestLANClientHealth (5) ✓
+- TestLANClientUpload (4) ✓
+- TestAudioRecorder (3) ✓
+- TestScreenshotCapture (2) ✓
+- TestGUIComponents (9) ✓
+- TestAsyncRunner (3) ✓
+- TestAppController (2) ✓
+- TestLANClientHealthExtra (3) ✓
+
+**Combined LAN tests (server + client): 87/87 通過 (9.44s)**
+
+**Key Decisions:**
+- GUI 與 PyAudio/mss 解耦：SOAPVoiceGUI 透過 `set_recording_callbacks()` 接受外部實作，便於無頭測試
+- Async/Sync 雙模 callback：`update_connection_status` 為 async（測試以 run_until_complete），同步 wrapper `_sync_*` 用 `after(0,...)` 排程到 Tk 主執行緒
+- `AsyncRunner` 在背景 thread 跑 asyncio loop，主執行緒專責 tkinter mainloop（避免阻塞 UI）
+- `ConnectionIndicator` 直接畫 Canvas 圓燈，避免外部圖示資源
+- 離線/降級時自動 disable 錄音按鈕（防誤操作）
+- 啟動時 `load_pending_from_disk()` 恢復上次未上傳項目
+- 版本不相容時 `messagebox.showwarning`，但仍進入 GUI 讓使用者重試
+
+---
 
 ## Phase 11-01 Completion Summary (2026-04-27)
 
