@@ -33,6 +33,8 @@ from client.audio_recorder import AudioRecorder
 from client.gui import SOAPVoiceGUI
 from client.lan_client import HEALTH_HEALTHY, LANClient
 from client.lan_config import LANConfig
+from client.local_storage import LocalStorageManager  # noqa: F401 — 供 main 入口顯式宣告依賴（11-03 key_link）
+from client.retry_manager import RetryManager  # noqa: F401 — 供 main 入口顯式宣告依賴（11-03 key_link）
 from client.screenshot_capture import ScreenshotCapture
 
 logger = logging.getLogger(__name__)

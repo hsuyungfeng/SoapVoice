@@ -385,12 +385,14 @@ class TestLANClientUpload:
         assert len(client.pending_uploads) == 1
         assert client.pending_uploads[0].patient_name == "病患A"
 
-        # JSON 檔案存在
-        cache_files = list(Path(tmp_config.local_cache_dir).glob("pending_*.json"))
-        assert len(cache_files) == 1
-        with open(cache_files[0], "r", encoding="utf-8") as f:
+        # 11-03 新 schema：單一 queue.json 集中管理
+        queue_file = Path(tmp_config.local_cache_dir) / "pending" / "queue.json"
+        assert queue_file.exists()
+        with open(queue_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-        assert data["patient_name"] == "病患A"
+        assert isinstance(data, list)
+        assert len(data) == 1
+        assert data[0]["patient_name"] == "病患A"
 
     @pytest.mark.asyncio
     async def test_lan_client_upload_missing_audio(self, tmp_config):
@@ -407,26 +409,28 @@ class TestLANClientUpload:
 
     @pytest.mark.asyncio
     async def test_lan_client_load_pending_from_disk(self, tmp_config, tmp_path):
-        """啟動時可從快取目錄載入 pending JSON。"""
+        """啟動時可從 11-03 新 schema (pending/queue.json) 載入既有隊列。"""
         from client.lan_client import LANClient
 
-        # 預先寫入兩筆 pending
+        # 預先以新 schema 寫入兩筆 pending（單一 queue.json，list of dict）
         cache_dir = Path(tmp_config.local_cache_dir)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        for i in range(2):
-            (cache_dir / f"pending_2026-04-27T0{i}.json").write_text(
-                json.dumps(
-                    {
-                        "audio_path": f"/tmp/a{i}.wav",
-                        "screenshot_path": f"/tmp/s{i}.jpg",
-                        "patient_name": f"P{i}",
-                        "doctor_name": "",
-                        "queued_at": f"2026-04-27T0{i}:00:00",
-                        "retry_count": 0,
-                    }
-                ),
-                encoding="utf-8",
-            )
+        pending_dir = cache_dir / "pending"
+        pending_dir.mkdir(parents=True, exist_ok=True)
+        queue_data = [
+            {
+                "session_id": f"sess-{i}",
+                "audio_path": f"/tmp/a{i}.wav",
+                "screenshot_path": f"/tmp/s{i}.jpg",
+                "patient_name": f"P{i}",
+                "doctor_name": "",
+                "queued_at": f"2026-04-27T0{i}:00:00",
+                "retry_count": 0,
+            }
+            for i in range(2)
+        ]
+        (pending_dir / "queue.json").write_text(
+            json.dumps(queue_data), encoding="utf-8"
+        )
 
         client = LANClient(tmp_config)
         loaded = client.load_pending_from_disk()
