@@ -78,7 +78,11 @@ Plans:
   1. IT 人員在瀏覽器中開啟儀表板，可即時查看 GPU 使用率、VRAM 用量、請求佇列長度，指標透過 SSE 每 2 秒自動更新
   2. IT 人員可查看歷史處理時間趨勢圖，支援小時與日粒度切換（使用 Chart.js 前端渲染）
   3. IT 人員可查看患者看診次數統計摘要（如「本日 N 筆、本月 M 筆」），數據來自 Phase 10 持久層
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — 伺服器端指標收集與 SSE 推送（GPU/VRAM 輪詢、metrics_history 表、非同步任務）
+- [ ] 12-02-PLAN.md — 儀表板前端與歷史圖表（HTML + Chart.js、SSE 連線、統計卡片）
 
 ### Phase 13: Wine EXE 驗證
 **Goal**: 確保 Phase 11 建置的 Windows 精簡客戶端 EXE 可在 Linux Wine 環境下完成基本煙霧測試，CI 自動化執行
@@ -111,6 +115,6 @@ Phases execute in numeric order: 10 → 11 ∥ 12 → 13 → 14
 |-------|-----------|----------------|--------|-----------|
 | 10. 資料持久化 | v1.1 | 3/3 | ✅ Complete | 2026-04-25 |
 | 11. LAN 瘦客戶端 | v1.1 | 0/3 | Planning | — |
-| 12. 監控儀表板 | v1.1 | 0/TBD | Not started | — |
+| 12. 監控儀表板 | v1.1 | 0/2 | Planning | — |
 | 13. Wine EXE 驗證 | v1.1 | 0/TBD | Not started | — |
 | 14. 技術文件 | v1.1 | 0/TBD | Not started | — |
