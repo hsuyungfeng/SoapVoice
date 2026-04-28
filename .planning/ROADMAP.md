@@ -66,9 +66,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — 伺服器端 LAN API（multipart 端點、Opus 壓縮、IP 白名單、健康檢查）
-- [ ] 11-02-PLAN.md — Windows 瘦客戶端 GUI（錄音+截圖、LAN 上傳、連線狀態指示燈、SOAP 展示面板）
-- [ ] 11-03-PLAN.md — 本機暫存與恢復機制（失敗上傳隊列、指數退避重試、應用重啟後自動恢復）
+- [x] 11-01-PLAN.md — 伺服器端 LAN API（multipart 端點、Opus 壓縮、IP 白名單、健康檢查）
+- [x] 11-02-PLAN.md — Windows 瘦客戶端 GUI（錄音+截圖、LAN 上傳、連線狀態指示燈、SOAP 展示面板）
+- [x] 11-03-PLAN.md — 本機暫存與恢復機制（失敗上傳隊列、指數退避重試、應用重啟後自動恢復）
 
 ### Phase 12: 監控儀表板
 **Goal**: 診所 IT 人員可透過瀏覽器即時監控 GPU 伺服器健康狀態，並查看歷史處理效能趨勢

@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: 網路部署與資料管理
 status: in_progress
-stopped_at: Phase 11-02 complete (2026-04-27)
-last_updated: "2026-04-27T15:00:00.000Z"
-last_activity: 2026-04-27 — Phase 11-02 完成（Windows 瘦客戶端 GUI + 38 測試通過）
+stopped_at: Phase 11-03 complete (2026-04-27)
+last_updated: "2026-04-27T16:30:00.000Z"
+last_activity: 2026-04-27 — Phase 11-03 完成（本機暫存 + 指數退避重試 + 60 client 測試通過）
 progress:
   total_phases: 5
   completed_phases: 1
   planned_phases: 1
   total_plans: 13
-  completed_plans: 5
+  completed_plans: 6
   planned_plans: 1
-  percent: 38
+  percent: 46
 ---
 
 # Project State
@@ -23,16 +23,49 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** 語音自動轉錄為專業 SOAP 病歷，讓醫師專注問診而非打字
-**Current focus:** Phase 11 — LAN 瘦客戶端（11-01 + 11-02 完成 → 11-03 待執行）
+**Current focus:** Phase 11 — LAN 瘦客戶端（11-01 + 11-02 + 11-03 完成 → 下一步整合測試 / Windows 部署）
 
 ## Current Position
 
 Phase: 11 of 14 (LAN 瘦客戶端)
-Plan: 11-02 完成 → 下一步 11-03 (整合測試 + Windows 部署)
+Plan: 11-03 完成 → 下一步 11-04 (整合測試 / Windows 部署)
 Status: in_progress
-Last activity: 2026-04-27 — Phase 11-02 執行完成（38/38 client tests pass，總計 87/87）
+Last activity: 2026-04-27 — Phase 11-03 執行完成（60/60 client tests pass，含 22 新增）
 
-Progress: [█████████░░] 38% (5/13 v1.1 計畫已完成，1/13 已規劃)
+Progress: [██████████░] 46% (6/13 v1.1 計畫已完成，1/13 已規劃)
+
+## Phase 11-03 Completion Summary (2026-04-27)
+
+✅ **Phase 11-03: 本機暫存與重試機制 — COMPLETE**
+
+**Deliverables:**
+- `client/local_storage.py` — `LocalStorageManager` + `PendingUpload` dataclass（303 行）
+- `client/retry_manager.py` — `RetryManager` 指數退避 2-4-8 秒（193 行）
+- `client/lan_client.py` — 整合本機暫存 + 自動重試（524 行，從 381 → 524）
+- `client/main.py` — 顯式 import key_link（+2 行）
+- `tests/test_client.py` — 22 新測試 + 2 schema 修正（1507 行，從 997 → 1507）
+
+**Commits:**
+- 2609705 — feat(11-03): add LocalStorageManager for client offline queue
+- 34d8d71 — feat(11-03): add RetryManager with exponential backoff
+- 7a798a2 — feat(11-03): integrate LocalStorageManager + RetryManager into LANClient
+
+**Test Coverage:** 60/60 通過 (2.02s)
+- TestLocalStorageManager (9) ✓ — add/save/load/remove/overflow/retry_count/corrupt/clear/serialization
+- TestRetryManager (6) ✓ — backoff/should_retry/next_delay/wait/state/defaults
+- TestLANClientRetry (7) ✓ — restore/queue/success/failure/max_retries/health_recovery/session_id_format
+- 既有 38 測試 + 22 新測試 = 60
+
+**Key Decisions:**
+- 採單一 queue.json 集中管理（原子寫入：tmp + replace），避免散檔導致同步漏寫
+- PendingUpload 採 dataclass + asdict / from_dict（容錯：缺欄位以預設值補齊）
+- 隊列上限 10 筆（先 drop_oldest 再 append，避免短暫超限）
+- 指數退避 2-4-8 秒（base=2.0, multiplier=2.0, max_retries=3）
+- 連線恢復觸發點：unknown→healthy 與 offline→healthy 皆觸發補傳
+- _retry_in_progress 旗標避免 retry coroutine 重入
+- FileNotFoundError 期間自動清出隊列（不可復原）
+
+---
 
 ## Phase 11-02 Completion Summary (2026-04-27)
 
