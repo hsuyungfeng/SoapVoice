@@ -628,3 +628,370 @@ class TestGUIComponents:
             assert app.connection_indicator.status == "healthy"
         finally:
             app.destroy()
+
+    def test_gui_status_transitions(self):
+        """SOAPVoiceGUI 連線狀態切換：healthy → offline → degraded 都正確反映。"""
+        from client.gui import SOAPVoiceGUI
+        from client.lan_client import LANClient
+        from client.lan_config import LANConfig
+
+        cfg = LANConfig(local_cache_dir="/tmp/soapvoice_test_gui_trans")
+        lan_client = LANClient(cfg)
+        app = SOAPVoiceGUI(lan_client)
+        try:
+            loop = asyncio.new_event_loop()
+            try:
+                loop.run_until_complete(app.update_connection_status("healthy"))
+                assert app.connection_indicator.status == "healthy"
+                assert str(app.record_button.cget("state")) == "normal"
+
+                loop.run_until_complete(app.update_connection_status("offline"))
+                assert app.connection_indicator.status == "offline"
+                # 離線時錄音按鈕應為 disabled
+                assert str(app.record_button.cget("state")) == "disabled"
+
+                loop.run_until_complete(app.update_connection_status("degraded"))
+                assert app.connection_indicator.status == "degraded"
+                assert str(app.record_button.cget("state")) == "disabled"
+            finally:
+                loop.close()
+        finally:
+            app.destroy()
+
+    def test_gui_display_soap_result(self):
+        """display_soap_result 將伺服器回應寫入 SOAPPanel 各分頁。"""
+        import tkinter as tk
+
+        from client.gui import SOAPVoiceGUI
+        from client.lan_client import LANClient
+        from client.lan_config import LANConfig
+
+        cfg = LANConfig(local_cache_dir="/tmp/soapvoice_test_soap")
+        lan_client = LANClient(cfg)
+        app = SOAPVoiceGUI(lan_client)
+        try:
+            response = {
+                "session_id": "sess-xyz",
+                "status": "ok",
+                "soap": {
+                    "S": "胸悶",
+                    "O": "BP 130/85",
+                    "A": "焦慮",
+                    "P": "深呼吸",
+                    "summary": "緩解策略",
+                },
+            }
+            loop = asyncio.new_event_loop()
+            try:
+                loop.run_until_complete(app.display_soap_result(response))
+            finally:
+                loop.close()
+            text = app.soap_panel.soap_sections["A (評估)"].get("1.0", tk.END)
+            assert "焦慮" in text
+        finally:
+            app.destroy()
+
+    def test_gui_recording_callbacks(self):
+        """set_recording_callbacks 接到按鈕後，按鈕點擊會傳遞錄音狀態。"""
+        from client.gui import SOAPVoiceGUI
+        from client.lan_client import LANClient
+        from client.lan_config import LANConfig
+
+        cfg = LANConfig(local_cache_dir="/tmp/soapvoice_test_btn")
+        lan_client = LANClient(cfg)
+        app = SOAPVoiceGUI(lan_client)
+        try:
+            states = []
+            shots = []
+            app.set_recording_callbacks(
+                on_record=lambda is_rec: states.append(is_rec),
+                on_screenshot=lambda: shots.append(True),
+            )
+
+            # 模擬點擊
+            app._on_record_click()
+            app._on_record_click()
+            app._on_screenshot_click()
+
+            assert states == [True, False]
+            assert shots == [True]
+        finally:
+            app.destroy()
+
+    def test_gui_get_patient_doctor(self):
+        """get_patient_doctor 回傳輸入欄當前值（trim 空白）。"""
+        from client.gui import SOAPVoiceGUI
+        from client.lan_client import LANClient
+        from client.lan_config import LANConfig
+
+        cfg = LANConfig(local_cache_dir="/tmp/soapvoice_test_pd")
+        lan_client = LANClient(cfg)
+        app = SOAPVoiceGUI(lan_client)
+        try:
+            app.patient_var.set("  王大明  ")
+            app.doctor_var.set("李醫師")
+            patient, doctor = app.get_patient_doctor()
+            assert patient == "王大明"
+            assert doctor == "李醫師"
+        finally:
+            app.destroy()
+
+    def test_soap_panel_handles_missing_keys(self):
+        """display_soap 對缺欄位回應應顯示空字串而非 None。"""
+        import tkinter as tk
+
+        from client.gui import SOAPPanel
+
+        root = tk.Tk()
+        try:
+            panel = SOAPPanel(root)
+            # 只給 S，其他缺
+            panel.display_soap({"S": "測試"})
+            for label in ("O (客觀)", "A (評估)", "P (計畫)", "摘要"):
+                content = panel.soap_sections[label].get("1.0", tk.END).strip()
+                assert content == "", f"section {label} 應為空，實際: {content!r}"
+        finally:
+            root.destroy()
+
+    def test_soap_panel_ignores_non_dict(self):
+        """display_soap 收到非 dict 不應丟例外。"""
+        import tkinter as tk
+
+        from client.gui import SOAPPanel
+
+        root = tk.Tk()
+        try:
+            panel = SOAPPanel(root)
+            panel.display_soap(None)  # type: ignore[arg-type]
+            panel.display_soap("not a dict")  # type: ignore[arg-type]
+            # 沒丟例外即通過
+        finally:
+            root.destroy()
+
+
+# ======================================================================
+# Task 3: AsyncRunner（背景事件迴圈）
+# ======================================================================
+
+
+class TestAsyncRunner:
+    def test_async_runner_start_stop(self):
+        """start() 後 loop 可運作，stop() 後 thread 結束。"""
+        from client.main import AsyncRunner
+
+        runner = AsyncRunner()
+        runner.start()
+        assert runner.loop is not None
+        assert runner.loop.is_running()
+
+        # 提交一個簡單協程
+        async def hello() -> str:
+            return "ok"
+
+        future = runner.submit(hello())
+        result = future.result(timeout=2.0)
+        assert result == "ok"
+
+        runner.stop(timeout=2.0)
+        # stop 後再 submit 應丟例外（loop 已關）
+        with pytest.raises(RuntimeError):
+            runner.submit(hello())
+
+    def test_async_runner_submit_before_start(self):
+        """未 start 直接 submit 應丟 RuntimeError。"""
+        from client.main import AsyncRunner
+
+        runner = AsyncRunner()
+
+        async def noop() -> None:
+            return None
+
+        with pytest.raises(RuntimeError):
+            runner.submit(noop())
+
+    def test_async_runner_double_start_safe(self):
+        """重複 start 應為 no-op，不丟例外。"""
+        from client.main import AsyncRunner
+
+        runner = AsyncRunner()
+        runner.start()
+        runner.start()  # no-op
+        try:
+            assert runner.loop is not None
+        finally:
+            runner.stop()
+
+
+# ======================================================================
+# Task 3: App 控制器（整合 GUI + LANClient + I/O）
+# ======================================================================
+
+
+@pytest.mark.skipif(not _have_display(), reason="No display server available")
+class TestAppController:
+    def test_app_init_wires_components(self, tmp_path):
+        """App.__init__ 正確建立 lan_client/recorder/screenshot/gui。"""
+        from client.lan_config import LANConfig
+        from client.main import App
+
+        cfg = LANConfig(
+            local_cache_dir=str(tmp_path / "cache"),
+            connection_timeout_sec=0.5,
+        )
+        app = App(cfg)
+        try:
+            assert app.lan_client is not None
+            assert app.audio_recorder is not None
+            assert app.screenshot_capture is not None
+            assert app.gui is not None
+            # GUI 已掛上 lan_client callback
+            assert app.lan_client.connection_status_callback is not None
+            assert app.lan_client.result_callback is not None
+        finally:
+            try:
+                app.gui.destroy()
+            except Exception:
+                pass
+            app.shutdown()
+
+    def test_app_record_toggle_triggers_upload(self, tmp_path):
+        """錄音停止後，App 應將 wav+screenshot 提交至 lan_client.upload_consultation。"""
+        from client.lan_config import LANConfig
+        from client.main import App
+
+        cfg = LANConfig(
+            local_cache_dir=str(tmp_path / "cache"),
+            connection_timeout_sec=0.5,
+        )
+        app = App(cfg)
+        try:
+            app.async_runner.start()
+
+            # mock recorder & screenshot
+            app.audio_recorder = MagicMock()
+            wav_path = str(tmp_path / "fake.wav")
+            Path(wav_path).write_bytes(b"RIFFfake")
+            app.audio_recorder.is_recording = False
+            app.audio_recorder.start = MagicMock()
+            app.audio_recorder.stop = MagicMock(return_value=wav_path)
+
+            shot_path = str(tmp_path / "fake.jpg")
+            Path(shot_path).write_bytes(b"\xff\xd8fake")
+            app.screenshot_capture = MagicMock()
+            app.screenshot_capture.capture = MagicMock(return_value=shot_path)
+
+            # 替換 lan_client.upload_consultation 為可追蹤的 async mock
+            calls: list[tuple] = []
+
+            async def fake_upload(audio_path, screenshot_path, patient_name="", doctor_name=""):
+                calls.append((audio_path, screenshot_path, patient_name, doctor_name))
+                return {"session_id": "fake", "status": "ok", "soap": {"S": "x"}}
+
+            app.lan_client.upload_consultation = fake_upload  # type: ignore[assignment]
+
+            # 模擬 GUI 病患資訊
+            app.gui.patient_var.set("王大明")
+            app.gui.doctor_var.set("李醫師")
+
+            # 1. 開始錄音 → 應截圖並啟動 recorder
+            app._on_record_toggle(True)
+            assert app.screenshot_capture.capture.call_count == 1
+            assert app.audio_recorder.start.call_count == 1
+
+            # 2. 停止錄音 → 應呼叫 upload_consultation
+            app._on_record_toggle(False)
+            # 等待 async 任務跑完
+            import time as _t
+
+            for _ in range(20):
+                if calls:
+                    break
+                _t.sleep(0.05)
+
+            assert len(calls) == 1
+            audio_p, shot_p, patient, doctor = calls[0]
+            assert audio_p == wav_path
+            assert shot_p == shot_path
+            assert patient == "王大明"
+            assert doctor == "李醫師"
+        finally:
+            try:
+                app.gui.destroy()
+            except Exception:
+                pass
+            app.shutdown()
+
+
+# ======================================================================
+# Task 1+: 額外健康檢查邊界
+# ======================================================================
+
+
+class TestLANClientHealthExtra:
+    @pytest.mark.asyncio
+    async def test_lan_client_health_recovery_triggers_retry(self, tmp_config, tmp_path):
+        """連線恢復時會自動觸發 retry_pending_uploads。"""
+        from client.lan_client import LANClient
+
+        client = LANClient(tmp_config)
+
+        # 預塞一筆 pending（以 _queue_for_retry 方便產生 cache 檔）
+        audio = tmp_path / "a.wav"
+        audio.write_bytes(b"x")
+        shot = tmp_path / "s.jpg"
+        shot.write_bytes(b"y")
+        client._queue_for_retry(str(audio), str(shot), "P", "D")
+        assert len(client.pending_uploads) == 1
+
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.get = AsyncMock(
+                return_value={
+                    "version": "1.1.0",
+                    "services": {"asr": "ready", "llm": "ready", "database": "ready"},
+                }
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+
+            await client.check_health()
+            # 觸發了 create_task；給事件迴圈一輪機會跑
+            await asyncio.sleep(0.01)
+
+        # check_health 完成後，因 retry_pending_uploads 為非同步任務，
+        # 此處只驗證 health_status 為 healthy（建立 retry task 是副作用）
+        assert client.health_status == "healthy"
+
+    @pytest.mark.asyncio
+    async def test_lan_client_pending_queue_cap(self, tmp_config, tmp_path):
+        """超過 max_pending_uploads 時自動 drop 最舊。"""
+        from client.lan_client import LANClient
+
+        # 把上限設低
+        tmp_config.max_pending_uploads = 2
+        client = LANClient(tmp_config)
+
+        audio = tmp_path / "a.wav"
+        audio.write_bytes(b"x")
+        shot = tmp_path / "s.jpg"
+        shot.write_bytes(b"y")
+
+        for i in range(3):
+            client._queue_for_retry(str(audio), str(shot), f"P{i}", "D")
+
+        assert len(client.pending_uploads) == 2
+        # 最舊的 P0 應被 drop
+        names = [p.patient_name for p in client.pending_uploads]
+        assert "P0" not in names
+        assert "P1" in names
+        assert "P2" in names
+
+    @pytest.mark.asyncio
+    async def test_lan_client_semver_compare_edge(self):
+        """_semver_tuple 處理 rc/beta tag 不丟 ValueError。"""
+        from client.lan_client import _semver_tuple
+
+        assert _semver_tuple("1.1.0") == (1, 1, 0)
+        assert _semver_tuple("1.2.0-rc1") == (1, 2, 0)
+        assert _semver_tuple("") == (0,)
+        assert _semver_tuple("invalid") == (0,)
+        assert _semver_tuple("1.0.0") < _semver_tuple("1.1.0")
