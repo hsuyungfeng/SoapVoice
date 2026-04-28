@@ -995,3 +995,509 @@ class TestLANClientHealthExtra:
         assert _semver_tuple("") == (0,)
         assert _semver_tuple("invalid") == (0,)
         assert _semver_tuple("1.0.0") < _semver_tuple("1.1.0")
+
+
+# ======================================================================
+# Phase 11-03 Task 1: LocalStorageManager
+# ======================================================================
+
+
+class TestLocalStorageManager:
+    """本機暫存管理器測試。"""
+
+    def _mk_audio(self, tmp_path, name="audio.wav"):
+        audio = tmp_path / name
+        audio.write_bytes(b"RIFFfakewav")
+        return str(audio)
+
+    def _mk_shot(self, tmp_path, name="screenshot.jpg"):
+        shot = tmp_path / name
+        shot.write_bytes(b"\xff\xd8\xff\xe0fakejpg")
+        return str(shot)
+
+    def test_local_storage_add_pending(self, tmp_path):
+        """新增項目，驗證隊列大小增加並寫入 queue.json。"""
+        from client.local_storage import LocalStorageManager
+
+        mgr = LocalStorageManager(str(tmp_path / "cache"))
+        audio = self._mk_audio(tmp_path)
+        shot = self._mk_shot(tmp_path)
+
+        ok = mgr.add_pending(
+            session_id="20260427_103000_a1b2c3d4",
+            audio_path=audio,
+            screenshot_path=shot,
+            patient_name="王大明",
+            doctor_name="李醫師",
+        )
+        assert ok is True
+        assert mgr.get_queue_size() == 1
+
+        # 驗證 queue.json 已寫入
+        queue_file = mgr.queue_file
+        assert queue_file.exists()
+        with open(queue_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        assert isinstance(data, list)
+        assert len(data) == 1
+        assert data[0]["session_id"] == "20260427_103000_a1b2c3d4"
+        assert data[0]["patient_name"] == "王大明"
+        assert data[0]["retry_count"] == 0
+
+    def test_local_storage_add_pending_missing_audio(self, tmp_path):
+        """音檔不存在時 add_pending 應回 False，不入隊。"""
+        from client.local_storage import LocalStorageManager
+
+        mgr = LocalStorageManager(str(tmp_path / "cache"))
+        ok = mgr.add_pending(
+            session_id="missing",
+            audio_path="/no/such/file.wav",
+            screenshot_path="/no/such/file.jpg",
+        )
+        assert ok is False
+        assert mgr.get_queue_size() == 0
+
+    def test_local_storage_save_load(self, tmp_path):
+        """儲存隊列，重新建立 manager，驗證內容一致。"""
+        from client.local_storage import LocalStorageManager
+
+        cache_dir = str(tmp_path / "cache")
+        mgr1 = LocalStorageManager(cache_dir)
+        for i in range(3):
+            audio = self._mk_audio(tmp_path, f"a{i}.wav")
+            shot = self._mk_shot(tmp_path, f"s{i}.jpg")
+            mgr1.add_pending(
+                session_id=f"sess{i}",
+                audio_path=audio,
+                screenshot_path=shot,
+                patient_name=f"P{i}",
+                doctor_name="D",
+            )
+
+        # 重新建立 manager，從 queue.json 載入
+        mgr2 = LocalStorageManager(cache_dir)
+        assert mgr2.get_queue_size() == 3
+        items = mgr2.get_all_pending()
+        assert items[0].session_id == "sess0"
+        assert items[1].patient_name == "P1"
+        assert items[2].session_id == "sess2"
+
+    def test_local_storage_remove_pending(self, tmp_path):
+        """移除特定項目，驗證隊列更新並 queue.json 同步。"""
+        from client.local_storage import LocalStorageManager
+
+        mgr = LocalStorageManager(str(tmp_path / "cache"))
+        for i in range(3):
+            audio = self._mk_audio(tmp_path, f"a{i}.wav")
+            shot = self._mk_shot(tmp_path, f"s{i}.jpg")
+            mgr.add_pending(f"sess{i}", audio, shot, f"P{i}", "D")
+
+        assert mgr.remove_pending("sess1") is True
+        assert mgr.get_queue_size() == 2
+        names = [p.session_id for p in mgr.get_all_pending()]
+        assert "sess1" not in names
+        assert "sess0" in names
+        assert "sess2" in names
+
+        # 不存在的 session_id
+        assert mgr.remove_pending("nonexistent") is False
+
+        # 驗證 queue.json 也已同步
+        with open(mgr.queue_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        assert len(data) == 2
+
+    def test_local_storage_queue_overflow(self, tmp_path):
+        """新增超過上限時，最舊項目自動刪除並記 warning。"""
+        from client.local_storage import LocalStorageManager
+
+        mgr = LocalStorageManager(str(tmp_path / "cache"), max_pending=3)
+
+        for i in range(5):
+            audio = self._mk_audio(tmp_path, f"a{i}.wav")
+            shot = self._mk_shot(tmp_path, f"s{i}.jpg")
+            mgr.add_pending(f"sess{i}", audio, shot, f"P{i}", "D")
+
+        # 上限 3：最舊兩個（sess0/sess1）應被刪除
+        assert mgr.get_queue_size() == 3
+        names = [p.session_id for p in mgr.get_all_pending()]
+        assert "sess0" not in names
+        assert "sess1" not in names
+        assert "sess2" in names
+        assert "sess3" in names
+        assert "sess4" in names
+
+    def test_local_storage_increment_retry(self, tmp_path):
+        """增加重試計數，驗證 retry_count 遞增並持久化。"""
+        from client.local_storage import LocalStorageManager
+
+        cache_dir = str(tmp_path / "cache")
+        mgr = LocalStorageManager(cache_dir)
+        audio = self._mk_audio(tmp_path)
+        shot = self._mk_shot(tmp_path)
+        mgr.add_pending("sessA", audio, shot)
+
+        assert mgr.increment_retry_count("sessA") is True
+        assert mgr.find_by_session_id("sessA").retry_count == 1
+        assert mgr.increment_retry_count("sessA") is True
+        assert mgr.find_by_session_id("sessA").retry_count == 2
+
+        # 不存在
+        assert mgr.increment_retry_count("nope") is False
+
+        # 重新載入後 retry_count 仍為 2
+        mgr2 = LocalStorageManager(cache_dir)
+        assert mgr2.find_by_session_id("sessA").retry_count == 2
+
+    def test_local_storage_corrupt_queue_json(self, tmp_path):
+        """損毀的 queue.json 應記 error 並回退為空隊列，不丟例外。"""
+        from client.local_storage import LocalStorageManager
+
+        cache_dir = tmp_path / "cache"
+        pending_dir = cache_dir / "pending"
+        pending_dir.mkdir(parents=True)
+        # 寫入損毀內容
+        (pending_dir / "queue.json").write_text("{ this is not valid JSON ", encoding="utf-8")
+
+        mgr = LocalStorageManager(str(cache_dir))
+        assert mgr.get_queue_size() == 0  # 回退為空
+
+    def test_local_storage_clear_all(self, tmp_path):
+        """clear_all 清空隊列並同步 queue.json。"""
+        from client.local_storage import LocalStorageManager
+
+        mgr = LocalStorageManager(str(tmp_path / "cache"))
+        audio = self._mk_audio(tmp_path)
+        shot = self._mk_shot(tmp_path)
+        mgr.add_pending("a", audio, shot)
+        mgr.add_pending("b", audio, shot)
+        assert mgr.get_queue_size() == 2
+
+        mgr.clear_all()
+        assert mgr.get_queue_size() == 0
+        with open(mgr.queue_file, "r", encoding="utf-8") as f:
+            assert json.load(f) == []
+
+    def test_local_storage_pending_upload_serialization(self):
+        """PendingUpload to_dict / from_dict 對稱。"""
+        from client.local_storage import PendingUpload
+
+        original = PendingUpload(
+            session_id="x",
+            audio_path="/tmp/a.wav",
+            screenshot_path="/tmp/s.jpg",
+            patient_name="王",
+            doctor_name="李",
+            queued_at="2026-04-27T10:30:00",
+            retry_count=2,
+        )
+        d = original.to_dict()
+        restored = PendingUpload.from_dict(d)
+        assert restored.session_id == "x"
+        assert restored.retry_count == 2
+        assert restored.patient_name == "王"
+
+        # 容錯：缺欄位應回退至預設值
+        partial = PendingUpload.from_dict({"session_id": "y", "audio_path": "/a", "screenshot_path": "/s"})
+        assert partial.patient_name == ""
+        assert partial.retry_count == 0
+
+
+# ======================================================================
+# Phase 11-03 Task 2: RetryManager
+# ======================================================================
+
+
+class TestRetryManager:
+    """重試管理器測試。"""
+
+    def test_retry_manager_backoff_calculation(self):
+        """指數退避計算：retry_count 0/1/2 → 2/4/8 秒。"""
+        from client.retry_manager import RetryManager
+
+        rm = RetryManager(base_delay_sec=2.0, max_retries=3, backoff_multiplier=2.0)
+        assert rm.get_retry_delay(0) == 2.0
+        assert rm.get_retry_delay(1) == 4.0
+        assert rm.get_retry_delay(2) == 8.0
+        # 邊界：負值回 0
+        assert rm.get_retry_delay(-1) == 0
+
+    def test_retry_manager_should_retry(self):
+        """最多 3 次重試邏輯：count < max 則 True。"""
+        from client.retry_manager import RetryManager
+
+        rm = RetryManager(max_retries=3)
+        assert rm.should_retry("s", 0) is True
+        assert rm.should_retry("s", 1) is True
+        assert rm.should_retry("s", 2) is True
+        assert rm.should_retry("s", 3) is False  # 已達上限
+        assert rm.should_retry("s", 5) is False
+
+    def test_retry_manager_get_next_retry_delay(self):
+        """超過 max_retries 時 get_next_retry_delay 回 -1（標記不應重試）。"""
+        from client.retry_manager import RetryManager
+
+        rm = RetryManager(base_delay_sec=2.0, max_retries=3)
+        assert rm.get_next_retry_delay(0) == 2.0
+        assert rm.get_next_retry_delay(2) == 8.0
+        assert rm.get_next_retry_delay(3) == -1  # 已達上限
+
+    @pytest.mark.asyncio
+    async def test_retry_manager_wait_before_retry(self):
+        """非同步等待：retry_count 0 應 sleep 約 base_delay 秒。"""
+        import time as _t
+
+        from client.retry_manager import RetryManager
+
+        rm = RetryManager(base_delay_sec=0.05, max_retries=3, backoff_multiplier=2.0)
+
+        start = _t.monotonic()
+        ok = await rm.wait_before_retry(0)
+        elapsed = _t.monotonic() - start
+
+        assert ok is True
+        # 至少 base_delay；給點誤差
+        assert elapsed >= 0.04
+
+        # 已達 max → False，不 sleep
+        start = _t.monotonic()
+        ok = await rm.wait_before_retry(3)
+        elapsed = _t.monotonic() - start
+        assert ok is False
+        assert elapsed < 0.02  # 立即回
+
+    def test_retry_manager_state_tracking(self):
+        """mark_retry_scheduled / get_state / reset_state 行為。"""
+        from client.retry_manager import RetryManager
+
+        rm = RetryManager(base_delay_sec=2.0, max_retries=3)
+
+        # 初始無狀態
+        assert rm.get_state("sessA") is None
+
+        rm.mark_retry_scheduled("sessA", 1)
+        state = rm.get_state("sessA")
+        assert state is not None
+        assert state["count"] == 1
+        assert "next_retry_at" in state
+        assert "last_attempt_at" in state
+
+        rm.reset_state("sessA")
+        assert rm.get_state("sessA") is None
+        # 重複 reset 不丟例外
+        rm.reset_state("sessA")
+
+    def test_retry_manager_default_params(self):
+        """預設值：base_delay=2.0, max_retries=3, multiplier=2.0。"""
+        from client.retry_manager import RetryManager
+
+        rm = RetryManager()
+        assert rm.base_delay_sec == 2.0
+        assert rm.max_retries == 3
+        assert rm.backoff_multiplier == 2.0
+
+
+# ======================================================================
+# Phase 11-03 Task 3: LANClient × LocalStorageManager × RetryManager 整合
+# ======================================================================
+
+
+class TestLANClientRetry:
+    """整合：上傳失敗 → 入隊 → 連線恢復 → 重試 → 成功移除 / 失敗保留。"""
+
+    @pytest.fixture
+    def make_files(self, tmp_path):
+        def _make(name="x"):
+            audio = tmp_path / f"audio_{name}.wav"
+            audio.write_bytes(b"RIFFfake")
+            shot = tmp_path / f"shot_{name}.jpg"
+            shot.write_bytes(b"\xff\xd8fake")
+            return str(audio), str(shot)
+
+        return _make
+
+    @pytest.mark.asyncio
+    async def test_lan_client_upload_failure_queue(self, tmp_config, make_files):
+        """上傳失敗時自動入 LocalStorageManager 隊列。"""
+        from client.http_client import HTTPClientError
+        from client.lan_client import LANClient
+
+        audio, shot = make_files("u1")
+        client = LANClient(tmp_config)
+
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.post_multipart = AsyncMock(
+                side_effect=HTTPClientError("server unreachable")
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+
+            result = await client.upload_consultation(
+                audio_path=audio,
+                screenshot_path=shot,
+                patient_name="病患A",
+                doctor_name="醫師B",
+            )
+
+        assert result is None
+        # storage 隊列存有一筆
+        assert client.storage.get_queue_size() == 1
+        item = client.storage.get_all_pending()[0]
+        assert item.patient_name == "病患A"
+        assert item.audio_path == audio
+
+    @pytest.mark.asyncio
+    async def test_lan_client_restore_pending_uploads(self, tmp_config, make_files):
+        """新建 LANClient 時，已存在的 queue.json 應自動載入。"""
+        from client.lan_client import LANClient
+        from client.local_storage import LocalStorageManager
+
+        # 先以一個獨立 manager 預塞兩筆
+        audio, shot = make_files("r1")
+        pre_mgr = LocalStorageManager(tmp_config.local_cache_dir)
+        pre_mgr.add_pending("sess-1", audio, shot, "P1", "D")
+        pre_mgr.add_pending("sess-2", audio, shot, "P2", "D")
+        assert pre_mgr.get_queue_size() == 2
+
+        # 新 LANClient 應從 queue.json 取得既有項目
+        client = LANClient(tmp_config)
+        assert client.storage.get_queue_size() == 2
+
+    @pytest.mark.asyncio
+    async def test_lan_client_retry_pending_uploads_success(self, tmp_config, make_files):
+        """retry_pending_uploads：所有項目重試成功 → 隊列清空。"""
+        from client.lan_client import LANClient
+
+        client = LANClient(tmp_config)
+        audio, shot = make_files("ok")
+        client.storage.add_pending("s-ok-1", audio, shot, "P1", "D")
+        client.storage.add_pending("s-ok-2", audio, shot, "P2", "D")
+        assert client.storage.get_queue_size() == 2
+
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.post_multipart = AsyncMock(
+                return_value={"session_id": "x", "status": "ok", "soap": {}}
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+
+            success_count = await client.retry_pending_uploads()
+
+        assert success_count == 2
+        assert client.storage.get_queue_size() == 0
+
+    @pytest.mark.asyncio
+    async def test_lan_client_retry_pending_uploads_failure(self, tmp_config, make_files):
+        """retry_pending_uploads：失敗時 retry_count++ 且保留隊列。"""
+        from client.http_client import HTTPClientError
+        from client.lan_client import LANClient
+
+        client = LANClient(tmp_config)
+        audio, shot = make_files("fail")
+        client.storage.add_pending("s-fail", audio, shot, "P", "D")
+
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.post_multipart = AsyncMock(
+                side_effect=HTTPClientError("still down")
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+
+            success_count = await client.retry_pending_uploads()
+
+        assert success_count == 0
+        assert client.storage.get_queue_size() == 1
+        # retry_count 已遞增
+        item = client.storage.find_by_session_id("s-fail")
+        assert item.retry_count == 1
+
+    @pytest.mark.asyncio
+    async def test_lan_client_max_retries_exceeded(self, tmp_config, make_files):
+        """超過 max_retries 後該項目自動從隊列移除。"""
+        from client.http_client import HTTPClientError
+        from client.lan_client import LANClient
+
+        # tmp_config.max_retries=1（fixture 設定），故 retry_count >= 1 即超過
+        client = LANClient(tmp_config)
+        audio, shot = make_files("over")
+
+        # 以 retry_count=1 預塞（已達上限）
+        client.storage.add_pending("s-over", audio, shot, "P", "D")
+        client.storage.increment_retry_count("s-over")  # retry_count=1
+        assert client.storage.find_by_session_id("s-over").retry_count == 1
+
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.post_multipart = AsyncMock(
+                side_effect=HTTPClientError("still down")
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+
+            await client.retry_pending_uploads()
+
+        # 因 retry_count >= max_retries=1，應被刪除
+        assert client.storage.find_by_session_id("s-over") is None
+
+    @pytest.mark.asyncio
+    async def test_lan_client_health_recovery_triggers_retry(self, tmp_config, make_files):
+        """連線恢復（offline → healthy）時自動觸發 retry_pending_uploads。"""
+        from client.http_client import HTTPClientError
+        from client.lan_client import HEALTH_HEALTHY, HEALTH_OFFLINE, LANClient
+
+        client = LANClient(tmp_config)
+        audio, shot = make_files("rec")
+        client.storage.add_pending("s-rec", audio, shot, "P", "D")
+
+        # 第一輪：offline
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.get = AsyncMock(side_effect=HTTPClientError("down"))
+            mock_cls.return_value.__aenter__.return_value = instance
+            await client.check_health()
+            assert client.health_status == HEALTH_OFFLINE
+
+        # 第二輪：healthy + post 成功 → retry 應被觸發
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.get = AsyncMock(
+                return_value={
+                    "version": "1.1.0",
+                    "services": {"asr": "ready", "llm": "ready", "database": "ready"},
+                }
+            )
+            instance.post_multipart = AsyncMock(
+                return_value={"session_id": "ok", "status": "ok", "soap": {}}
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+
+            await client.check_health()
+            # 給事件迴圈一輪機會跑 create_task
+            await asyncio.sleep(0.1)
+
+        assert client.health_status == HEALTH_HEALTHY
+        # retry 已執行 → 隊列清空
+        assert client.storage.get_queue_size() == 0
+
+    @pytest.mark.asyncio
+    async def test_lan_client_session_id_format(self, tmp_config, make_files):
+        """上傳失敗時生成的 session_id 應符合 YYYYMMDD_HHMMSS_xxxxxxxx 格式。"""
+        import re
+
+        from client.http_client import HTTPClientError
+        from client.lan_client import LANClient
+
+        client = LANClient(tmp_config)
+        audio, shot = make_files("sid")
+
+        with patch("client.lan_client.AsyncHTTPClient") as mock_cls:
+            instance = AsyncMock()
+            instance.post_multipart = AsyncMock(
+                side_effect=HTTPClientError("down")
+            )
+            mock_cls.return_value.__aenter__.return_value = instance
+            await client.upload_consultation(audio, shot, "P", "D")
+
+        item = client.storage.get_all_pending()[0]
+        # 期望格式 20260427_103000_xxxxxxxx
+        assert re.match(r"^\d{8}_\d{6}_[0-9a-f]{8}$", item.session_id), \
+            f"session_id 格式不符: {item.session_id}"
