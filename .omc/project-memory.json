@@ -1,9 +1,17 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1776937653865,
+  "lastScanned": 1777515275408,
   "projectRoot": "/home/hsu/Desktop/SoapVoice",
   "techStack": {
     "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
       {
         "name": "Python",
         "version": null,
@@ -16,6 +24,11 @@
     ],
     "frameworks": [
       {
+        "name": "jest",
+        "version": "29.7.0",
+        "category": "testing"
+      },
+      {
         "name": "fastapi",
         "version": null,
         "category": "backend"
@@ -26,15 +39,18 @@
         "category": "testing"
       }
     ],
-    "packageManager": "pip",
+    "packageManager": "npm",
     "runtime": null
   },
   "build": {
     "buildCommand": null,
-    "testCommand": "pytest",
+    "testCommand": "npm test",
     "lintCommand": "ruff check",
     "devCommand": null,
-    "scripts": {}
+    "scripts": {
+      "test": "jest --testPathPattern=tests/test_dashboard_frontend.js",
+      "test:all": "jest"
+    }
   },
   "conventions": {
     "namingStyle": "snake_case",
@@ -60,19 +76,23 @@
     "__pycache__": {
       "path": "__pycache__",
       "purpose": null,
-      "fileCount": 2,
-      "lastAccessed": 1776937653860,
+      "fileCount": 4,
+      "lastAccessed": 1777515275394,
       "keyFiles": [
+        "conftest.cpython-312-pytest-8.3.5.pyc",
         "conftest.cpython-313-pytest-9.0.2.pyc",
+        "conftest.cpython-313-pytest-9.0.3.pyc",
         "start_server.cpython-313.pyc"
       ]
     },
     "benchmarks": {
       "path": "benchmarks",
       "purpose": null,
-      "fileCount": 1,
-      "lastAccessed": 1776937653860,
+      "fileCount": 3,
+      "lastAccessed": 1777515275401,
       "keyFiles": [
+        "BATCH_VOICE_RECORDS_REPORT_20260424_121251.json",
+        "E4B_SOAP_BENCHMARK_RECORD.md",
         "GPUllmcompare.md"
       ]
     },
@@ -80,14 +100,27 @@
       "path": "build",
       "purpose": "Build output",
       "fileCount": 0,
-      "lastAccessed": 1776937653860,
+      "lastAccessed": 1777515275402,
       "keyFiles": []
+    },
+    "client": {
+      "path": "client",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1777515275403,
+      "keyFiles": [
+        "__init__.py",
+        "audio_recorder.py",
+        "gui.py",
+        "http_client.py",
+        "lan_client.py"
+      ]
     },
     "config": {
       "path": "config",
       "purpose": "Configuration files",
       "fileCount": 5,
-      "lastAccessed": 1776937653861,
+      "lastAccessed": 1777515275403,
       "keyFiles": [
         "medical_vocabulary.json",
         "models.yaml",
@@ -100,14 +133,14 @@
       "path": "data",
       "purpose": "Data files",
       "fileCount": 0,
-      "lastAccessed": 1776937653862,
+      "lastAccessed": 1777515275403,
       "keyFiles": []
     },
     "dist": {
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 1,
-      "lastAccessed": 1776937653862,
+      "lastAccessed": 1777515275403,
       "keyFiles": [
         "SoapVoice.exe"
       ]
@@ -115,21 +148,21 @@
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
-      "fileCount": 10,
-      "lastAccessed": 1776937653862,
+      "fileCount": 11,
+      "lastAccessed": 1777515275403,
       "keyFiles": [
         "API_INTEGRATION.md",
+        "BENCHMARK_GUIDE.md",
         "CLI_USAGE.md",
         "DEPLOYMENT.md",
-        "MODEL_BENCHMARK_REPORT.md",
-        "OPEN_SOURCE_MODELS_REPORT.md"
+        "MODEL_BENCHMARK_REPORT.md"
       ]
     },
     "examples": {
       "path": "examples",
       "purpose": "Example code",
       "fileCount": 1,
-      "lastAccessed": 1776937653862,
+      "lastAccessed": 1777515275403,
       "keyFiles": [
         "cli_example_input.txt"
       ]
@@ -138,7 +171,7 @@
       "path": "installer",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1776937653862,
+      "lastAccessed": 1777515275403,
       "keyFiles": [
         "is-unicode.exe",
         "soapvoice.iss"
@@ -148,7 +181,7 @@
       "path": "models",
       "purpose": "Data models",
       "fileCount": 7,
-      "lastAccessed": 1776937653862,
+      "lastAccessed": 1777515275404,
       "keyFiles": [
         "LICENSE",
         "NOTICE.txt",
@@ -157,11 +190,22 @@
         "gemma-4-E4B-it-Q4_K_M.gguf"
       ]
     },
+    "reports": {
+      "path": "reports",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1777515275405,
+      "keyFiles": [
+        "voice_records_test_20260424_114029.json",
+        "voice_records_test_20260424_114237.json",
+        "voice_records_test_20260424_114721.json"
+      ]
+    },
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 36,
-      "lastAccessed": 1776937653862,
+      "lastAccessed": 1777515275405,
       "keyFiles": [
         "backup.sh",
         "benchmark_llama.py",
@@ -173,54 +217,54 @@
     "src": {
       "path": "src",
       "purpose": "Source code",
-      "fileCount": 6,
-      "lastAccessed": 1776937653863,
+      "fileCount": 7,
+      "lastAccessed": 1777515275405,
       "keyFiles": [
         "__init__.py",
         "cli.py",
+        "cli_db_query.py",
         "cli_typer.py",
-        "main.py",
-        "offline_server.py"
+        "main.py"
       ]
     },
     "static": {
       "path": "static",
       "purpose": "Static files",
-      "fileCount": 12,
-      "lastAccessed": 1776937653863,
+      "fileCount": 14,
+      "lastAccessed": 1777515275405,
       "keyFiles": [
         "chest_pain.wav",
+        "dashboard.html",
         "diabetes.wav",
         "doctor_patient.wav",
-        "drug_order.wav",
-        "hypertension.wav"
+        "drug_order.wav"
       ]
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
-      "fileCount": 9,
-      "lastAccessed": 1776937653863,
+      "fileCount": 23,
+      "lastAccessed": 1777515275405,
       "keyFiles": [
         "__init__.py",
-        "test_asr.py",
-        "test_init.py",
-        "test_llm_benchmark.py",
-        "test_nlp.py"
+        "generate_batch_soap_report.py",
+        "run_batch_report_standalone.py",
+        "test_alerts_api.py",
+        "test_asr.py"
       ]
     },
     "watch": {
       "path": "watch",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1776937653863,
+      "lastAccessed": 1777515275406,
       "keyFiles": []
     },
     "models/assets": {
       "path": "models/assets",
       "purpose": "Static assets",
       "fileCount": 6,
-      "lastAccessed": 1776937653864,
+      "lastAccessed": 1777515275407,
       "keyFiles": [
         "bonsai-logo.svg",
         "energy_8B.png",
@@ -230,19 +274,19 @@
     "src/api": {
       "path": "src/api",
       "purpose": "API routes",
-      "fileCount": 9,
-      "lastAccessed": 1776937653864,
+      "fileCount": 14,
+      "lastAccessed": 1777515275407,
       "keyFiles": [
         "__init__.py",
-        "cloud_api.py",
-        "consultation_api.py"
+        "alerts_api.py",
+        "cloud_api.py"
       ]
     },
     "tests/fixtures": {
       "path": "tests/fixtures",
       "purpose": "Test fixtures",
       "fileCount": 2,
-      "lastAccessed": 1776937653865,
+      "lastAccessed": 1777515275408,
       "keyFiles": [
         "asr_comparison_result.json",
         "sample_zh.wav"
@@ -251,21 +295,39 @@
   },
   "hotPaths": [
     {
-      "path": "src/soap/soap_generator.py",
-      "accessCount": 24,
-      "lastAccessed": 1777000797622,
+      "path": "src/main.py",
+      "accessCount": 52,
+      "lastAccessed": 1777517557598,
       "type": "file"
     },
     {
       "path": ".planning/STATE.md",
-      "accessCount": 10,
-      "lastAccessed": 1776998448525,
+      "accessCount": 38,
+      "lastAccessed": 1777535877853,
       "type": "file"
     },
     {
-      "path": "src/main.py",
-      "accessCount": 9,
-      "lastAccessed": 1776998799985,
+      "path": "src/soap/soap_generator.py",
+      "accessCount": 26,
+      "lastAccessed": 1777517337508,
+      "type": "file"
+    },
+    {
+      "path": ".planning/ROADMAP.md",
+      "accessCount": 19,
+      "lastAccessed": 1777535881517,
+      "type": "file"
+    },
+    {
+      "path": "src/api/rest.py",
+      "accessCount": 14,
+      "lastAccessed": 1777517336711,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 10,
+      "lastAccessed": 1777517331620,
       "type": "file"
     },
     {
@@ -287,12 +349,6 @@
       "type": "file"
     },
     {
-      "path": "src/api/rest.py",
-      "accessCount": 4,
-      "lastAccessed": 1776918463140,
-      "type": "file"
-    },
-    {
       "path": "src/asr/whisper_model.py",
       "accessCount": 4,
       "lastAccessed": 1776919484224,
@@ -311,15 +367,21 @@
       "type": "file"
     },
     {
-      "path": "WINDOWS_DEPLOYMENT_SUMMARY.md",
-      "accessCount": 3,
-      "lastAccessed": 1776917760362,
+      "path": "scripts/extended_soapvoice.py",
+      "accessCount": 4,
+      "lastAccessed": 1777258210286,
       "type": "file"
     },
     {
-      "path": "scripts/extended_soapvoice.py",
+      "path": "src/api/extended_api.py",
+      "accessCount": 4,
+      "lastAccessed": 1777517350455,
+      "type": "file"
+    },
+    {
+      "path": "WINDOWS_DEPLOYMENT_SUMMARY.md",
       "accessCount": 3,
-      "lastAccessed": 1776927801054,
+      "lastAccessed": 1776917760362,
       "type": "file"
     },
     {
@@ -335,12 +397,6 @@
       "type": "file"
     },
     {
-      "path": "src/api/extended_api.py",
-      "accessCount": 2,
-      "lastAccessed": 1776919475410,
-      "type": "file"
-    },
-    {
       "path": "src/asr/asr_factory.py",
       "accessCount": 2,
       "lastAccessed": 1776919483842,
@@ -353,15 +409,15 @@
       "type": "file"
     },
     {
-      "path": "test_soap_generation.py",
-      "accessCount": 1,
-      "lastAccessed": 1775699106161,
+      "path": "src/api/cloud_api.py",
+      "accessCount": 2,
+      "lastAccessed": 1777517358331,
       "type": "file"
     },
     {
-      "path": ".planning/ROADMAP.md",
+      "path": "test_soap_generation.py",
       "accessCount": 1,
-      "lastAccessed": 1776842269197,
+      "lastAccessed": 1775699106161,
       "type": "file"
     },
     {
@@ -437,12 +493,6 @@
       "type": "file"
     },
     {
-      "path": "pyproject.toml",
-      "accessCount": 1,
-      "lastAccessed": 1776918459119,
-      "type": "file"
-    },
-    {
       "path": "AGENTS.md",
       "accessCount": 1,
       "lastAccessed": 1776918459243,
@@ -494,12 +544,6 @@
       "path": "src/phase8/main.py",
       "accessCount": 1,
       "lastAccessed": 1776918476673,
-      "type": "file"
-    },
-    {
-      "path": "src/api/cloud_api.py",
-      "accessCount": 1,
-      "lastAccessed": 1776919468180,
       "type": "file"
     },
     {

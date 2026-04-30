@@ -10,188 +10,346 @@
 SoapVoice 是一套基於本地 LLM 的醫療語音轉 SOAP 病歷系統：
 
 - 🎤 即時多語語音輸入（中文、英文）
-- 🧠 AI 驅動的醫療語意標準化與術語專業化（73 個內建映射 + 80+ 術語）
-- 📋 結構化 SOAP 病歷自動產出（含 ICD-10 候選碼預填）
-- 📊 ICD-10 診斷代碼映射與專科分類
-- 💊 藥務推薦與醫囑建議
-- 🔐 內網專用安全部署
+- 🧠 AI 驅動的醫療語意標準化與術語專業化（100 個內建映射 + 80+ 術語）
+- 📋 結構化 SOAP 病歷自動產出（英文，含 ICD-10 候選碼預填）
+- 📊 ICD-10 診斷代碼映射與專科分類（96,802 代碼）
+- 💊 藥務推薦與醫囑建議（12,042 藥品）
+- 🔐 內網專用安全部署（API Key 認證）
 - 🖥️ **支援 CLI 命令列介面**
-- 🌐 **支援 Windows CPU 離線部署（llama.cpp + Gemma 4:E4B 模型）**
+- 🌐 **支援 Windows/Linux 離線部署（llama.cpp + Gemma 4 E4B 模型）**
+- 🔗 **集成 doctor-toolbox.com（嵌入式 Widget + API）**
+
+---
+
+## 🎯 核心特性
+
+### 三層架構
+```
+病歷語音/文字
+    ↓
+SOAP Generator (LLM 生成)
+    ↓
+LLM Database CLI (ICD-10、藥品、醫囑查詢)
+    ↓
+LocalDatabase (96,802 ICD-10 + 12,042 藥品 + 1,665 病例)
+```
+
+### 效能基準 (Gemma 4 E4B)
+| 指標 | 結果 |
+|------|------|
+| **成功率** | 100% (5/5 醫療案例) |
+| **平均生成時間** | 41.0 秒 |
+| **吞吐量** | 6.7-7.8 tokens/秒 |
+| **SOAP 長度** | 200-250 tokens |
+| **硬體** | RTX 2080 Ti (22GB) / CPU (llama.cpp) |
+
+---
 
 ## 🚀 快速開始
 
-### 選項一：離線版本（推薦，Windows 可打包）
+### 選項一：CLI（推薦，無需服務）
 
 ```bash
-# 執行 Python (使用 Gemma 4 模型)
+# 安裝依賴
 uv sync
-USE_LLAMA_CPP=true uv run python src/cli_typer.py main --text "病人胸悶兩天" --model gemma-4-e4b
+
+# 文字輸入生成 SOAP
+uv run python src/cli_typer.py main --text "病人胸悶兩天伴呼吸困難"
+
+# 使用 llama.cpp 後端（離線）
+USE_LLAMA_CPP=true LLAMA_MODEL_PATH="models/gemma-4-E4B-it-Q4_K_M.gguf" \
+uv run python src/cli_typer.py main --text "病人發燒"
+
+# 列出可用模型
+uv run python src/cli_typer.py models
 ```
 
 **功能**：
-- ✅ SOAP 病歷生成
-- ✅ 術語標準化（73 個內建映射）
+- ✅ SOAP 病歷生成（英文）
+- ✅ 術語標準化（100 個內建映射）
 - ✅ ICD-10 分類（96,802 代碼）
 - ✅ 藥物推薦（12,042 藥品）
 - ✅ 醫囑建議（2,102 項目）
 - ✅ RAG 病例範本檢索（1,665 範本）
 
-### 選項二：線上版本（需要 Ollama）
+### 選項二：API 伺服器
 
 ```bash
-# 1. 安裝依賴
-uv sync
+# 啟動 FastAPI 伺服器
+uv run uvicorn src.main:app --host 0.0.0.0 --port 8010
 
-# 2. 安裝並啟動 Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-ollama pull qwen2.5:7b
-
-# 3. 啟動 API 服務
-uv run uvicorn src.main:app --host 0.0.0.0 --port 8010 --reload
-
-# 4. 確認服務
+# 確認服務健康
 curl http://localhost:8010/api/v1/clinical/health
-```
 
----
-
-## 🖥️ Windows 離線部署
-
-### 打包命令
-
-```bash
-# 安裝 pyinstaller
-uv pip install pyinstaller
-
-# 打包
-pyinstaller SoapVoice-Offline.spec --clean
-```
-
-### 產出
-
-```
-dist/SoapVoice/
-├── SoapVoice.exe           # 主程式
-├── models/
-│   ├── gemma-4-E4B-it-Q4_K_M.gguf  # 2.6GB (首選，效能卓越)
-│   └── Qwen2.5-7B-Instruct-Q4_K_M.gguf  # 4.4GB (備用)
-└── data/
-    └── local_db/medical.db               # 70MB
-```
-
-### 使用方式
-
-```bash
 # 生成 SOAP
-SoapVoice.exe main --text "病人胸悶兩天伴隨呼吸困難"
-
-# 使用 3B 模型（較快）
-SoapVoice.exe main --text "病人發燒" --model qwen2.5-3b
-
-# 啟動 API 伺服器
-SoapVoice.exe serve --port 8000
-
-# 列出模型
-SoapVoice.exe models
+curl -X POST http://localhost:8010/api/v1/clinical/soap/generate \
+  -H "Content-Type: application/json" \
+  -d '{"transcript": "病人胸悶兩天"}'
 ```
 
 ---
 
 ## 📦 模型配置
 
-### LLM 模型（SOAP 生成）- GGUF 離線版本
-
-| 模型 | 大小 | 用途 | 推薦 |
-|------|------|------|------|
-| Qwen2.5-7B-Instruct-Q4_K_M.gguf | 4.4 GB | SOAP 生成 | ✅ 預設 |
-| qwen2.5-3b-instruct-q4_k_m.gguf | 2 GB | 快速推理 | ⭐ 輕量 |
-
-### LLM 模型 - Ollama 版本
-
-| 模型 | 大小 | 用途 | 推薦 |
-|------|------|------|------|
-| qwen2.5:7b | 4.7 GB | SOAP 生成 | ✅ 線上預設 |
-| qwen2.5:3b | 1.9 GB | 快速推理 | ⭐ 輕量 |
-| gemma4:e2b | 7.2 GB | 測試中 | 🔄 |
-
-### OCR 模型
-
-| 模型 | 大小 | 用途 |
-|------|------|------|
-| glm-ocr (Ollama) | 2.2 GB | 螢幕截圖 OCR（線上） |
-| EasyOCR (離線) | - | 繁體中文 + 英文 |
-
-### ASR 模型
-
-| 模型 | 大小 | 用途 |
-|------|------|------|
-| qwen2.5:3b | 1.9 GB | 語音轉文字 |
-| faster-whisper | - | 備用語音辨識 |
-
----
-
-## 🖥️ CLI 使用方式
+### 推薦配置（Gemma 4 E4B）
 
 ```bash
-# 文字輸入生成 SOAP
-uv run python src/cli_typer.py main --text "病人咳嗽兩天有痰"
+# 使用環境變數
+export USE_LLAMA_CPP=true
+export LLAMA_MODEL_PATH="models/gemma-4-E4B-it-Q4_K_M.gguf"
+export LLAMA_N_GPU_LAYERS=-1  # 全 GPU 卸載
 
-# 指定模型
-uv run python src/cli_typer.py main --text "病人胸悶" --model qwen2.5:3b
-
-# 啟動 API 伺服器
-uv run python src/cli_typer.py serve
-
-# 列出可用模型
-uv run python src/cli_typer.py models
+uv run python src/cli_typer.py main --text "..."
 ```
+
+| 模型 | 大小 | 用途 | 推薦 | 來源 |
+|------|------|------|------|------|
+| Gemma 4 E4B (Q4_K_M) | 9.6GB | SOAP 生成 | ⭐⭐⭐ 首選 | llama.cpp |
+| Qwen2.5-7B (Q4_K_M) | 4.4GB | SOAP 生成 | ✅ 備用 | llama.cpp |
+| qwen2.5:7b | 4.7GB | SOAP 生成 | ✅ 線上 | Ollama |
+
+### 其他模型
+
+**ASR（語音辨識）**:
+- `faster-whisper-medium` - 繁體中文語音識別
+- `whisper.cpp` - 離線版本
+
+**OCR（螢幕截圖）**:
+- `PaddleOCR-VL` - 繁體中文 + 英文
+- `EasyOCR` - 離線備用
 
 ---
 
-## 📦 API 端點
+## 🔌 API 文件
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/health` | GET | 健康檢查 |
-| `/api/v1/clinical/normalize` | POST | 術語標準化 |
-| `/api/v1/clinical/icd10` | POST | ICD-10 分類 |
-| `/api/v1/clinical/soap/generate` | POST | SOAP 生成 |
-| `/api/v1/extended/process` | POST | 擴展 SOAP（含症狀/ICD-10/醫囑/藥物） |
+### 基礎端點
+
+| 端點 | 方法 | 說明 | 需要 API Key |
+|------|------|------|-------------|
+| `/health` | GET | 健康檢查 | ❌ |
+| `/api/v1/clinical/health` | GET | 元件健康檢查 | ❌ |
+| `/api/v1/clinical/normalize` | POST | 術語標準化 | ✅ |
+| `/api/v1/clinical/icd10` | POST | ICD-10 分類 | ✅ |
+| `/api/v1/clinical/soap/generate` | POST | SOAP 生成 | ✅ |
+| `/api/v1/clinical/soap/generate-quick` | POST | SOAP 快速生成（嵌入式） | ✅ |
 
 ### SOAP 生成範例
 
 ```bash
-# 使用 qwen2.5:3b
+# 完整 SOAP 生成
 curl -X POST http://localhost:8010/api/v1/clinical/soap/generate \
   -H "Content-Type: application/json" \
-  -d '{"transcript": "病人胸悶兩天伴隨呼吸困難", "model": "qwen2.5:3b"}'
+  -H "X-API-Key: your-api-key" \
+  -d '{
+    "transcript": "患者主訴胸痛三天，呼吸時加重...",
+    "patient_context": {
+      "age": "45",
+      "gender": "M",
+      "chief_complaint": "胸痛"
+    }
+  }'
 
-# 使用 qwen2.5:7b
-curl -X POST http://localhost:8010/api/v1/clinical/soap/generate \
+# 快速生成（為 doctor-toolbox.com 設計）
+curl -X POST http://localhost:8010/api/v1/clinical/soap/generate-quick \
   -H "Content-Type: application/json" \
-  -d '{"transcript": "病人胸悶兩天伴隨呼吸困難", "model": "qwen2.5:7b"}'
+  -H "X-API-Key: your-api-key" \
+  -d '{"text": "患者發燒，體溫 38.5°C"}'
+```
+
+### 響應格式
+
+```json
+{
+  "soap": {
+    "subjective": "Patient reports...",
+    "objective": "Vital signs...",
+    "assessment": "Differential diagnosis...",
+    "plan": "Diagnostic and treatment plan..."
+  },
+  "metadata": {
+    "confidence": 0.92,
+    "model_version": "gemma-4-e4b",
+    "processing_time_ms": 41000,
+    "icd10_codes": ["R07.9", "R07.1"],
+    "medications": ["Ibuprofen 400mg", "..."]
+  }
+}
+```
+
+---
+
+## 🔗 doctor-toolbox.com 集成
+
+### 方式一：嵌入式 Widget
+
+```html
+<!-- 在 doctor-toolbox.com 頁面中嵌入 -->
+<iframe 
+  src="https://soapvoice.hospital.local/widget.html?apiKey=YOUR_API_KEY" 
+  width="800" 
+  height="600" 
+  frameborder="0"
+></iframe>
+```
+
+**Widget 功能**:
+- 📝 支援文字輸入或貼上語音轉文字結果
+- 📋 4 個分頁展示 SOAP (Subjective/Objective/Assessment/Plan)
+- 📋 一鍵複製各個 SOAP 段落
+- ⚡ 實時進度提示
+- 🔐 API Key 從 URL 參數讀取
+
+### 方式二：API 直接呼叫
+
+```javascript
+// JavaScript 中呼叫 SoapVoice API
+const response = await fetch('https://soapvoice.hospital.local/api/v1/clinical/soap/generate-quick', {
+  method: 'POST',
+  headers: {
+    'Content-Type': application/json',
+    'X-API-Key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    text: "患者症狀描述"
+  })
+});
+
+const data = await response.json();
+console.log(data.soap.assessment);  // 評估段落
+```
+
+### 配置 API Key
+
+```bash
+# 在 SoapVoice 伺服器上設定
+export SOAPVOICE_API_KEY="your-secure-key-here"
+uv run uvicorn src.main:app --port 8010
 ```
 
 ---
 
 ## 💾 資料庫內容 (`data/local_db/medical.db`)
 
-本系統使用整合了臨床知識圖譜與學術資料的 SQLite 資料庫 `medical.db`，包含以下表結構：
+本系統使用整合了臨床知識圖譜、學術資料與疾病知識圖譜的 SQLite 資料庫 `medical.db`。
 
-| 資料表 | 說明 |
+### 核心標準資料
+
+| 資料表 | 記錄數 | 用途 | 來源 |
+|--------|--------|------|------|
+| `icd10_codes` | 96,802 | ICD-10 疾病分類 | 健保署標準 |
+| `drugs` | 12,042 | 藥品資料（ATC 分類） | 健保署標準 |
+| `medical_orders` | 2,102 | 醫療服務與診斷 | 健保署標準 |
+| `case_templates` | 1,665 | SOAP 病例範本（RAG） | 自建 |
+
+### 疾病知識圖譜（新增 v1.8.0）
+
+| 資料表 | 記錄數 | 用途 |
+|--------|--------|------|
+| `disease_info` | 8,807 | 疾病描述、病因、預防、治療方式 |
+| `disease_symptoms` | 54,710 | 疾病➜症狀對應（5,998 種症狀） |
+| `disease_drugs` | 74,123 | 疾病➜藥品對應（3,828 種藥品） |
+| `disease_foods` | 84,803 | 疾病➜飲食建議（4,870 種食物） |
+| `disease_checks` | 39,531 | 疾病➜檢查項目（3,353 種檢查） |
+| `disease_departments` | 16,783 | 疾病➜科室對應（54 個科室） |
+| `disease_acompany` | 12,052 | 疾病➜併發症關係 |
+| **小計** | **~282K 關係** | 整合自 [chatbot-base-on-Knowledge-Graph](https://github.com/baiyang2464/chatbot-base-on-Knowledge-Graph) |
+
+### 臨床知識圖譜（自 clinic.db 同步）
+
+| 資料表 | 用途 |
 |--------|------|
-| **icd10_codes** | ICD-10 疾病分類代碼 (96,802 筆) |
-| **drugs** | 臨床常見用藥與健保品項資料 (12,042 筆) |
-| **medical_orders** | 醫療處置、檢驗項目與醫囑建議 (2,102 筆) |
-| **case_templates** | 臨床病歷 RAG 檢索範本 (1,665 筆) |
-| **medical_nodes** | 臨床醫學知識圖譜實體節點 (自 clinic.db 同步) |
-| **medical_edges** | 臨床知識實體關聯邊 (自 clinic.db 同步) |
-| **disease_details** | 疾病診斷特徵、症狀關聯 (自 clinic.db 同步) |
-| **medical_terminology** | 臨床學術術語與日常口語對照表 (自 clinic.db 同步) |
-| **medical_conditions** | 臨床適應症與用藥安全條件 (自 clinic.db 同步) |
-| **medical_treatments** | 療程原理、修復期與處置細節 (自 clinic.db 同步) |
-| **medical_guidelines** | 臨床指引與標準照護規範 (自 clinic.db 同步) |
-| **medical_knowledge** | 醫學常識與知識庫 (自 clinic.db 同步) |
+| `medical_nodes` | 臨床醫學知識圖譜實體節點 |
+| `medical_edges` | 臨床知識實體關聯邊 |
+| `disease_details` | 疾病診斷特徵、症狀關聯 |
+| `medical_terminology` | 臨床學術術語與日常口語對照表 |
+| `medical_conditions` | 臨床適應症與用藥安全條件 |
+| `medical_treatments` | 療程原理、修復期與處置細節 |
+| `medical_guidelines` | 臨床指引與標準照護規範 |
+| `medical_knowledge` | 醫學常識與知識庫 |
+
+**動態查詢示例**:
+
+```bash
+# 查詢 ICD-10 代碼
+uv run python -m src.cli_db_query query_icd10 "chest pain" --limit 5
+
+# 查詢藥品
+uv run python -m src.cli_db_query query_drugs "ibuprofen" --limit 5
+
+# 查詢醫療服務
+uv run python -m src.cli_db_query query_medical_orders "ECG" --limit 5
+
+# 資料庫統計
+uv run python -m src.cli_db_query get_stats
+
+# 疾病知識查詢
+uv run python -c "
+from pathlib import Path
+from src.db.local_database import LocalDatabase
+db = LocalDatabase(Path('data/local_db/medical.db'))
+profile = db.get_disease_profile('高血壓')
+if profile:
+    print(f'症狀: {profile.symptoms}')
+    print(f'藥品: {profile.drugs}')
+db.close()
+"
+```
+
+---
+
+## 📁 專案結構
+
+```
+SoapVoice/
+├── src/
+│   ├── main.py                  # FastAPI 入口
+│   ├── cli_typer.py             # Typer CLI 工具
+│   ├── offline_server.py        # 離線伺服器
+│   ├── api/                     # API 端點
+│   │   ├── rest.py              # REST API
+│   │   ├── extended_api.py      # 擴展 API
+│   │   └── websocket.py
+│   ├── soap/                    # SOAP 生成引擎
+│   │   ├── soap_generator.py    # 核心生成器
+│   │   └── prompt_builder.py
+│   ├── llm/                     # LLM 引擎
+│   │   ├── llama_engine.py      # llama.cpp 後端
+│   │   └── ollama_engine.py     # Ollama 後端
+│   ├── nlp/                     # NLP 處理
+│   │   ├── terminology_mapper.py  # 術語映射
+│   │   └── icd10_classifier.py
+│   ├── db/                      # 資料庫
+│   │   ├── local_database.py
+│   │   └── llm_db_cli.py        # LLM 資料庫 CLI
+│   └── asr/                     # 語音辨識
+├── models/                      # GGUF 模型檔案
+│   ├── gemma-4-E4B-it-Q4_K_M.gguf  # 主模型
+│   └── qwen2.5-7B-Instruct-Q4_K_M.gguf
+├── data/
+│   ├── local_db/medical.db      # 本地醫療資料庫（含知識圖譜）
+│   └── rag/                     # 病例範本
+├── scripts/                     # 工具腳本
+│   └── import_kg_data.py       # 疾病知識圖譜 ETL 匯入
+├── static/                      # Web 前端
+│   ├── index.html               # 主控制台
+│   ├── widget.html              # doctor-toolbox.com Widget
+│   ├── dashboard.html           # 分析儀表板
+│   └── *.wav                    # 測試音檔
+├── tests/                       # 測試套件
+│   ├── test_soap.py
+│   ├── test_llm_db_cli.py
+│   └── ...
+├── docs/                        # 文件
+│   ├── API_INTEGRATION.md
+│   ├── CLI_USAGE.md
+│   ├── DEPLOYMENT.md
+│   └── BENCHMARK_GUIDE.md
+├── benchmarks/                  # 效能基準
+│   ├── E4B_SOAP_BENCHMARK_RECORD.md
+│   └── GPUllmcompare.md
+├── pyproject.toml              # UV 配置
+└── README.md                   # 本檔案
+```
 
 ---
 
@@ -202,7 +360,7 @@ curl -X POST http://localhost:8010/api/v1/clinical/soap/generate \
 uv run pytest tests/ -v
 
 # 快速測試（不需模型）
-uv run pytest tests/test_nlp.py tests/test_soap.py tests/test_init.py -v
+uv run pytest tests/test_soap.py tests/test_llm_db_cli.py -v
 
 # 帶覆蓋率
 uv run pytest tests/ --cov=src --cov-report=html
@@ -215,53 +373,12 @@ uv run pytest tests/ --cov=src --cov-report=html
 | 層次 | 技術 |
 |------|------|
 | API 框架 | FastAPI + uvicorn |
-| 語音辨識 | Faster-Whisper |
-| LLM | Ollama / llama.cpp |
+| LLM 推理 | llama.cpp（首選）/ Ollama（備用） |
+| 語音辨識 | Faster-Whisper + whisper.cpp |
 | NLP | 自建術語映射器 + ICD-10 分類器 |
-| 向量資料庫 | Chroma + SQLite |
-| 套件管理 | uv |
-
----
-
-## 📁 專案結構
-
-```
-SoapVoice/
-├── src/
-│   ├── main.py              # FastAPI 入口
-│   ├── cli.py               # 舊版 CLI
-│   ├── cli_typer.py         # Typer CLI
-│   ├── offline_server.py    # 離線伺服器
-│   ├── api/                 # API 端點
-│   │   ├── rest.py
-│   │   ├── extended_api.py
-│   │   └── websocket.py
-│   ├── asr/                 # 語音辨識
-│   ├── nlp/                 # 自然語言處理
-│   │   ├── terminology_mapper.py
-│   │   ├── icd10_classifier.py
-│   │   ├── soap_classifier.py
-│   │   └── ocr_parser.py
-│   ├── soap/                # SOAP 生成
-│   ├── llm/                 # LLM 引擎
-│   │   ├── ollama_engine.py
-│   │   └── llamacpp_engine.py
-│   └── db/                  # 資料庫
-├── models/                  # GGUF 模型
-│   ├── qwen2.5-3b-instruct-q4_k_m.gguf
-│   ├── llama-cpp/           # Linux llama.cpp
-│   └── windows/             # Windows 執行檔
-├── data/
-│   ├── local_db/medical.db
-│   └── rag/case_templates.db
-├── static/                  # Web 前端
-├── tests/                   # 測試
-├── docs/                   # 文件
-│   └── archives/            # 歸檔文件
-├── SoapVoice.spec          # PyInstaller 配置
-├── docker-compose.yml      # Docker 部署
-└── README.md
-```
+| 向量資料庫 | Chroma DB + SQLite |
+| 套件管理 | uv（Python） |
+| 前端 | Vanilla JS + HTML5 |
 
 ---
 
@@ -282,32 +399,20 @@ SoapVoice/
 
 MIT License
 
-Windows CPU 離線版本模型選擇建議
-1. LLM 模型 (SOAP 生成)
-模型	推薦量化
-gemma4:e4b	Q4_0
-qwen2.5:7b	Q4_K_M
-首選: gemma4:e4b — 輸出更詳細，適合醫療記錄
 ---
-2. OCR / 螢幕截圖辨識
-模型	類型
-PaddleOCR-VL	VLM
-Tesseract	傳統 OCR
-Windows OneOCR	系統內建
-建議: PaddleOCR-VL-1.5 — 離線最強，但需 Python 環境
-輕量替代: Tesseract — Windows 內建，無需安裝
+
+## 🎓 參考資源
+
+- **基準測試報告**: `benchmarks/E4B_SOAP_BENCHMARK_RECORD.md`
+- **API 整合指南**: `docs/API_INTEGRATION.md`
+- **CLI 使用**: `docs/CLI_USAGE.md`
+- **部署指南**: `docs/DEPLOYMENT.md`
+- **模型比較**: `benchmarks/GPUllmcompare.md`
+
 ---
-3. 語音轉文字 (ASR)
-模型	離線支援
-Whisper.cpp	✅ 完全離線
-Faster-Whisper	✅ Python
-SenseVoice	✅ ONNX
-建議: Whisper.cpp — Windows 支援完善，medium-q5 量化平衡速度與準確度
----
-4. Windows 離線執行方案
-工具
-llama.cpp
-whisper.cpp
-PaddleOCR
-LM Studio
-推薦組合: llama.cpp + whisper.cpp + Tesseract (輕量) 或 PaddleOCR (完整)
+
+**最後更新**: 2026-07-21
+**版本**: 1.8.0
+**核心模型**: Gemma 4 E4B (9.6GB, Q4_K_M)
+**資料庫**: ICD-10 (96,802) + 疾病知識圖譜 (8,807 疾病, ~282K 關係) + clinic.db 臨床圖譜
+**推薦部署**: llama.cpp + GPU 加速

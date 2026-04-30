@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoapVoice 儀表板</title>
+    <title>SoapVoice 監控儀表板</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,1064 +15,500 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: #f0f2f5;
             min-height: 100vh;
-            padding: 20px;
+            color: #333;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        /* ── 頁首 ─────────────────────────────────────── */
         .header {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .header h1 {
-            color: #0066cc;
-            margin-bottom: 10px;
-            font-size: 32px;
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .header p {
-            color: #666;
-            font-size: 14px;
+        .header-left p {
+            font-size: 13px;
+            opacity: 0.85;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
         }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
-        }
-
-        .card h2 {
-            color: #0066cc;
-            font-size: 18px;
-            margin-bottom: 15px;
+        /* ── 連線狀態指示器 ──────────────────────────── */
+        .connection-status {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .card-icon {
-            font-size: 24px;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .search-box input {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #0066cc;
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
         }
 
-        button:hover {
-            transform: scale(1.02);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary {
-            background: #0066cc;
-            color: white;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .btn-primary:hover {
-            background: #0052a3;
-        }
-
-        .btn-primary:disabled {
+        .connection-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
             background: #ccc;
-            cursor: not-allowed;
+            flex-shrink: 0;
+            transition: background 0.3s;
         }
 
-        .btn-secondary {
-            background: #e9ecef;
-            color: #333;
+        .connection-dot.connected {
+            background: #28d17c;
+            animation: pulse-green 2s infinite;
         }
 
-        .btn-secondary:hover {
-            background: #dee2e6;
+        .connection-dot.disconnected {
+            background: #ff4d4d;
+            animation: pulse-red 1s infinite;
         }
 
-        .btn-success {
-            background: #28a745;
-            color: white;
+        .connection-dot.connecting {
+            background: #ffc107;
         }
 
-        .btn-success:hover {
-            background: #218838;
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(40,209,124,0.4); }
+            50% { box-shadow: 0 0 0 5px rgba(40,209,124,0); }
         }
 
-        .btn-danger {
-            background: #dc3545;
-            color: white;
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,77,0.5); }
+            50% { box-shadow: 0 0 0 5px rgba(255,77,77,0); }
         }
 
-        .btn-danger:hover {
-            background: #c82333;
+        #connectionIndicator {
+            font-weight: 600;
         }
 
-        .btn-small {
-            padding: 6px 10px;
+        #lastUpdateTime {
             font-size: 12px;
+            opacity: 0.8;
         }
 
-        .patient-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            border-radius: 6px;
+        /* ── 主容器 ──────────────────────────────────── */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px;
         }
 
-        .patient-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
-        }
-
-        .patient-item:hover {
-            background: #f9f9f9;
-        }
-
-        .patient-item.selected {
-            background: #e3f2fd;
+        /* ── 章節標題 ────────────────────────────────── */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 14px;
+            padding-left: 10px;
             border-left: 4px solid #0066cc;
         }
 
-        .patient-info {
-            flex: 1;
-        }
-
-        .patient-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .patient-meta {
-            font-size: 12px;
-            color: #999;
-            margin-top: 4px;
-        }
-
-        .checkbox-col {
-            width: 24px;
-            display: flex;
-            align-items: center;
-        }
-
-        .checkbox-col input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .soap-view {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .soap-section {
-            margin-bottom: 15px;
-        }
-
-        .soap-section-title {
-            font-weight: 600;
-            color: #0066cc;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .soap-section-content {
-            background: white;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #333;
-            border-left: 4px solid #0066cc;
-        }
-
-        .stats-grid {
+        /* ── 指標卡片區 ──────────────────────────────── */
+        .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .metric-card.gpu::before { background: #0066cc; }
+        .metric-card.vram::before { background: #6f42c1; }
+        .metric-card.queue::before { background: #17a2b8; }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .metric-card-header {
+            display: flex;
+            align-items: center;
             gap: 10px;
-            margin-top: 15px;
+            margin-bottom: 14px;
         }
 
-        .stat-box {
-            background: #f0f5ff;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid #0066cc;
+        .metric-icon {
+            font-size: 26px;
+            line-height: 1;
         }
 
-        .stat-label {
-            font-size: 11px;
-            color: #999;
+        .metric-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .stat-value {
+        .metric-value {
+            font-size: 40px;
+            font-weight: 800;
+            color: #222;
+            line-height: 1;
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-value span.unit {
             font-size: 18px;
-            font-weight: bold;
-            color: #0066cc;
+            font-weight: 500;
+            color: #888;
+            margin-left: 4px;
+        }
+
+        .metric-sub {
+            font-size: 12px;
+            color: #999;
             margin-top: 4px;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
+        /* VRAM 進度條 */
+        .vram-bar-container {
+            margin-top: 12px;
         }
 
-        .status-new {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-old {
-            background: #e2e3e5;
-            color: #383d41;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #0066cc;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 13px;
-        }
-
-        .alert-info {
-            background: #e7f3ff;
-            color: #004085;
-            border-left: 4px solid #0066cc;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left: 4px solid #ffc107;
-        }
-
-        .tab-container {
+        .vram-bar-label {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
         }
 
-        .tab {
-            padding: 10px 15px;
-            background: transparent;
-            border: none;
-            color: #666;
-            font-weight: 600;
+        .vram-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .vram-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #6f42c1, #a855f7);
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* ── 圖表區 ───────────────────────────────────── */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 28px;
+        }
+
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .granularity-selector {
+            display: flex;
+            gap: 6px;
+        }
+
+        .granularity-btn {
+            padding: 6px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
+            color: #555;
         }
 
-        .tab.active {
-            color: #0066cc;
-            border-bottom-color: #0066cc;
+        .granularity-btn.active,
+        .granularity-btn:hover {
+            background: #0066cc;
+            border-color: #0066cc;
+            color: white;
         }
 
-        .tab-content {
+        .chart-wrapper {
+            position: relative;
+            height: 280px;
+        }
+
+        /* ── 統計卡片區 ──────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .stat-icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon-box.today { background: #e8f4fd; }
+        .stat-icon-box.monthly { background: #f0ebff; }
+
+        .stat-info {}
+
+        .stat-card-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #222;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .stat-card-sub {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 4px;
+        }
+
+        /* ── 頁尾 ─────────────────────────────────────── */
+        .footer {
+            background: #fff;
+            border-top: 1px solid #eee;
+            padding: 16px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* ── 錯誤通知列 ─────────────────────────────── */
+        .alert-bar {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
             display: none;
         }
 
-        .tab-content.active {
-            display: block;
-        }
+        .alert-bar.show { display: block; }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-
-        .empty-state svg {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .filter-row label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-            display: block;
-            font-weight: 600;
-        }
-
-        .filter-row input,
-        .filter-row select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .filter-row input:focus,
-        .filter-row select:focus {
-            outline: none;
-            border-color: #0066cc;
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-
-        .cloud-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .cloud-btn {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .cloud-btn:hover {
-            background: #f0f5ff;
-            border-color: #0066cc;
-        }
-
-        .eye-screen-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #e7f3ff;
-            color: #0066cc;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            margin-left: 8px;
+        /* ── 響應式 ──────────────────────────────────── */
+        @media (max-width: 600px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .header-right { align-items: flex-start; }
+            .metric-value { font-size: 32px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏥 SoapVoice 病患管理儀表板</h1>
-            <p>進階搜尋、SOAP 病歷、批量下載到本地或雲端</p>
+
+    <!-- 頁首 -->
+    <header class="header" role="banner">
+        <div class="header-left">
+            <h1>SoapVoice 監控儀表板</h1>
+            <p>GPU 伺服器即時健康狀態 &amp; 歷史趨勢</p>
         </div>
-
-        <div class="grid">
-            <!-- 患者查詢（增強版） -->
-            <div class="card">
-                <h2><span class="card-icon">🔍</span> 進階患者搜尋</h2>
-
-                <div class="filter-row">
-                    <div>
-                        <label>患者名稱或 ID</label>
-                        <input type="text" id="patientSearch" placeholder="輸入名稱/ID...">
-                    </div>
-                    <div>
-                        <label>開始日期</label>
-                        <input type="date" id="dateFrom">
-                    </div>
-                    <div>
-                        <label>結束日期</label>
-                        <input type="date" id="dateTo">
-                    </div>
-                    <div>
-                        <label>眼科篩檢</label>
-                        <select id="eyeScreenFilter">
-                            <option value="">全部</option>
-                            <option value="yes">✅ 已篩檢</option>
-                            <option value="no">❌ 未篩檢</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button class="btn-primary" id="searchBtn">🔎 搜尋</button>
-
-                <div class="patient-list" id="patientList">
-                    <div class="empty-state">
-                        <p>輸入患者名稱開始搜尋</p>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-success" id="selectAllBtn">✓ 全選</button>
-                    <button class="btn-secondary" id="clearSelBtn">✗ 取消選擇</button>
-                </div>
-
-                <div style="margin-top: 15px;">
-                    <label style="font-weight: 600; color: #333; margin-bottom: 10px; display: block;">
-                        下載方式
-                    </label>
-                    <div class="cloud-options">
-                        <button class="cloud-btn" id="downloadLocalBtn" disabled title="下載到本機">
-                            💾 本地 CSV
-                        </button>
-                        <button class="cloud-btn" id="downloadGoogleBtn" disabled title="上傳到 Google Drive">
-                            🔵 Google Drive
-                        </button>
-                        <button class="cloud-btn" id="downloadDropboxBtn" disabled title="上傳到 Dropbox">
-                            🔷 Dropbox
-                        </button>
-                        <button class="cloud-btn" id="downloadS3Btn" disabled title="上傳到 AWS S3">
-                            ☁️ AWS S3
-                        </button>
-                    </div>
-                </div>
-
-                <div id="selectedCount" style="margin-top: 10px; font-size: 12px; color: #999;">
-                    已選擇: 0 位患者
-                </div>
+        <div class="header-right">
+            <!-- 連線狀態指示器 -->
+            <div class="connection-status" role="status" aria-live="polite">
+                <div class="connection-dot connecting" id="connectionDot"></div>
+                <span id="connectionIndicator">連線中...</span>
             </div>
-
-            <!-- SOAP 檢視 -->
-            <div class="card">
-                <h2><span class="card-icon">📋</span> SOAP 病歷</h2>
-
-                <div id="soapContainer" style="margin-top: 15px;">
-                    <div class="empty-state" style="padding: 30px 20px;">
-                        <p>選擇患者查看 SOAP 病歷</p>
-                    </div>
-                </div>
-
-                <button class="btn-secondary" id="downloadSoapBtn" style="width: 100%; margin-top: 15px; display: none;">
-                    💾 下載此 SOAP 病歷
-                </button>
-            </div>
-
-            <!-- 統計資訊 -->
-            <div class="card">
-                <h2><span class="card-icon">📊</span> 統計資訊</h2>
-
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-label">總患者數</div>
-                        <div class="stat-value" id="totalPatients">--</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">本週新增</div>
-                        <div class="stat-value" id="weeklyNew">--</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">SOAP 記錄</div>
-                        <div class="stat-value" id="soapCount">--</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">平均耗時</div>
-                        <div class="stat-value" id="avgTime">--</div>
-                    </div>
-                </div>
-
-                <button class="btn-secondary" style="width: 100%; margin-top: 15px;" id="refreshStatsBtn">
-                    🔄 刷新統計
-                </button>
-            </div>
-
-            <!-- 即時流 (Real-time Results) -->
-            <div class="card full-width">
-                <h2><span class="card-icon">⚡</span> 即時結果流</h2>
-
-                <div class="tab-container">
-                    <button class="tab active" data-tab="recent">最近生成</button>
-                    <button class="tab" data-tab="today">今日</button>
-                    <button class="tab" data-tab="errors">錯誤日誌</button>
-                </div>
-
-                <div id="recent" class="tab-content active">
-                    <div id="recentList" style="max-height: 300px; overflow-y: auto;">
-                        <div class="empty-state" style="padding: 20px;">
-                            <p>等待新的 SOAP 生成...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="today" class="tab-content">
-                    <div id="todayList" style="max-height: 300px; overflow-y: auto;">
-                        <div class="empty-state" style="padding: 20px;">
-                            <p>今日無記錄</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="errors" class="tab-content">
-                    <div id="errorList" style="max-height: 300px; overflow-y: auto;">
-                        <div class="empty-state" style="padding: 20px;">
-                            <p>無錯誤記錄</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- 最後更新時間 -->
+            <span id="lastUpdateTime">尚未接收資料</span>
         </div>
-    </div>
+    </header>
 
-    <script>
-        const API_BASE = '/api/v1';
-        let selectedPatients = new Set();
-        let allPatients = [];
-        let currentPatient = null;
-        let recentResults = [];
+    <main class="container">
 
-        // 初始化
-        window.addEventListener('load', () => {
-            loadStats();
-            setupTabs();
-            setupEventListeners();
-            // 模擬即時流（實際應連接 WebSocket）
-            simulateRealtimeStream();
-        });
+        <!-- 錯誤通知列 -->
+        <div class="alert-bar" id="alertBar" role="alert"></div>
 
-        // 標籤頁切換
-        function setupTabs() {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    const tabName = e.target.dataset.tab;
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    e.target.classList.add('active');
-                    document.getElementById(tabName).classList.add('active');
-                });
-            });
-        }
+        <!-- ── 即時警報區 (Phase 12-03) ─────────────── -->
+        <section aria-labelledby="alertSectionTitle">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <h2 class="section-title" id="alertSectionTitle" style="margin-bottom:0; border:none; padding:0;">即時警報</h2>
+                <button id="alert-sound-toggle"
+                    onclick="setAlertSoundEnabled(!alertState.alertSoundEnabled)"
+                    title="點擊切換聲音通知">🔔 聲音</button>
+            </div>
+            <div class="alert-container" id="alert-container">
+                <div class="alert-empty">目前無活躍警報</div>
+            </div>
+        </section>
 
-        // 事件監聽
-        function setupEventListeners() {
-            document.getElementById('searchBtn').addEventListener('click', searchPatients);
-            document.getElementById('patientSearch').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') searchPatients();
-            });
-            document.getElementById('selectAllBtn').addEventListener('click', selectAllPatients);
-            document.getElementById('clearSelBtn').addEventListener('click', clearSelection);
-            document.getElementById('downloadSoapBtn').addEventListener('click', downloadCurrentSoap);
-            document.getElementById('refreshStatsBtn').addEventListener('click', loadStats);
+        <!-- ── 即時指標卡片 ─────────────────────────── -->
+        <section aria-labelledby="metricsTitle">
+            <h2 class="section-title" id="metricsTitle">即時系統指標</h2>
+            <div class="metrics-grid">
 
-            // 雲端下載按鈕
-            document.getElementById('downloadLocalBtn').addEventListener('click', downloadLocalBtn);
-            document.getElementById('downloadGoogleBtn').addEventListener('click', downloadGoogleBtn);
-            document.getElementById('downloadDropboxBtn').addEventListener('click', downloadDropboxBtn);
-            document.getElementById('downloadS3Btn').addEventListener('click', downloadS3Btn);
-        }
-
-        // 搜尋患者（進階篩選）
-        async function searchPatients() {
-            const name = document.getElementById('patientSearch').value.trim();
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
-            const eyeScreen = document.getElementById('eyeScreenFilter').value;
-
-            if (!name && !dateFrom && !dateTo && !eyeScreen) {
-                alert('請輸入至少一個搜尋條件');
-                return;
-            }
-
-            try {
-                let url = `${API_BASE}/records/search?page=1&page_size=100`;
-                if (name) url += `&name=${encodeURIComponent(name)}`;
-                if (dateFrom) url += `&date_from=${dateFrom}`;
-                if (dateTo) url += `&date_to=${dateTo}`;
-
-                const response = await fetch(url);
-                if (response.ok) {
-                    const data = await response.json();
-                    allPatients = (data.records || []).filter(p => {
-                        // 眼科篩檢篩選
-                        if (eyeScreen === 'yes') return p.eye_screen === true;
-                        if (eyeScreen === 'no') return p.eye_screen === false;
-                        return true;
-                    });
-                    renderPatientList();
-                    updateDownloadButtonsState();
-                } else {
-                    alert('搜尋失敗');
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-                alert('搜尋出錯: ' + error.message);
-            }
-        }
-
-        // 渲染患者列表
-        function renderPatientList() {
-            const list = document.getElementById('patientList');
-            if (allPatients.length === 0) {
-                list.innerHTML = '<div class="empty-state"><p>未找到患者</p></div>';
-                return;
-            }
-
-            list.innerHTML = allPatients.map(p => `
-                <div class="patient-item ${selectedPatients.has(p.id) ? 'selected' : ''}" data-id="${p.id}">
-                    <div class="checkbox-col">
-                        <input type="checkbox" ${selectedPatients.has(p.id) ? 'checked' : ''}>
+                <!-- GPU 使用率 -->
+                <article class="metric-card gpu" aria-label="GPU 使用率">
+                    <div class="metric-card-header">
+                        <span class="metric-icon">&#x1F4CA;</span>
+                        <span class="metric-label">GPU 使用率</span>
                     </div>
-                    <div class="patient-info" onclick="viewPatient('${p.id}', '${p.name}')">
-                        <div class="patient-name">${p.name}</div>
-                        <div class="patient-meta">
-                            ID: ${p.id} | ${p.date} |
-                            <span class="status-badge ${p.date.includes('2026-04') ? 'status-new' : 'status-old'}">
-                                ${p.date.includes('2026-04') ? '新' : '舊'}
-                            </span>
+                    <div class="metric-value" id="gpuPercent">
+                        --<span class="unit">%</span>
+                    </div>
+                    <div class="metric-sub" id="gpuSub">等待資料中...</div>
+                </article>
+
+                <!-- VRAM 使用量 -->
+                <article class="metric-card vram" aria-label="VRAM 使用量">
+                    <div class="metric-card-header">
+                        <span class="metric-icon">&#x1F9E0;</span>
+                        <span class="metric-label">VRAM 使用量</span>
+                    </div>
+                    <div class="metric-value" id="vramMb">
+                        --<span class="unit">MB</span>
+                    </div>
+                    <div class="vram-bar-container">
+                        <div class="vram-bar-label">
+                            <span>已用</span>
+                            <span id="vramTotal">/ -- MB</span>
+                        </div>
+                        <div class="vram-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div class="vram-bar-fill" id="vramBarFill"></div>
                         </div>
                     </div>
+                </article>
+
+                <!-- 佇列長度 -->
+                <article class="metric-card queue" aria-label="處理佇列長度">
+                    <div class="metric-card-header">
+                        <span class="metric-icon">&#x23F3;</span>
+                        <span class="metric-label">處理佇列長度</span>
+                    </div>
+                    <div class="metric-value" id="queueLength">
+                        --<span class="unit">筆</span>
+                    </div>
+                    <div class="metric-sub" id="queueSub">等待資料中...</div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ── 歷史趨勢圖 ──────────────────────────── -->
+        <section class="chart-section" aria-labelledby="chartTitle">
+            <div class="chart-controls">
+                <h2 class="section-title" id="chartTitle" style="margin-bottom:0; border:none; padding:0;">
+                    歷史處理趨勢
+                </h2>
+                <!-- 粒度選擇器 -->
+                <div class="granularity-selector" role="group" aria-label="圖表粒度">
+                    <button class="granularity-btn active" data-granularity="hour" id="btnHour">
+                        小時
+                    </button>
+                    <button class="granularity-btn" data-granularity="day" id="btnDay">
+                        日
+                    </button>
                 </div>
-            `).join('');
+            </div>
+            <!-- Chart.js Canvas -->
+            <div class="chart-wrapper">
+                <canvas id="metricsChart" aria-label="GPU 使用率歷史折線圖" role="img"></canvas>
+            </div>
+        </section>
 
-            // 綁定複選框事件
-            list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.addEventListener('change', (e) => {
-                    const id = e.target.closest('.patient-item').dataset.id;
-                    if (e.target.checked) {
-                        selectedPatients.add(id);
-                    } else {
-                        selectedPatients.delete(id);
-                    }
-                    updateSelectedCount();
-                });
-            });
-        }
+        <!-- ── 看診統計 ────────────────────────────── -->
+        <section aria-labelledby="statsTitle">
+            <h2 class="section-title" id="statsTitle">看診次數統計</h2>
+            <div class="stats-grid">
 
-        // 查看患者 SOAP
-        async function viewPatient(id, name) {
-            currentPatient = { id, name };
-            try {
-                const response = await fetch(`${API_BASE}/records/${id}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    renderSoapView(data.soap);
-                    document.getElementById('downloadSoapBtn').style.display = 'block';
-                } else {
-                    document.getElementById('soapContainer').innerHTML =
-                        '<div class="alert alert-warning">無法載入 SOAP 病歷</div>';
-                }
-            } catch (error) {
-                document.getElementById('soapContainer').innerHTML =
-                    `<div class="alert alert-warning">載入失敗: ${error.message}</div>`;
-            }
-        }
-
-        // 渲染 SOAP 檢視
-        function renderSoapView(soap) {
-            if (!soap) {
-                document.getElementById('soapContainer').innerHTML =
-                    '<div class="empty-state"><p>無 SOAP 記錄</p></div>';
-                return;
-            }
-
-            const html = `
-                <div class="soap-view">
-                    <div class="soap-section">
-                        <div class="soap-section-title">主訴 (Subjective)</div>
-                        <div class="soap-section-content">${soap.subjective || '無'}</div>
+                <!-- 本日看診 -->
+                <div class="stat-card">
+                    <div class="stat-icon-box today">&#x1F4C5;</div>
+                    <div class="stat-info">
+                        <div class="stat-card-label">本日看診次數</div>
+                        <div class="stat-card-value" id="todayCount">--</div>
+                        <div class="stat-card-sub" id="todayDate">載入中...</div>
                     </div>
-                    <div class="soap-section">
-                        <div class="soap-section-title">客觀檢查 (Objective)</div>
-                        <div class="soap-section-content">${soap.objective || '無'}</div>
-                    </div>
-                    <div class="soap-section">
-                        <div class="soap-section-title">評估 (Assessment)</div>
-                        <div class="soap-section-content">${soap.assessment || '無'}</div>
-                    </div>
-                    <div class="soap-section">
-                        <div class="soap-section-title">計畫 (Plan)</div>
-                        <div class="soap-section-content">${soap.plan || '無'}</div>
-                    </div>
-                    ${soap.medical_orders && soap.medical_orders.length > 0 ? `
-                        <div class="soap-section">
-                            <div class="soap-section-title">醫囑</div>
-                            <div class="soap-section-content">${soap.medical_orders.join('<br>')}</div>
-                        </div>
-                    ` : ''}
                 </div>
-            `;
-            document.getElementById('soapContainer').innerHTML = html;
-        }
 
-        // 全選患者
-        function selectAllPatients() {
-            allPatients.forEach(p => selectedPatients.add(p.id));
-            document.querySelectorAll('.patient-list input[type="checkbox"]').forEach(cb => cb.checked = true);
-            updateSelectedCount();
-        }
-
-        // 清除選擇
-        function clearSelection() {
-            selectedPatients.clear();
-            document.querySelectorAll('.patient-list input[type="checkbox"]').forEach(cb => cb.checked = false);
-            updateSelectedCount();
-        }
-
-        // 更新已選計數
-        function updateSelectedCount() {
-            document.getElementById('selectedCount').textContent = `已選擇: ${selectedPatients.size} 位患者`;
-            updateDownloadButtonsState();
-        }
-
-        // 更新下載按鈕狀態
-        function updateDownloadButtonsState() {
-            const hasSelection = selectedPatients.size > 0;
-            document.getElementById('downloadLocalBtn').disabled = !hasSelection;
-            document.getElementById('downloadGoogleBtn').disabled = !hasSelection;
-            document.getElementById('downloadDropboxBtn').disabled = !hasSelection;
-            document.getElementById('downloadS3Btn').disabled = !hasSelection;
-        }
-
-        // 下載患者記錄
-        function downloadPatients() {
-            if (selectedPatients.size === 0) {
-                alert('請先選擇患者');
-                return;
-            }
-
-            const patients = allPatients.filter(p => selectedPatients.has(p.id));
-            const csv = 'ID,姓名,日期,狀態\n' +
-                patients.map(p => `${p.id},"${p.name}",${p.date},已生成`).join('\n');
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `patients_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
-
-        // 下載 SOAP 病歷
-        function downloadCurrentSoap() {
-            if (!currentPatient) return;
-
-            const soapText = document.querySelector('.soap-view').innerText;
-            const blob = new Blob([soapText], { type: 'text/plain;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `SOAP_${currentPatient.name}_${new Date().toISOString().split('T')[0]}.txt`;
-            link.click();
-        }
-
-        // 載入統計
-        async function loadStats() {
-            try {
-                const response = await fetch(`${API_BASE}/clinical/health`);
-                if (response.ok) {
-                    document.getElementById('totalPatients').textContent = '234';
-                    document.getElementById('weeklyNew').textContent = '12';
-                    document.getElementById('soapCount').textContent = '1,847';
-                    document.getElementById('avgTime').textContent = '52.3s';
-                }
-            } catch (error) {
-                console.error('Stats error:', error);
-            }
-        }
-
-        // 模擬即時流
-        function simulateRealtimeStream() {
-            const cases = [
-                { name: '王小明', time: '剛剛', status: '✅' },
-                { name: '李美華', time: '1 分鐘前', status: '✅' },
-                { name: '陳浩天', time: '3 分鐘前', status: '❌' },
-            ];
-
-            const recentList = document.getElementById('recentList');
-            recentList.innerHTML = cases.map(c => `
-                <div style="padding: 12px; border-bottom: 1px solid #eee;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <strong>${c.name}</strong>
-                        <span>${c.status}</span>
+                <!-- 本月看診 -->
+                <div class="stat-card">
+                    <div class="stat-icon-box monthly">&#x1F4C6;</div>
+                    <div class="stat-info">
+                        <div class="stat-card-label">本月看診次數</div>
+                        <div class="stat-card-value" id="monthlyCount">--</div>
+                        <div class="stat-card-sub" id="monthlyRange">載入中...</div>
                     </div>
-                    <div style="font-size: 12px; color: #999; margin-top: 4px;">${c.time}</div>
                 </div>
-            `).join('');
-        }
 
-        // ============ 下載函數實現 ============
+            </div>
+        </section>
 
-        // 本地 CSV 下載
-        function downloadLocalBtn() {
-            if (selectedPatients.size === 0) {
-                alert('請先選擇患者');
-                return;
-            }
+    </main>
 
-            const patients = allPatients.filter(p => selectedPatients.has(p.id));
-            const headers = ['ID', '姓名', '日期', '眼科篩檢'];
-            const rows = patients.map(p => [
-                p.id,
-                `"${p.name}"`,
-                p.date,
-                p.eye_screen ? '是' : '否'
-            ]);
+    <!-- 頁尾 -->
+    <footer class="footer" role="contentinfo">
+        <p>SoapVoice 監控儀表板 &mdash; 本頁資料僅供 IT 人員系統維護參考，不作為臨床診斷依據。</p>
+        <p style="margin-top:4px;">資料每 2 秒自動更新 &bull; 使用 EventSource (SSE) 即時推送</p>
+    </footer>
 
-            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `患者記錄_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
+    <!-- 主要 JavaScript -->
+    <script src="/static/js/dashboard.js"></script>
+    <!-- Phase 12-03：即時警報系統 -->
+    <script src="/static/js/dashboard-alerts.js"></script>
 
-        // Google Drive 上傳
-        function downloadGoogleBtn() {
-            if (selectedPatients.size === 0) {
-                alert('請先選擇患者');
-                return;
-            }
-
-            const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-                `client_id=YOUR_GOOGLE_CLIENT_ID&` +
-                `redirect_uri=${encodeURIComponent(window.location.origin + '/auth/google')}&` +
-                `response_type=code&` +
-                `scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.file')}&` +
-                `state=google_drive_upload`;
-
-            const popup = window.open(oauthUrl, 'google_auth', 'width=500,height=600');
-            if (!popup) {
-                alert('授權窗口開啟失敗，請檢查彈窗設定');
-                return;
-            }
-
-            // 等待授權完成後上傳
-            const checkPopup = setInterval(() => {
-                if (popup.closed) {
-                    clearInterval(checkPopup);
-                    uploadToGoogleDrive();
-                }
-            }, 1000);
-        }
-
-        // 上傳到 Google Drive（OAuth 授權後）
-        async function uploadToGoogleDrive() {
-            try {
-                if (selectedPatients.size === 0) return;
-
-                const patients = allPatients.filter(p => selectedPatients.has(p.id));
-                const csv = generateCSV(patients);
-
-                const response = await fetch(`${API_BASE}/extended/upload/google-drive`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filename: `患者記錄_${new Date().toISOString().split('T')[0]}.csv`,
-                        content: csv
-                    })
-                });
-
-                if (response.ok) {
-                    alert('已成功上傳至 Google Drive');
-                } else {
-                    alert('上傳失敗');
-                }
-            } catch (error) {
-                console.error('Google Drive upload error:', error);
-                alert('上傳出錯: ' + error.message);
-            }
-        }
-
-        // Dropbox 上傳
-        function downloadDropboxBtn() {
-            if (selectedPatients.size === 0) {
-                alert('請先選擇患者');
-                return;
-            }
-
-            const oauthUrl = `https://www.dropbox.com/oauth2/authorize?` +
-                `client_id=YOUR_DROPBOX_APP_KEY&` +
-                `redirect_uri=${encodeURIComponent(window.location.origin + '/auth/dropbox')}&` +
-                `response_type=code&` +
-                `state=dropbox_upload`;
-
-            const popup = window.open(oauthUrl, 'dropbox_auth', 'width=500,height=600');
-            if (!popup) {
-                alert('授權窗口開啟失敗，請檢查彈窗設定');
-                return;
-            }
-
-            const checkPopup = setInterval(() => {
-                if (popup.closed) {
-                    clearInterval(checkPopup);
-                    uploadToDropbox();
-                }
-            }, 1000);
-        }
-
-        // 上傳到 Dropbox（OAuth 授權後）
-        async function uploadToDropbox() {
-            try {
-                if (selectedPatients.size === 0) return;
-
-                const patients = allPatients.filter(p => selectedPatients.has(p.id));
-                const csv = generateCSV(patients);
-
-                const response = await fetch(`${API_BASE}/extended/upload/dropbox`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filename: `患者記錄_${new Date().toISOString().split('T')[0]}.csv`,
-                        content: csv
-                    })
-                });
-
-                if (response.ok) {
-                    alert('已成功上傳至 Dropbox');
-                } else {
-                    alert('上傳失敗');
-                }
-            } catch (error) {
-                console.error('Dropbox upload error:', error);
-                alert('上傳出錯: ' + error.message);
-            }
-        }
-
-        // AWS S3 上傳
-        async function downloadS3Btn() {
-            if (selectedPatients.size === 0) {
-                alert('請先選擇患者');
-                return;
-            }
-
-            try {
-                const patients = allPatients.filter(p => selectedPatients.has(p.id));
-                const csv = generateCSV(patients);
-                const filename = `患者記錄_${new Date().toISOString().split('T')[0]}.csv`;
-
-                // 1. 請求後端生成簽署 URL
-                const signedUrlResponse = await fetch(`${API_BASE}/extended/upload/s3-signed-url`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ filename })
-                });
-
-                if (!signedUrlResponse.ok) {
-                    alert('無法取得 S3 上傳授權');
-                    return;
-                }
-
-                const { signedUrl } = await signedUrlResponse.json();
-
-                // 2. 使用簽署 URL 上傳 CSV
-                const uploadResponse = await fetch(signedUrl, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'text/csv' },
-                    body: csv
-                });
-
-                if (uploadResponse.ok) {
-                    alert('已成功上傳至 AWS S3');
-                } else {
-                    alert('上傳失敗');
-                }
-            } catch (error) {
-                console.error('S3 upload error:', error);
-                alert('上傳出錯: ' + error.message);
-            }
-        }
-
-        // 輔助函數：生成 CSV
-        function generateCSV(patients) {
-            const headers = ['ID', '姓名', '日期', '眼科篩檢'];
-            const rows = patients.map(p => [
-                p.id,
-                `"${p.name}"`,
-                p.date,
-                p.eye_screen ? '是' : '否'
-            ]);
-            return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-        }
-    </script>
 </body>
 </html>

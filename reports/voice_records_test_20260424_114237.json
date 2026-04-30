@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-04-24 11:42:37",
+  "test_type": "Batch Voice Records SOAP Generation",
+  "total_cases": 5,
+  "successful": 0,
+  "failed": 5,
+  "total_time_seconds": 8.40451717376709,
+  "average_time_per_case_seconds": 1.680903434753418,
+  "cases": [
+    {
+      "index": 1,
+      "name": "Chest Pain with Cough",
+      "status": "error",
+      "error": "404 Client Error: Not Found for url: http://localhost:11434/api/generate"
+    },
+    {
+      "index": 2,
+      "name": "High Blood Pressure",
+      "status": "error",
+      "error": "404 Client Error: Not Found for url: http://localhost:11434/api/generate"
+    },
+    {
+      "index": 3,
+      "name": "Cough and Fever",
+      "status": "error",
+      "error": "404 Client Error: Not Found for url: http://localhost:11434/api/generate"
+    },
+    {
+      "index": 4,
+      "name": "Abdominal Pain",
+      "status": "error",
+      "error": "404 Client Error: Not Found for url: http://localhost:11434/api/generate"
+    },
+    {
+      "index": 5,
+      "name": "Medication Review",
+      "status": "error",
+      "error": "404 Client Error: Not Found for url: http://localhost:11434/api/generate"
+    }
+  ]
+}

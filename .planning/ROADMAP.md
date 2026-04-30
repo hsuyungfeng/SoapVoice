@@ -114,7 +114,7 @@ Phases execute in numeric order: 10 → 11 ∥ 12 → 13 → 14
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 10. 資料持久化 | v1.1 | 3/3 | ✅ Complete | 2026-04-25 |
-| 11. LAN 瘦客戶端 | v1.1 | 0/3 | Planning | — |
-| 12. 監控儀表板 | v1.1 | 0/2 | Planning | — |
+| 11. LAN 瘦客戶端 | v1.1 | 3/3 | ✅ Complete | 2026-04-27 |
+| 12. 監控儀表板 | v1.1 | 2/2 | 📋 Planned | — |
 | 13. Wine EXE 驗證 | v1.1 | 0/TBD | Not started | — |
 | 14. 技術文件 | v1.1 | 0/TBD | Not started | — |

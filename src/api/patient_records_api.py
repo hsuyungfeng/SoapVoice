@@ -20,6 +20,7 @@ from src.db.patient_records_db import (
     get_consultation_by_id,
     get_audit_log,
     amend_soap,
+    get_patient_records_db,
 )
 
 logger = logging.getLogger(__name__)
@@ -273,4 +274,60 @@ async def amend_record_soap(record_id: int, request: SOAPAmendRequest):
         raise
     except Exception as e:
         logger.error(f"修改 SOAP 失敗: record_id={record_id}, error={e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── 患者身份驗證端點 (LINE 外掛用) ──────────────────────────────
+
+
+class PatientVerifyResponse(BaseModel):
+    """患者身份驗證回應"""
+
+    verified: bool
+    patient_id: Optional[int] = None
+
+
+@router.get("/patient/verify", response_model=PatientVerifyResponse)
+async def verify_patient_identity(
+    name: str = Query(..., min_length=1, description="患者姓名"),
+    birth_year: str = Query(..., pattern=r"^\d{4}$", description="出生年份（YYYY）"),
+):
+    """患者身份驗證端點 (LINE 外掛用)
+
+    LINE 患者帳號連結時，透過姓名 + 出生年份驗證患者身份。
+    僅返回 {verified, patient_id}，不洩露病歷內容。
+
+    **設計理由:**
+    - 隱私保護：患者身份驗證與病歷查詢分離
+    - LINE userId 永不存入醫療資料庫
+    - 驗證成功後，外掛在本地 SQLite 記錄 LINE userId ↔ patient_id 映射
+
+    **範例:**
+    ```
+    GET /api/v1/patient/verify?name=王小明&birth_year=1975
+    Response: {"verified": true, "patient_id": 123}
+    ```
+    """
+    try:
+        db = await get_patient_records_db()
+        cursor = await db.execute(
+            """
+            SELECT id FROM patient_records
+            WHERE name = ? AND birth_date LIKE ?
+            LIMIT 1
+            """,
+            (name, f"{birth_year}%"),
+        )
+        row = await cursor.fetchone()
+
+        if row:
+            patient_id = row[0]
+            logger.info(f"患者身份驗證成功: name={name}, birth_year={birth_year}, patient_id={patient_id}")
+            return PatientVerifyResponse(verified=True, patient_id=patient_id)
+        else:
+            logger.warning(f"患者身份驗證失敗: name={name}, birth_year={birth_year}")
+            return PatientVerifyResponse(verified=False, patient_id=None)
+
+    except Exception as e:
+        logger.error(f"患者身份驗證異常: name={name}, birth_year={birth_year}, error={e}")
         raise HTTPException(status_code=500, detail=str(e))

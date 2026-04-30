@@ -390,6 +390,91 @@ async def generate_soap(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class SOAPGenerateQuickRequest(BaseModel):
+    """快速 SOAP 生成請求（簡化版）"""
+
+    text: str = Field(..., description="醫療文本（中文或英文）")
+    lang: Optional[str] = Field(
+        default="zh",
+        description="文本語言：'zh' 或 'en'",
+    )
+
+
+@router.post("/soap/generate-quick", response_model=SOAPGenerateResponse)
+async def generate_soap_quick(
+    request: SOAPGenerateQuickRequest,
+    generator: SOAPGenerator = Depends(get_soap_generator),
+):
+    """
+    快速 SOAP 生成（簡化版）
+
+    輕量級端點用於嵌入式使用。自動填充病患背景。
+
+    **範例:**
+    ```
+    POST /api/v1/clinical/soap/generate-quick
+    {
+        "text": "病人胸悶兩天伴隨呼吸困難",
+        "lang": "zh"
+    }
+    ```
+    """
+    start_time = time.time()
+
+    try:
+        # 自動填充病患背景
+        patient_context = {
+            "language": request.lang,
+            "source": "quick-generate",
+        }
+
+        # 提取症狀與 ICD-10
+        mapper = get_terminology_mapper()
+        _, mappings = mapper.map_text(request.text)
+        symptoms = [m.standard for m in mappings]
+
+        classifier = get_icd10_classifier()
+        icd10_matches = classifier.classify(request.text)
+        icd10_codes = [m.code for m in icd10_matches]
+
+        # 查詢醫囑與藥物
+        clinical_db = get_clinical_db()
+        medical_orders = clinical_db.get_medical_orders(symptoms, icd10_codes)
+        drug_recommendations = clinical_db.get_drug_recommendations(symptoms, icd10_codes)
+
+        # 生成 SOAP
+        soap_dict = generator.generate(
+            transcript=request.text,
+            patient_context=patient_context,
+            medical_orders=medical_orders,
+            drug_recommendations=drug_recommendations
+        )
+
+        processing_time = (time.time() - start_time) * 1000
+
+        return SOAPGenerateResponse(
+            soap=SOAPSection(
+                subjective=soap_dict.get("subjective", ""),
+                objective=soap_dict.get("objective", ""),
+                assessment=soap_dict.get("assessment", ""),
+                plan=soap_dict.get("plan", ""),
+                conversation_summary=soap_dict.get("conversation_summary", ""),
+                medical_orders=medical_orders,
+                drug_recommendations=drug_recommendations,
+            ),
+            metadata={
+                "confidence": soap_dict.get("classification_confidence", {}),
+                "model_version": generator.config.model_id,
+                "normalized_terms": soap_dict.get("normalized_terms", []),
+            },
+            processing_time_ms=round(processing_time, 2),
+        )
+
+    except Exception as e:
+        logger.error(f"Quick SOAP generation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/health")
 async def clinical_health():
     """

@@ -1,0 +1,20 @@
+{
+  "name": "soapvoice-frontend",
+  "version": "1.0.0",
+  "description": "SoapVoice 監控儀表板前端測試",
+  "private": true,
+  "scripts": {
+    "test": "jest --testPathPattern=tests/test_dashboard_frontend.js",
+    "test:all": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/test_dashboard_frontend.js"
+    ]
+  }
+}

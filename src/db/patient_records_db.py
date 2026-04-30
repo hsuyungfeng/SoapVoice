@@ -199,6 +199,26 @@ async def init_schema(db: aiosqlite.Connection):
     await db.execute("CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON soap_audit_log(action_timestamp)")
     await db.execute("CREATE INDEX IF NOT EXISTS idx_audit_user ON soap_audit_log(user_id)")
 
+    # ── metrics_history ──（Phase 12-01 新增）
+    await db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS metrics_history (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp       REAL NOT NULL,
+            gpu_percent     REAL NOT NULL,
+            vram_mb         REAL NOT NULL,
+            queue_length    INTEGER NOT NULL,
+            created_at      TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+        )
+        """
+    )
+    await db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_metrics_timestamp ON metrics_history(timestamp)"
+    )
+    await db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_metrics_created_at ON metrics_history(created_at)"
+    )
+
     # ── schema_version ──
     await db.execute(
         """
@@ -216,11 +236,11 @@ async def init_schema(db: aiosqlite.Connection):
     if row and row[0] == 0:
         await db.execute(
             "INSERT INTO schema_version (version, description) VALUES (?, ?)",
-            (1, "Initial schema: patient_records, consultation_records, soap_audit_log, schema_version"),
+            (1, "Initial schema: patient_records, consultation_records, soap_audit_log, schema_version, metrics_history"),
         )
 
     await db.commit()
-    logger.info("Schema 初始化完成（4 張表，idempotent）")
+    logger.info("Schema 初始化完成（5 張表，idempotent）")
 
 
 async def verify_schema(db: aiosqlite.Connection) -> Dict[str, bool]:
@@ -620,6 +640,69 @@ async def amend_soap(record_id: int, new_soap: dict, user_id: str) -> bool:
         return False
 
 
+# ── CRUD: 指標歷史 ────────────────────────────────────────────（Phase 12-01）
+
+
+async def save_metrics_to_db(
+    timestamp: float,
+    gpu_percent: float,
+    vram_mb: float,
+    queue_length: int,
+) -> int:
+    """保存 GPU 指標至 metrics_history 表（非同步持久化）
+
+    Args:
+        timestamp: Unix 時戳（秒）
+        gpu_percent: GPU 使用率（0-100）
+        vram_mb: VRAM 使用量（MB）
+        queue_length: 佇列深度
+
+    Returns:
+        新增記錄的 id（成功）或 0（失敗）
+    """
+    try:
+        db = await get_patient_records_db()
+        async with _write_lock:
+            cursor = await db.execute(
+                """INSERT INTO metrics_history
+                   (timestamp, gpu_percent, vram_mb, queue_length)
+                   VALUES (?, ?, ?, ?)""",
+                (timestamp, gpu_percent, vram_mb, queue_length),
+            )
+            await db.commit()
+            logger.debug(f"指標已保存: gpu={gpu_percent:.1f}% vram={vram_mb:.1f}MB queue={queue_length}")
+            return cursor.lastrowid if cursor.lastrowid and cursor.lastrowid > 0 else 0
+    except Exception as e:
+        logger.warning(f"save_metrics_to_db 失敗: {e}")
+        return 0
+
+
+async def get_metrics_history(limit: int = 100, granularity: str = "minute") -> List[Dict[str, Any]]:
+    """查詢指標歷史記錄
+
+    Args:
+        limit: 最多回傳筆數
+        granularity: 聚合粒度（"minute"/"hour"/"day"），暫時忽略，回傳原始列表
+
+    Returns:
+        指標記錄列表（按時間倒序）
+    """
+    try:
+        db = await get_patient_records_db()
+        cursor = await db.execute(
+            """SELECT timestamp, gpu_percent, vram_mb, queue_length, created_at
+               FROM metrics_history
+               ORDER BY timestamp DESC
+               LIMIT ?""",
+            (limit,),
+        )
+        rows = await cursor.fetchall()
+        return [_row_to_dict(r) for r in rows]
+    except Exception as e:
+        logger.warning(f"get_metrics_history 失敗: {e}")
+        return []
+
+
 # ── 模組匯出概覽 ──────────────────────────────────────────────
 
 __all__ = [
@@ -636,4 +719,6 @@ __all__ = [
     "save_audit_log",
     "get_audit_log",
     "amend_soap",
+    "save_metrics_to_db",
+    "get_metrics_history",
 ]

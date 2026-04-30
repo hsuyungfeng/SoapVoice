@@ -33,6 +33,8 @@ from src.api.ocr_api import router as ocr_router
 from src.api.patient_records_api import router as patient_records_router
 from src.api.lan_health_api import router as lan_health_router
 from src.api.lan_process_api import router as lan_process_router
+from src.api.metrics_api import router as metrics_router
+from src.api.alerts_api import router as alerts_router
 from src.llm.ollama_engine import initialize_engine, ModelConfig
 
 # 配置日誌
@@ -96,14 +98,48 @@ async def lifespan(app: FastAPI):
         from src.db.patient_records_db import get_patient_records_db, init_schema
         db = await get_patient_records_db()
         await init_schema(db)
-        logger.info("Patient records DB initialized (WAL mode, 4 tables)")
+        logger.info("Patient records DB initialized (WAL mode, 5 tables)")
     except Exception as e:
         logger.warning(f"Patient records DB init failed (non-fatal): {e}")
+
+    # Phase 12-01：啟動 MetricsCollector 背景任務
+    try:
+        from src.utils.metrics_collector import MetricsCollector
+        metrics_collector = MetricsCollector(update_interval=2.0)
+        await metrics_collector.start_background_task()
+        app.state.metrics_collector = metrics_collector
+        logger.info("Metrics collector started (2s update interval)")
+    except Exception as e:
+        logger.warning(f"Failed to start metrics collector: {e}")
+
+    # Phase 12-03：初始化 AlertManager 與警報 DB
+    try:
+        from src.utils.alert_manager import AlertManager
+        from src.db.alerts_db import init_alerts_schema
+        from src.db.patient_records_db import get_patient_records_db
+        alert_manager = AlertManager(auto_clear_enabled=True)
+        app.state.alert_manager = alert_manager
+        # 在同一個 DB 連線上初始化警報表
+        db = await get_patient_records_db()
+        await init_alerts_schema(db)
+        app.state.alerts_db = db
+        logger.info("AlertManager 初始化完成，警報表 Schema 已建立")
+    except Exception as e:
+        logger.warning(f"AlertManager 初始化失敗（非致命）: {e}")
 
     yield
 
     # 關閉時清理
     logger.info("Shutting down SoapVoice API...")
+
+    # Phase 12-01：停止 MetricsCollector 背景任務
+    try:
+        metrics_collector = getattr(app.state, "metrics_collector", None)
+        if metrics_collector is not None:
+            await metrics_collector.stop_background_task()
+            logger.info("Metrics collector stopped")
+    except Exception as e:
+        logger.warning(f"Failed to stop metrics collector: {e}")
 
     # 關閉病患記錄 DB
     try:
@@ -227,6 +263,10 @@ if static_dir.exists():
 # 註冊路由
 # Phase 11-01：LAN 健康檢查必須優先註冊，搶在 websocket_router 之前佔用 /api/v1/health
 app.include_router(lan_health_router, prefix="/api/v1", tags=["LAN Health"])
+# Phase 12-01：監控指標 SSE 與歷史查詢端點（在 websocket 之前，避免路由衝突）
+app.include_router(metrics_router, prefix="/api/v1", tags=["Metrics"])
+# Phase 12-03：警報管理端點
+app.include_router(alerts_router)
 app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
 app.include_router(rest_router, prefix="/api/v1", tags=["Clinical NLP"])
 app.include_router(consultation_router, prefix="/api/v1", tags=["Consultation Flow"])

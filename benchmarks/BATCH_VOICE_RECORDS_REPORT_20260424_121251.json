@@ -1,0 +1,85 @@
+[
+  {
+    "index": 1,
+    "name": "Chest Pain with Cough",
+    "chief_complaint": "胸痛伴咳嗽",
+    "transcript_length": 176,
+    "status": "success",
+    "timing": {
+      "soap_generation_s": 43.27745580673218,
+      "total_s": 43.30846810340881
+    },
+    "icd10_codes": [],
+    "medications": [],
+    "db_queries": 2,
+    "soap": {}
+  },
+  {
+    "index": 2,
+    "name": "High Blood Pressure",
+    "chief_complaint": "高血壓",
+    "transcript_length": 189,
+    "status": "success",
+    "timing": {
+      "soap_generation_s": 34.777578592300415,
+      "total_s": 34.8130989074707
+    },
+    "icd10_codes": [
+      "H35.03",
+      "I11",
+      "I11.0"
+    ],
+    "medications": [],
+    "db_queries": 2,
+    "soap": {}
+  },
+  {
+    "index": 3,
+    "name": "Cough and Fever",
+    "chief_complaint": "咳嗽伴發燒",
+    "transcript_length": 175,
+    "status": "success",
+    "timing": {
+      "soap_generation_s": 41.91365361213684,
+      "total_s": 41.947500467300415
+    },
+    "icd10_codes": [],
+    "medications": [],
+    "db_queries": 2,
+    "soap": {}
+  },
+  {
+    "index": 4,
+    "name": "Abdominal Pain",
+    "chief_complaint": "腹痛",
+    "transcript_length": 197,
+    "status": "success",
+    "timing": {
+      "soap_generation_s": 40.15192770957947,
+      "total_s": 40.18635821342468
+    },
+    "icd10_codes": [
+      "R10",
+      "R10.9",
+      "R10.11"
+    ],
+    "medications": [],
+    "db_queries": 2,
+    "soap": {}
+  },
+  {
+    "index": 5,
+    "name": "Medication Review",
+    "chief_complaint": "用藥諮詢",
+    "transcript_length": 180,
+    "status": "success",
+    "timing": {
+      "soap_generation_s": 44.81878924369812,
+      "total_s": 44.85309290885925
+    },
+    "icd10_codes": [],
+    "medications": [],
+    "db_queries": 2,
+    "soap": {}
+  }
+]

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoapVoice SOAP 生成器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 4px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { padding: 24px; }
+
+        .input-section {
+            margin-bottom: 24px;
+        }
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover { background: #e0e0e0; }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .soap-output {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        .soap-output.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .soap-section {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+        }
+        .soap-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .soap-content {
+            color: #666;
+            line-height: 1.6;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        .copy-btn {
+            margin-left: 8px;
+            padding: 4px 12px;
+            font-size: 12px;
+            background: #e8e8e8;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .copy-btn:hover { background: #d0d0d0; }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error {
+            display: none;
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        .error.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 SOAP 病歷生成</h1>
+            <p>醫療語音轉文字 → AI 驅動的結構化病歷</p>
+        </div>
+
+        <div class="content">
+            <div class="error" id="error-msg"></div>
+
+            <div class="input-section">
+                <label for="input-text">病歷文字內容</label>
+                <textarea id="input-text" placeholder="貼上語音轉文字結果或手動輸入...&#10;例如：患者主訴胸痛三天，呼吸時加重..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="generate-btn" onclick="generateSOAP()">生成 SOAP 病歷</button>
+                <button class="btn-secondary" onclick="clearInput()">清空</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 12px; color: #666;">生成中...</p>
+            </div>
+
+            <div id="output" style="display: none;">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="S" onclick="switchTab(event)">主訴 (S)</button>
+                    <button class="tab-btn" data-tab="O" onclick="switchTab(event)">檢查 (O)</button>
+                    <button class="tab-btn" data-tab="A" onclick="switchTab(event)">評估 (A)</button>
+                    <button class="tab-btn" data-tab="P" onclick="switchTab(event)">計劃 (P)</button>
+                </div>
+
+                <div class="soap-output active" data-section="S">
+                    <div class="soap-section">
+                        <div class="soap-title">
+                            主訴 (Subjective)
+                            <button class="copy-btn" onclick="copySection('S')">複製</button>
+                        </div>
+                        <div class="soap-content" id="section-S"></div>
+                    </div>
+                </div>
+
+                <div class="soap-output" data-section="O">
+                    <div class="soap-section">
+                        <div class="soap-title">
+                            檢查所見 (Objective)
+                            <button class="copy-btn" onclick="copySection('O')">複製</button>
+                        </div>
+                        <div class="soap-content" id="section-O"></div>
+                    </div>
+                </div>
+
+                <div class="soap-output" data-section="A">
+                    <div class="soap-section">
+                        <div class="soap-title">
+                            臨床評估 (Assessment)
+                            <button class="copy-btn" onclick="copySection('A')">複製</button>
+                        </div>
+                        <div class="soap-content" id="section-A"></div>
+                    </div>
+                </div>
+
+                <div class="soap-output" data-section="P">
+                    <div class="soap-section">
+                        <div class="soap-title">
+                            治療計劃 (Plan)
+                            <button class="copy-btn" onclick="copySection('P')">複製</button>
+                        </div>
+                        <div class="soap-content" id="section-P"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 16px; background: #f0f8ff; border-radius: 4px; font-size: 13px; color: #666;">
+                    <strong>💡 提示：</strong> 點擊「複製」按鈕複製該段落到剪貼簿，可直接貼入醫療系統。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 從 URL 參數或 localStorage 讀取 API Key
+        const getApiKey = () => {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('apiKey') || localStorage.getItem('soapvoice_api_key');
+        };
+
+        const API_BASE = window.location.origin;
+        const API_KEY = getApiKey();
+
+        async function generateSOAP() {
+            const text = document.getElementById('input-text').value.trim();
+            if (!text) {
+                showError('請輸入病歷文字內容');
+                return;
+            }
+
+            document.getElementById('generate-btn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('output').style.display = 'none';
+            hideError();
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/clinical/soap/generate-quick`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(API_KEY && { 'X-API-Key': API_KEY })
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({ message: '生成失敗' }));
+                    throw new Error(error.message || '服務錯誤');
+                }
+
+                const data = await response.json();
+                const soap = data.soap || {};
+
+                document.getElementById('section-S').textContent = soap.subjective || '無';
+                document.getElementById('section-O').textContent = soap.objective || '無';
+                document.getElementById('section-A').textContent = soap.assessment || '無';
+                document.getElementById('section-P').textContent = soap.plan || '無';
+
+                document.getElementById('output').style.display = 'block';
+                document.querySelector('[data-tab="S"]').click();
+
+            } catch (error) {
+                showError(`錯誤: ${error.message}`);
+            } finally {
+                document.getElementById('generate-btn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function switchTab(event) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.soap-output').forEach(sec => sec.classList.remove('active'));
+
+            event.target.classList.add('active');
+            const section = event.target.dataset.tab;
+            document.querySelector(`.soap-output[data-section="${section}"]`).classList.add('active');
+        }
+
+        function copySection(section) {
+            const text = document.getElementById(`section-${section}`).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已複製到剪貼簿');
+            });
+        }
+
+        function clearInput() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output').style.display = 'none';
+            hideError();
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.textContent = msg;
+            el.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('error-msg').classList.remove('show');
+        }
+
+        // 支援回車鍵提交（Ctrl+Enter）
+        document.getElementById('input-text').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateSOAP();
+            }
+        });
+    </script>
+</body>
+</html>

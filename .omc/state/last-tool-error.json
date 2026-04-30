@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"source .venv/bin/activate && timeout 300 python -c \\\"\\nimport sys\\nimport time\\nimport json\\nfrom pathlib import Path\\n\\nsys.path.insert(0, str(Path.cwd()))\\n\\nfrom src.soap.soap_generator...",
-  "error": "Exit code 1\nINFO:src.soap.soap_generator:使用 Ollama 引擎\nINFO:src.nlp.terminology_mapper:Loaded 100 built-in term mappings\nINFO:src.nlp.terminology_mapper:Loaded external vocabulary from /home/hsu/Desktop/SoapVoice/keywords.json\nINFO:src.soap.soap_generator:RAG 系統已初始化，病例範本數量: 1665\nINFO:sentence_transformers.base.model:No device provided, using cpu\nINFO:sentence_transformers.base.model:Loading SentenceTransformer model from sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2.\nINFO:src.llm.ol...",
-  "timestamp": "2026-04-24T03:22:52.553Z",
+  "tool_input_preview": "{\"command\":\"python3 -c \\\"\\nimport sys\\nsys.path.insert(0, '.')\\nfrom src.api.patient_records_api import verify_patient_identity, PatientVerifyResponse\\nprint('✓ 端點導入成功')\\nprint(f'✓ PatientVerifyRespon...",
+  "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    from src.api.patient_records_api import verify_patient_identity, PatientVerifyResponse\n  File \"/home/hsu/Desktop/SoapVoice/src/api/patient_records_api.py\", line 18, in <module>\n    from src.db.patient_records_db import (\n    ...<5 lines>...\n    )\nImportError: cannot import name 'get_db' from 'src.db.patient_records_db' (/home/hsu/Desktop/SoapVoice/src/db/patient_records_db.py)",
+  "timestamp": "2026-04-30T08:00:52.334Z",
   "retry_count": 1
 }

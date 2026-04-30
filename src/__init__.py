@@ -13,7 +13,12 @@ except ImportError:
     initialize_engine = None
     ollama_available = False
 
-from src.api.websocket import router as websocket_router
+try:
+    from src.api.websocket import router as websocket_router
+    websocket_router_available = True
+except ImportError:
+    websocket_router = None
+    websocket_router_available = False
 
 __version__ = "1.5.0"
 __all__ = [
@@ -23,4 +28,5 @@ __all__ = [
     "initialize_engine",
     "websocket_router",
     "ollama_available",
+    "websocket_router_available",
 ]
