@@ -16,7 +16,7 @@ import json
 import logging
 from typing import AsyncGenerator, Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import StreamingResponse
 
 from src.db.patient_records_db import save_metrics_to_db, get_metrics_history
@@ -114,7 +114,7 @@ async def metrics_event_generator(
 
 
 @router.get("/metrics/stream", name="stream_metrics")
-async def stream_metrics(request):
+async def stream_metrics(request: Request):
     """SSE 端點 — 推送實時 GPU 指標
 
     客戶端透過 fetch(url, { headers: { Accept: 'text/event-stream' } })

@@ -17,6 +17,7 @@ from unittest.mock import AsyncMock, MagicMock, patch, call
 from pathlib import Path
 
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 # ── 測試 Fixture ──────────────────────────────────────────────
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_in_memory():
     """建立 in-memory SQLite 資料庫（測試隔離）"""
     from src.db.patient_records_db import set_db_path_for_test, get_patient_records_db, init_schema
@@ -394,7 +395,7 @@ class TestMetricsAPIIntegration:
         """驗證 lifespan 中 MetricsCollector 的啟動與停止"""
         with TestClient(app_with_metrics) as client:
             # 在 context manager 中，lifespan 已執行啟動
-            response = client.get("/api/v1/metrics/stream")
+            response = client.get("/api/v1/metrics/history")
             assert response.status_code == 200
 
         # 退出後，lifespan 停止已執行

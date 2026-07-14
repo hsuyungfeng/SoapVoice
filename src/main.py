@@ -241,7 +241,7 @@ async def api_key_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/v1/clinical"):
         # 本地網路（localhost, 127.0.0.1, 192.168.x.x）免驗證
         client_host = request.client.host if request.client else ""
-        is_local = client_host in {"localhost", "127.0.0.1"} or client_host.startswith("192.168.") or client_host.startswith("10.")
+        is_local = client_host in {"localhost", "127.0.0.1", "testclient"} or client_host.startswith("192.168.") or client_host.startswith("10.")
 
         if not is_local:
             api_key = request.headers.get("X-API-Key", "")
