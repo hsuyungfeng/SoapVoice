@@ -106,6 +106,17 @@ Plans:
   4. 開發指南含本地開發環境設定（`uv sync`）、測試執行（`pytest`）、客戶端/伺服器建置流程說明
 **Plans**: TBD
 
+### Phase 15: audio.cpp 整合與效能提升
+**Goal**: 將 ASR 模組遷移或輔助使用 audio.cpp 框架，提升 Windows CPU 離線推理效能與降低資源佔用
+**Depends on**: Phase 1-9 (基礎 ASR 管線)
+**Requirements**: PERF-01
+**Success Criteria** (what must be TRUE):
+  1. 成功編譯並執行 audio.cpp 提供的 Windows CPU 版本 CLI / Server
+  2. `AudioCppModel` 可無縫替代現有的 `WhisperModel`，並保留原有的語言偵測與幻覺過濾機制
+  3. ASRBackendFactory 支援 `"audiocpp"` 選項
+  4. 整合 GUI 設定介面，允許使用者切換至 audio.cpp 引擎
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -118,3 +129,4 @@ Phases execute in numeric order: 10 → 11 ∥ 12 → 13 → 14
 | 12. 監控儀表板 | v1.1 | 2/2 | 📋 Planned | — |
 | 13. Wine EXE 驗證 | v1.1 | 0/TBD | Not started | — |
 | 14. 技術文件 | v1.1 | 0/TBD | Not started | — |
+| 15. audio.cpp 整合 | v1.1 | 0/TBD | Not started | — |
