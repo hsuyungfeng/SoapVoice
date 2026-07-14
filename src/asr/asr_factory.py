@@ -13,6 +13,7 @@ class ASRBackend(Enum):
 
     WHISPER = "whisper"
     QWEN3ASR = "qwen3asr"
+    AUDIOCPP = "audiocpp"
 
 
 class ASRBackendFactory:
@@ -59,6 +60,12 @@ class ASRBackendFactory:
                 device=device,
                 dtype=kwargs.get("dtype"),
             )
+        elif backend == "audiocpp":
+            from src.asr.audiocpp_model import AudioCppModel
+
+            model = AudioCppModel(
+                server_url=kwargs.get("server_url")
+            )
         else:
             from src.asr.whisper_model import WhisperModel
 
@@ -81,6 +88,7 @@ class ASRBackendFactory:
         names = {
             "whisper": f"Faster-Whisper {default_whisper}",
             "qwen3asr": "Qwen3-ASR-0.6B",
+            "audiocpp": "audio.cpp (CPU)",
         }
         return names.get(backend, backend)
 
@@ -150,7 +158,7 @@ def create_asr_model(
     model = ASRBackendFactory.create_backend(backend, **kwargs)
 
     needs_conversion = (
-        backend == "qwen3asr" and convert_to_traditional and ChineseConverter.is_available()
+        backend in ("qwen3asr", "audiocpp") and convert_to_traditional and ChineseConverter.is_available()
     )
 
     return model, needs_conversion
