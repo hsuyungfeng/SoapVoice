@@ -15,6 +15,7 @@ class ConfigManager:
             "clinic": {"name": "", "institution_code": ""},
             "doctors": [],  # list of {"name": "...", "id_card": "..."}
             "last_selected_doctor_index": 0,
+            "asr_backend": "whisper",
         }
         self.load()
 
@@ -33,6 +34,8 @@ class ConfigManager:
                         self.config["last_selected_doctor_index"] = data[
                             "last_selected_doctor_index"
                         ]
+                    if "asr_backend" in data:
+                        self.config["asr_backend"] = data["asr_backend"]
             except Exception as e:
                 logger.error(f"無法讀取設定檔: {e}")
 
@@ -73,3 +76,10 @@ class ConfigManager:
 
     def get_clinic(self) -> Dict[str, str]:
         return self.config["clinic"]
+
+    def set_asr_backend(self, backend: str):
+        self.config["asr_backend"] = backend
+        self.save()
+
+    def get_asr_backend(self) -> str:
+        return self.config.get("asr_backend", "whisper")
