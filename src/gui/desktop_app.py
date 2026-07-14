@@ -147,10 +147,13 @@ class SoapVoiceApp:
         self.current_ocr_text = ""
         self.is_processing = False
         self.server_process = None
+        self.audiocpp_process = None
 
         self.setup_ui()
         self.update_ui_state("idle")
         self.start_backend_process()
+        if self.config_manager.get_asr_backend() == "audiocpp":
+            self.start_audiocpp_server()
         self.tray.start()
         
         # 延遲初始化重量級組件
@@ -290,9 +293,10 @@ class SoapVoiceApp:
         # ASR 模型選擇
         asr_row = ttk.Frame(act_frame); asr_row.pack(fill=X, pady=(0, 15))
         ttk.Label(asr_row, text="語音轉錄引擎:", font=(FONT_FAMILY, 12, "bold"), bootstyle="secondary").pack(side=LEFT)
-        self.asr_model_var = tk.StringVar(value="distil-large-v3")
-        self.asr_cb = ttk.Combobox(asr_row, textvariable=self.asr_model_var, values=["distil-large-v3", "medium", "large-v3", "Qwen3-ASR"], state="readonly", width=18, font=(FONT_FAMILY, 12))
+        self.asr_model_var = tk.StringVar(value=self.config_manager.get_asr_backend())
+        self.asr_cb = ttk.Combobox(asr_row, textvariable=self.asr_model_var, values=["distil-large-v3", "medium", "large-v3", "Qwen3-ASR", "audiocpp"], state="readonly", width=18, font=(FONT_FAMILY, 12))
         self.asr_cb.pack(side=LEFT, padx=15)
+        self.asr_cb.bind("<<ComboboxSelected>>", self.on_asr_backend_changed)
         
         # LLM 模型選擇
         m_row = ttk.Frame(act_frame); m_row.pack(fill=X, pady=(0, 20))
@@ -370,6 +374,9 @@ class SoapVoiceApp:
             if asr_model == "Qwen3-ASR":
                 backend = "qwen3asr"
                 asr_model = "Qwen/Qwen3-ASR-0.6B"
+            elif asr_model == "audiocpp":
+                backend = "audiocpp"
+                asr_model = "qwen3_asr_0_6b"
             
             with open(wav_path, "rb") as f:
                 res = requests.post(f"{API_BASE_URL}/api/v1/extended/transcribe", 
@@ -477,6 +484,59 @@ class SoapVoiceApp:
 
     def export_to_cloud(self): self.status_var.set("☁️ 匯出完成")
 
+    def on_asr_backend_changed(self, event=None):
+        selected = self.asr_model_var.get()
+        if selected == "audiocpp":
+            ext = ".exe" if sys.platform == "win32" else ""
+            server_path = PROJECT_ROOT / "audio.cpp" / "build" / "bin" / f"audiocpp_server{ext}"
+            model_path = PROJECT_ROOT / "models" / "qwen3_asr_0_6b"
+            
+            missing = []
+            if not server_path.exists():
+                missing.append(f"Server executable: {server_path.name}")
+            if not model_path.exists():
+                missing.append(f"Model file/dir: {model_path.name}")
+                
+            if missing:
+                from ttkbootstrap.dialogs import Messagebox
+                Messagebox.show_error(
+                    f"無法切換至 audio.cpp，缺少以下檔案：\n\n" + "\n".join(missing),
+                    "檔案缺失"
+                )
+                self.asr_model_var.set(self.config_manager.get_asr_backend())
+                return
+            
+            self.start_audiocpp_server()
+        else:
+            self.stop_audiocpp_server()
+
+        self.config_manager.set_asr_backend(selected)
+
+    def start_audiocpp_server(self):
+        if self.audiocpp_process is not None:
+            return
+        ext = ".exe" if sys.platform == "win32" else ""
+        server_path = PROJECT_ROOT / "audio.cpp" / "build" / "bin" / f"audiocpp_server{ext}"
+        if not server_path.exists():
+            logger.warning(f"audiocpp_server executable not found at {server_path}")
+            return
+        
+        cmd = [str(server_path)]
+        if sys.platform.startswith('linux'):
+            cmd.extend(["--backend", "cuda"])
+            
+        try:
+            self.audiocpp_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            logger.info("Started audiocpp_server")
+        except Exception as e:
+            logger.error(f"Failed to start audiocpp_server: {e}")
+
+    def stop_audiocpp_server(self):
+        if self.audiocpp_process:
+            self.audiocpp_process.terminate()
+            self.audiocpp_process = None
+            logger.info("Stopped audiocpp_server")
+
     def start_backend_process(self):
         try:
             if requests.get(f"{API_BASE_URL}/health", timeout=1).status_code == 200:
@@ -511,6 +571,7 @@ class SoapVoiceApp:
         print("[Info] 正在關閉 SoapVoice...")
         if self.server_process:
             self.server_process.terminate()
+        self.stop_audiocpp_server()
         if self.tray:
             self.tray.stop()
         self.root.quit()
