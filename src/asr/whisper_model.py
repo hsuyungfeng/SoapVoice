@@ -90,33 +90,11 @@ class WhisperModel:
         segments_list = []
         full_text_parts = []
         
-        # 擴大的幻覺黑名單與過濾邏輯
-        hallucination_blacklist = [
-            "谢谢", "謝謝", "字幕", "志愿者", "感謝", "感谢", "Watching", "Amara.org", 
-            "李宗盛", "杨茜茜", "楊茜茜", "訂閱", "订阅", "剧场", "劇場", "MING PAO", 
-            "CANADA", "TORONTO", "明報", "多倫多", "Zhang", "Today", "Kyi-day", 
-            "killed", "Sysh", "recently", "you're-must", "fashow", "chou yin", "chowl",
-            "jank", "tureen", "tut-tut", "hush-x", "gawonged"
-        ]
+        from src.asr.utils import filter_hallucinations
 
         for segment in segments:
-            text = segment.text.strip()
+            text = filter_hallucinations(segment.text)
             if not text:
-                continue
-                
-            # 檢查是否為重複的標點符號幻覺 (如 ". . . . .")
-            import re
-            if re.match(r'^[\.\s。，,！？!\?\-]+$', text):
-                continue
-                
-            # 檢查是否包含黑名單中的片段
-            is_hallucination = False
-            for black_word in hallucination_blacklist:
-                if black_word.lower() in text.lower():
-                    is_hallucination = True
-                    break
-                    
-            if is_hallucination:
                 continue
 
             segments_list.append(
