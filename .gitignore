@@ -61,6 +61,7 @@ models/.cache/
 data/local_db/
 data/rag/
 data/recordings/
+data/kg_import/
 
 # Large test files
 static/*.wav

@@ -2,7 +2,7 @@
 
 [![測試狀態](https://img.shields.io/badge/tests-105%20passed-green)]()
 [![測試覆蓋率](https://img.shields.io/badge/coverage-85%25-green)]()
-[![版本](https://img.shields.io/badge/version-1.7.0-blue)]()
+[![版本](https://img.shields.io/badge/version-1.8.0-blue)]()
 [![授權](https://img.shields.io/badge/license-MIT-blue)]()
 
 ## 📖 專案說明
@@ -14,6 +14,7 @@ SoapVoice 是一套基於本地 LLM 的醫療語音轉 SOAP 病歷系統：
 - 📋 結構化 SOAP 病歷自動產出（英文，含 ICD-10 候選碼預填）
 - 📊 ICD-10 診斷代碼映射與專科分類（96,802 代碼）
 - 💊 藥務推薦與醫囑建議（12,042 藥品）
+- 🏥 **整合疾病知識圖譜（8,807 疾病 + 294K 關係：症狀/藥品/飲食/檢查/科室/併發症）**
 - 🔐 內網專用安全部署（API Key 認證）
 - 🖥️ **支援 CLI 命令列介面**
 - 🌐 **支援 Windows/Linux 離線部署（llama.cpp + Gemma 4 E4B 模型）**
@@ -23,15 +24,15 @@ SoapVoice 是一套基於本地 LLM 的醫療語音轉 SOAP 病歷系統：
 
 ## 🎯 核心特性
 
-### 三層架構
+### 四層架構
 ```
 病歷語音/文字
     ↓
 SOAP Generator (LLM 生成)
     ↓
-LLM Database CLI (ICD-10、藥品、醫囑查詢)
+LLM Database CLI (ICD-10、藥品、醫囑、疾病知識查詢)
     ↓
-LocalDatabase (96,802 ICD-10 + 12,042 藥品 + 1,665 病例)
+LocalDatabase (96,802 ICD-10 + 12,042 藥品 + 8,807 疾病 + 294K 醫療關係)
 ```
 
 ### 效能基準 (Gemma 4 E4B)
@@ -70,6 +71,7 @@ uv run python src/cli_typer.py models
 - ✅ ICD-10 分類（96,802 代碼）
 - ✅ 藥物推薦（12,042 藥品）
 - ✅ 醫囑建議（2,102 項目）
+- ✅ 疾病知識圖譜（8,807 疾病 + 54K 症狀 + 74K 藥品 + 84K 飲食 + 39K 檢查 + 16K 科室 + 12K 併發症）
 - ✅ RAG 病例範本檢索（1,665 範本）
 
 ### 選項二：API 伺服器
@@ -279,6 +281,21 @@ uv run python -m src.cli_db_query query_drugs "ibuprofen" --limit 5
 # 查詢醫療服務
 uv run python -m src.cli_db_query query_medical_orders "ECG" --limit 5
 
+# 疾病知識查詢
+uv run python -c "
+from pathlib import Path
+from src.db.local_database import LocalDatabase
+
+db = LocalDatabase(Path('data/local_db/medical.db'))
+profile = db.get_disease_profile('高血壓')
+if profile:
+    print(f'症狀: {profile.symptoms}')
+    print(f'藥品: {profile.drugs}')
+    print(f'宜吃: {profile.foods.get(\"do_eat\", [])}')
+    print(f'忌吃: {profile.foods.get(\"not_eat\", [])}')
+db.close()
+"
+
 # 資料庫統計
 uv run python -m src.cli_db_query get_stats
 
@@ -344,6 +361,9 @@ SoapVoice/
 │   ├── CLI_USAGE.md
 │   ├── DEPLOYMENT.md
 │   └── BENCHMARK_GUIDE.md
+├── scripts/                     # 工具腳本
+│   ├── import_kg_data.py       # 疾病知識圖譜 ETL 匯入
+│   └── ...
 ├── benchmarks/                  # 效能基準
 │   ├── E4B_SOAP_BENCHMARK_RECORD.md
 │   └── GPUllmcompare.md

@@ -78,10 +78,18 @@ src/
 ├── gui/
 │   ├── desktop_app.py         # 桌面側邊欄 GUI（ttkbootstrap Superhero 主題，右貼螢幕）
 │   └── config_manager.py      # GUI 設定管理
+├── db/                      # 資料庫
+│   ├── local_database.py    # 查詢介面（含 ICD-10 + 疾病知識圖譜）
+│   └── llm_db_cli.py        # LLM 資料庫 CLI
 ├── phase8/
 │   └── capture_ocr.py         # 截圖 + OCR 整合（Tesseract 主力，EasyOCR 備援）
-└── security/
-    └── auth.py                # API Key + JWT 認證模組
+├── security/
+│   └── auth.py                # API Key + JWT 認證模組
+├── scripts/                    # 工具腳本
+│   └── import_kg_data.py      # 疾病知識圖譜 ETL（簡轉繁 + SQLite 匯入）
+└── data/
+    ├── local_db/medical.db    # 本地醫療資料庫
+    └── kg_import/             # 知識圖譜原始 JSON 資料
 ```
 
 ---
@@ -199,7 +207,7 @@ def get_soap_generator() -> SOAPGenerator:
 3. **SOAP_KEYWORDS 單一來源**：定義在 `soap_classifier.py`，`soap_generator.py` 引用之
 4. **術語標準化已整合至 SOAP 生成流程**：LLM prompt 自動含標準術語 + ICD-10 候選碼
 5. **ASR 引擎可切換**：透過 `asr_backend` 參數選擇 whisper 或 qwen3asr
-6. **主力 LLM：Gemma 4:E4B**（`llama-cpp-python 0.3.20`），使用 `<start_of_turn>` 控制標記；Ollama 為補充後端
+6. **主力 LLM：Gemma 4:E4B**（`llama-cpp-python 0.3.20`），使用 `<start_of_tell>` 控制標記；Ollama 為補充後端
 7. **OCR 優先順序**：Tesseract-OCR → Ollama Vision (gemma4:e2b) → 純截圖
 8. **GUI 架構：雙階段側邊欄**
    - `ttk.Window` + `superhero` 主題（`ttkbootstrap`）
@@ -207,6 +215,7 @@ def get_soap_generator() -> SOAPGenerator:
    - **展開模式** `420×900`：LLM 完成後自動展開，顯示患者卡片與完整 SOAP 病歷
    - 使用 `ttk.Labelframe`（小寫 f）搭配 `bootstyle=` 參數
 9. **語音與逐字稿須保存**：每次錄音須儲存原始音檔（WAV/PCM）與 ASR 逐字稿至 `data/recordings/` 目錄
+10. **疾病知識圖譜整合**：資料庫已匯入 8,807 疾病知識（症狀/藥品/飲食/檢查/科室/併發症），來源為 baiyang2464/chatbot-base-on-Knowledge-Graph，使用 `scripts/import_kg_data.py` 進行 ETL 與簡轉繁，新增 7 張資料表（disease_info, disease_symptoms, disease_drugs, disease_foods, disease_checks, disease_departments, disease_acompany）
 
 ## 資料庫與外部集成 (Database & Integrations)
 
