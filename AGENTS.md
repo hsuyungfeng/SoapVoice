@@ -208,6 +208,28 @@ def get_soap_generator() -> SOAPGenerator:
    - 使用 `ttk.Labelframe`（小寫 f）搭配 `bootstyle=` 參數
 9. **語音與逐字稿須保存**：每次錄音須儲存原始音檔（WAV/PCM）與 ASR 逐字稿至 `data/recordings/` 目錄
 
+## 資料庫與外部集成 (Database & Integrations)
+
+### A. 獨立本地資料庫 (`data/local_db/medical.db`)
+為了確保系統能在完全離線且獨立的環境運行，系統使用 SQLite 資料庫 `medical.db`。該資料庫除了內建的 ICD-10 代碼、藥品與醫囑外，還整合了從 `DrtoolboxLocalServer` 專案中克隆的臨床醫療知識圖譜（含疾病特徵、療程適應症與指引等 9 張關聯表）。
+
+### B. 雙向同步更新機制
+當 `DrtoolboxLocalServer` 的知識圖譜或資料結構有所更新時，必須依序執行以下步驟進行資料同步：
+1. **更新資料庫表結構**：在 `DrtoolboxLocalServer` 根目錄下執行以下腳本，將最新的臨床圖譜與資訊表複製至 `SoapVoice`：
+   ```bash
+   python scripts/copy_db_to_soapvoice.py
+   ```
+2. **同步 ASR 熱詞與詞典**：在 `DrtoolboxLocalServer` 根目錄下執行以下腳本，將圖譜中的所有醫療節點（如專有名詞、症狀等）去重後合併寫入 `SoapVoice/keywords.json`，防止語音聽寫時專用術語辨識錯誤：
+   ```bash
+   python scripts/export_nodes_to_soapvoice_keywords.py
+   ```
+
+### C. 臨床用藥與處置合規判定 (Clinical Compliance Guard)
+* 系統的 SOAP 病歷生成模組在輸出 Assessment & Plan 時，會透過 `ComplianceGuard` 比對診斷與計畫。
+* 任何可能發生的食物/用藥安全排斥、過敏禁忌皆會自 `medical.db` 中的知識庫表進行推導，並即時產出合規警告資訊。
+
+
+
 ## graphify
 
 This project has a graphify knowledge graph at graphify-out/.

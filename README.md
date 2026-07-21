@@ -174,14 +174,24 @@ curl -X POST http://localhost:8010/api/v1/clinical/soap/generate \
 
 ---
 
-## 💾 資料庫內容
+## 💾 資料庫內容 (`data/local_db/medical.db`)
 
-| 資料表 | 記錄數 | 用途 |
-|--------|--------|------|
-| icd10_codes | 96,802 | ICD-10 疾病分類 |
-| drugs | 12,042 | 藥品資料 |
-| medical_orders | 2,102 | 醫療服務 |
-| case_templates | 1,665 | 病例範本（RAG） |
+本系統使用整合了臨床知識圖譜與學術資料的 SQLite 資料庫 `medical.db`，包含以下表結構：
+
+| 資料表 | 說明 |
+|--------|------|
+| **icd10_codes** | ICD-10 疾病分類代碼 (96,802 筆) |
+| **drugs** | 臨床常見用藥與健保品項資料 (12,042 筆) |
+| **medical_orders** | 醫療處置、檢驗項目與醫囑建議 (2,102 筆) |
+| **case_templates** | 臨床病歷 RAG 檢索範本 (1,665 筆) |
+| **medical_nodes** | 臨床醫學知識圖譜實體節點 (自 clinic.db 同步) |
+| **medical_edges** | 臨床知識實體關聯邊 (自 clinic.db 同步) |
+| **disease_details** | 疾病診斷特徵、症狀關聯 (自 clinic.db 同步) |
+| **medical_terminology** | 臨床學術術語與日常口語對照表 (自 clinic.db 同步) |
+| **medical_conditions** | 臨床適應症與用藥安全條件 (自 clinic.db 同步) |
+| **medical_treatments** | 療程原理、修復期與處置細節 (自 clinic.db 同步) |
+| **medical_guidelines** | 臨床指引與標準照護規範 (自 clinic.db 同步) |
+| **medical_knowledge** | 醫學常識與知識庫 (自 clinic.db 同步) |
 
 ---
 
@@ -252,6 +262,19 @@ SoapVoice/
 ├── docker-compose.yml      # Docker 部署
 └── README.md
 ```
+
+---
+
+## 🤝 DrtoolboxLocalServer 雙向整合升級
+
+本專案已與 [DrtoolboxLocalServer](file:///home/hsuyungfeng/DrtoolboxLocalServer) 進行深度雙向整合，大幅提升 ASR 專科聽寫精準度與臨床合規性防護：
+
+1. **ASR 詞彙熱度與詞典校正**
+   * **機制**：將 `DrtoolboxLocalServer` 圖譜中的 2.6 萬個醫療實體節點（包含精準疾病、症狀、處置、藥物名稱）合併至本專案的 `keywords.json` 中。
+   * **效果**：直接加載於 ASR 與術語對應中，防止專科醫學術語（如「琥乙紅黴素」）被辨識為日常生活詞彙。
+2. **臨床處置與用藥合規防線 (Clinical Compliance Guard)**
+   * **機制**：SOAP 模組加載 `DrtoolboxLocalServer` 的 `clinic.db`（內含 30 萬條臨床知識關係），在生成病歷時自動觸發 `ClinicalComplianceGuard`。
+   * **效果**：自動比對診斷（Assessment）與計畫（Plan）中的用藥、醫囑與食物關係，如偵測到忌吃食物則發出 `CRITICAL` 警告，若使用推薦藥品則標註 `INFO` 通過，提供臨床防錯與決策輔助。
 
 ---
 

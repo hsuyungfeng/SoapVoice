@@ -14,6 +14,7 @@ from pathlib import Path
 from src.utils.resource_path import get_resource_path
 from src.nlp.soap_classifier import SOAPClassifier
 from src.nlp.terminology_mapper import MedicalTerminologyMapper, TermMapping
+from src.nlp.compliance_guard import ClinicalComplianceGuard
 
 # 引擎選擇：使用 llama.cpp 或 Ollama
 USE_LLAMA_CPP = os.getenv("USE_LLAMA_CPP", "false").lower() == "true"
@@ -65,6 +66,7 @@ class SOAPGenerator:
         self.config = config or SOAPConfig()
         self._engine: Optional[Engine] = None
         self._mapper: MedicalTerminologyMapper = MedicalTerminologyMapper()
+        self._compliance_guard: ClinicalComplianceGuard = ClinicalComplianceGuard()
 
         # RAG 系統初始化
         self._rag_client = None
@@ -270,6 +272,14 @@ class SOAPGenerator:
                 for m in term_mappings
             ]
             result["case_templates"] = case_templates
+            
+            # 臨床合規性查核
+            try:
+                result["compliance_warnings"] = self._compliance_guard.check_compliance(result)
+            except Exception as guard_err:
+                logger.warning(f"臨床合規性查核失敗: {guard_err}")
+                result["compliance_warnings"] = []
+                
             return result
         except Exception as e:
             logger.error(f"SOAP generation error: {e}")
