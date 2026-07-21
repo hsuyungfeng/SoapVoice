@@ -2741,6 +2741,15 @@ wheels = [
 ]
 
 [[package]]
+name = "nvidia-ml-py"
+version = "13.610.43"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f0/b5/a8fbc356f768fa5c9cfd646668fd7d34bf55bdd1c6e20754642a64d930d4/nvidia_ml_py-13.610.43.tar.gz", hash = "sha256:65437eb73d68d0c62c931ca4d45038472faff03bd0b8729abba4b899f70d60f2", size = 52109, upload-time = "2026-06-01T18:54:08.829Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/45/caa600acfab94560807a20a64b5830d2cd3c3202b7f1328644d70b7d6bd8/nvidia_ml_py-13.610.43-py3-none-any.whl", hash = "sha256:f13c72698edef492f985cc225f14faafe68ae065a2e407f45bdf6f4b9b43fde8", size = 53163, upload-time = "2026-06-01T18:54:07.704Z" },
+]
+
+[[package]]
 name = "nvidia-nccl-cu13"
 version = "2.28.9"
 source = { registry = "https://pypi.org/simple" }
@@ -7514,6 +7523,7 @@ dependencies = [
     { name = "moonshine-voice" },
     { name = "mss" },
     { name = "numpy" },
+    { name = "nvidia-ml-py" },
     { name = "openai" },
     { name = "opencc" },
     { name = "pillow" },
@@ -7532,6 +7542,7 @@ dependencies = [
     { name = "requests" },
     { name = "scipy" },
     { name = "sentence-transformers" },
+    { name = "sse-starlette" },
     { name = "tenacity" },
     { name = "torch" },
     { name = "torchaudio" },
@@ -7577,6 +7588,7 @@ requires-dist = [
     { name = "moonshine-voice", specifier = ">=0.0.49" },
     { name = "mss", specifier = ">=9.0.0" },
     { name = "numpy", specifier = ">=2.4.3" },
+    { name = "nvidia-ml-py", specifier = ">=12.0.0" },
     { name = "openai", specifier = ">=1.10.0" },
     { name = "opencc", specifier = ">=0.2.0" },
     { name = "pillow", specifier = ">=10.0.0" },
@@ -7599,6 +7611,7 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
     { name = "scipy", specifier = ">=1.17.1" },
     { name = "sentence-transformers", specifier = ">=5.3.0" },
+    { name = "sse-starlette", specifier = ">=2.1.0" },
     { name = "tenacity", specifier = ">=9.1.4" },
     { name = "torch", specifier = ">=2.1.0" },
     { name = "torchaudio", specifier = ">=2.1.0" },
@@ -7703,6 +7716,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7d/05/fb3f0c9248e60a0224e77198c31517b93b92d6060873b641caf474d42993/soynlp-0.0.493.tar.gz", hash = "sha256:4b20b825edbcadb9ebd494de54d8ca50b0ee317fe58d090e8b509d733422136a", size = 405393, upload-time = "2019-08-25T05:28:00.755Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7e/50/6913dc52a86a6b189419e59f9eef1b8d599cffb6f44f7bb91854165fc603/soynlp-0.0.493-py3-none-any.whl", hash = "sha256:2aed0ced1f0f74f7bdd0bdc24a979c5cb9ee4a28393642db52a83d174ed65b7a", size = 416753, upload-time = "2019-08-25T05:27:54.56Z" },
+]
+
+[[package]]
+name = "sse-starlette"
+version = "3.4.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "starlette" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d2/1b/bc9e3e7a72dcdad7dc7888758f5d00f56f8909ed5cfdff822bd72bb4c520/sse_starlette-3.4.5.tar.gz", hash = "sha256:83072538bc211a2f68b7b0422226c4af3e9b62e106e07034664b832ca019842a", size = 35249, upload-time = "2026-06-20T17:36:58.322Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/75/c88d3f5dafd59c791da1ce27650d30bf5b70cbf1cbf01cd00e5f9e360915/sse_starlette-3.4.5-py3-none-any.whl", hash = "sha256:e71bad53323f65573c3864a6c3bd0c1eb6e5f092b2e48082b0c35927d19ca296", size = 16518, upload-time = "2026-06-20T17:36:56.729Z" },
 ]
 
 [[package]]

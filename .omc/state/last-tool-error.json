@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"rtk find AstrBot -name \\\"cmd_config.json\\\" -o -name \\\"bots.json\\\" -o -name \\\"platforms.json\\\" 2>/dev/null\"}",
-  "error": "Exit code 1",
-  "timestamp": "2026-04-30T08:08:10.510Z",
-  "retry_count": 2
-}
