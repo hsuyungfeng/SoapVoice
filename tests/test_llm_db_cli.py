@@ -6,6 +6,8 @@ Test LLM Database CLI Integration
 
 import sys
 import json
+
+import pytest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
