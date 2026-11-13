@@ -188,16 +188,20 @@ class LocalStorageManager:
         Returns:
             True 成功；False 若音檔不存在或寫入失敗。
 
-        副作用：若隊列已達上限，自動刪除最舊項目並記 warning。
+        副作用：若隊列已達上限，記 warning 並保留所有未上傳項目 (D-31-32)。
         """
         # 驗證音檔存在（截圖可能在錄音停止時才補拍，故不強制）
         if not Path(audio_path).is_file():
             logger.error("Audio file not found: %s", audio_path)
             return False
 
-        # 隊列上限檢查（先 drop 後 add，避免短暫超限）
+        # 隊列上限檢查（D-31-32：佇列滿時不得丟棄最舊未上傳項目，僅記錄 warning）
         if len(self.pending_uploads) >= self.max_pending:
-            self._remove_oldest()
+            logger.warning(
+                "暫存佇列超過建議上限 (%d/%d)，仍保留所有未上傳項目",
+                len(self.pending_uploads),
+                self.max_pending,
+            )
 
         pending = PendingUpload(
             session_id=session_id,
@@ -260,7 +264,7 @@ class LocalStorageManager:
         return False
 
     def _remove_oldest(self) -> Optional[PendingUpload]:
-        """移除最舊的項目（隊列滿時呼叫）。
+        """移除最舊的項目（保留僅供手動管理維護用途，不再由 add_pending 自動呼叫，D-31-32）。
 
         Returns:
             被移除的項目；隊列空時回傳 None。

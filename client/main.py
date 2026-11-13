@@ -23,19 +23,28 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+import os
 import sys
 import threading
 from pathlib import Path
 from typing import Optional
 
+import httpx
+
 # 套件相對 import（執行 `python -m client.main`）
 from client.audio_recorder import AudioRecorder
+from client.chunk_uploader import ChunkUploader
+from client.control_server import ControlServer
+from client.cycle_pipeline import CyclePipeline
+from client.cycle_session import CycleSession
 from client.gui import SOAPVoiceGUI
 from client.lan_client import HEALTH_HEALTHY, LANClient
 from client.lan_config import LANConfig
 from client.local_storage import LocalStorageManager  # noqa: F401 — 供 main 入口顯式宣告依賴（11-03 key_link）
 from client.retry_manager import RetryManager  # noqa: F401 — 供 main 入口顯式宣告依賴（11-03 key_link）
 from client.screenshot_capture import ScreenshotCapture
+from client.segment_store import SegmentStore
+from client.temp_cleanup import enforce_cap
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +176,11 @@ class App:
 
         # 核心元件
         self.lan_client = LANClient(config)
-        self.audio_recorder = AudioRecorder(str(self.cache_dir))
+        self.store = SegmentStore(config.cycles_dir)
+        self.audio_recorder = AudioRecorder(
+            str(self.cache_dir),
+            segment_seconds=float(getattr(config, "chunk_seconds", 20.0)),
+        )
         self.screenshot_capture = ScreenshotCapture(str(self.cache_dir))
 
         # 事件迴圈（背景）
@@ -188,6 +201,137 @@ class App:
 
         # 紀錄上次自動截圖路徑（錄音停止 → 上傳時使用）
         self._last_screenshot_path: Optional[str] = None
+
+        # Phase 31: 循環狀態機與本機控制服務接線
+        self.elc_server_url = getattr(config, "elc_server_url", None) or os.getenv("ELC_SERVER_URL")
+        self.api_key = getattr(config, "api_key", None) or os.getenv("ELC_API_KEY", "")
+
+        self.uploader: Optional[ChunkUploader] = None
+        self.pipeline: Optional[CyclePipeline] = None
+        self.cycle_session: Optional[CycleSession] = None
+        self.control_server: Optional[ControlServer] = None
+
+        if self.elc_server_url:
+            self._init_phase31_components()
+        else:
+            logger.info("ELC_SERVER_URL not configured; Phase 31 control server not initialized")
+
+    def _init_phase31_components(self) -> None:
+        """初始化 Phase 31 循環分段上傳器、Pipeline、工作階段與本機控制服務。"""
+        assert self.elc_server_url is not None
+        base_url = self.elc_server_url
+        key = self.api_key
+
+        self.uploader = ChunkUploader(
+            store=self.store,
+            base_url=base_url,
+            api_key=key,
+        )
+
+        def generate_fn(full_wav_path: str, context: dict) -> dict:
+            patient_name = context.get("patient_name", "")
+            doctor_name = context.get("doctor_name", "")
+            screenshot_path = context.get("screenshot_path", "")
+            future = self.async_runner.submit(
+                self.lan_client._do_upload(
+                    audio_path=full_wav_path,
+                    screenshot_path=screenshot_path,
+                    patient_name=patient_name,
+                    doctor_name=doctor_name,
+                )
+            )
+            timeout = max(300.0, float(getattr(self.config, "read_timeout_sec", 30.0)) * 5)
+            return future.result(timeout=timeout)
+
+        self.pipeline = CyclePipeline(
+            store=self.store,
+            base_url=base_url,
+            api_key=key,
+            generate_fn=generate_fn,
+        )
+
+        def capture_patient() -> dict:
+            screenshot_path = self.screenshot_capture.capture() or ""
+            p_name, d_name = "", ""
+            evt = threading.Event()
+
+            def _get():
+                nonlocal p_name, d_name
+                try:
+                    p_name, d_name = self.gui.get_patient_doctor()
+                except Exception:
+                    pass
+                evt.set()
+
+            try:
+                self.gui.after(0, _get)
+                evt.wait(timeout=2.0)
+            except Exception:
+                pass
+
+            return {
+                "patient_name": p_name,
+                "doctor_name": d_name,
+                "screenshot_path": screenshot_path,
+            }
+
+        def cleanup_fn() -> None:
+            max_bytes = int(getattr(self.config, "temp_cache_max_mb", 2048)) * 1024 * 1024
+            enforce_cap(self.store, max_bytes=max_bytes)
+
+        def server_check_fn(cycle_id: str) -> Optional[str]:
+            url = f"{base_url.rstrip('/')}/api/cycles/{cycle_id}"
+            headers = {}
+            if key:
+                headers["X-API-Key"] = key
+            try:
+                with httpx.Client(timeout=5.0) as client:
+                    resp = client.get(url, headers=headers)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        return (data.get("cycle") or {}).get("state") or data.get("state")
+                    return None
+            except Exception as exc:
+                logger.debug("server_check failed for %s: %s", cycle_id, exc)
+                return None
+
+        self.cycle_session = CycleSession(
+            recorder=self.audio_recorder,
+            store=self.store,
+            uploader=self.uploader,
+            pipeline=self.pipeline,
+            capture_patient=capture_patient,
+            server_check=server_check_fn,
+            cleanup=cleanup_fn,
+        )
+
+        # recorder.on_segment: register_chunk 後 uploader.notify (不得做網路 I/O)
+        def _on_segment(seq: int, wav_path: str) -> None:
+            if self.cycle_session and self.cycle_session._active_cycle_id:
+                cid = self.cycle_session._active_cycle_id
+                try:
+                    self.store.register_chunk(cid, seq, wav_path)
+                except Exception as exc:
+                    logger.warning("register_chunk failed for %s seq %d: %s", cid, seq, exc)
+                if self.uploader:
+                    self.uploader.notify(cid)
+
+        self.audio_recorder.on_segment = _on_segment
+
+        # ControlServer
+        control_port = getattr(self.config, "control_port", 18765)
+        control_host = getattr(self.config, "control_host", "127.0.0.1")
+        token_path = getattr(self.config, "control_token_path", None)
+        try:
+            self.control_server = ControlServer(
+                session=self.cycle_session,
+                port=control_port,
+                host=control_host,
+                token_path=token_path,
+            )
+        except Exception as exc:
+            logger.exception("Failed to initialize ControlServer: %s", exc)
+            self.control_server = None
 
     # ------------------------------------------------------------------
     # 啟動健康檢查
@@ -308,7 +452,20 @@ class App:
         except Exception as exc:  # noqa: BLE001
             logger.exception("Initial health check raised: %s", exc)
 
-        # 4. tkinter mainloop（主執行緒）
+        # 4. 啟動 Phase 31 元件（上傳器、工作階段與本機控制伺服器）
+        if self.control_server and self.uploader and self.cycle_session:
+            try:
+                self.cycle_session.recover_on_startup()
+                self.uploader.start()
+                self.cycle_session.start_background()
+                self.control_server.start()
+            except Exception as exc:
+                logger.exception("Failed to start Phase 31 control server: %s", exc)
+                self.gui._set_status_message(f"⚠ 本機控制服務啟動失敗：{exc}")
+        elif not self.elc_server_url:
+            self.gui._set_status_message("提示：未設定 ELC_SERVER_URL，快捷列控制服務未啟動")
+
+        # 5. tkinter mainloop（主執行緒）
         try:
             self.gui.mainloop()
         finally:
@@ -317,6 +474,22 @@ class App:
     def shutdown(self) -> None:
         """關閉應用程式：停止背景 loop、釋放錄音資源。"""
         logger.info("Shutting down App")
+        # 依序停止 ControlServer、session、uploader、recorder
+        if self.control_server:
+            try:
+                self.control_server.stop()
+            except Exception:
+                pass
+        if self.cycle_session:
+            try:
+                self.cycle_session.stop_background()
+            except Exception:
+                pass
+        if self.uploader:
+            try:
+                self.uploader.stop()
+            except Exception:
+                pass
         try:
             if self.audio_recorder.is_recording:
                 self.audio_recorder.stop()
@@ -409,4 +582,6 @@ if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())
 
 
-__all__ = ["App", "AsyncRunner", "main"]
+SoapVoiceClientApp = App
+
+__all__ = ["App", "SoapVoiceClientApp", "AsyncRunner", "main"]

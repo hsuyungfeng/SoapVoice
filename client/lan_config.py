@@ -18,7 +18,16 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import List
+
+
+def _default_control_token_path() -> str:
+    """本機控制通道 token 路徑（契約 §1）。"""
+    localappdata = os.environ.get("LOCALAPPDATA")
+    if localappdata:
+        return os.path.join(localappdata, "ElcSoapVoice", "control_token")
+    return os.path.join(os.path.expanduser("~"), ".local", "share", "ElcSoapVoice", "control_token")
 
 
 def _default_cache_dir() -> str:
@@ -69,12 +78,32 @@ class LANConfig:
     # 本機暫存
     local_cache_dir: str = field(default_factory=_default_cache_dir)
     max_pending_uploads: int = 10
+    temp_cache_max_mb: int = field(
+        default_factory=lambda: int(os.getenv("SOAPVOICE_TEMP_CACHE_MAX_MB", "2048"))
+    )
+    chunk_seconds: int = 20
+
+    # 本機控制通道 (Phase 31)
+    control_port: int = field(
+        default_factory=lambda: int(os.getenv("SOAPVOICE_CONTROL_PORT", "18765"))
+    )
+    control_host: str = "127.0.0.1"
+    control_token_path: str = field(default_factory=_default_control_token_path)
 
     # 版本檢查
     min_api_version: str = "1.1.0"
     required_services: List[str] = field(
         default_factory=lambda: ["asr", "llm", "database"]
     )
+
+    def __post_init__(self):
+        # chunk_seconds 夾在 15–30 秒之間 (D-31-19)
+        self.chunk_seconds = max(15, min(30, int(self.chunk_seconds)))
+
+    @property
+    def cycles_dir(self) -> Path:
+        """循環分段儲存目錄。"""
+        return Path(self.local_cache_dir) / "cycles"
 
     @property
     def health_endpoint(self) -> str:

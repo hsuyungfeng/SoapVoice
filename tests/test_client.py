@@ -967,7 +967,7 @@ class TestLANClientHealthExtra:
 
     @pytest.mark.asyncio
     async def test_lan_client_pending_queue_cap(self, tmp_config, tmp_path):
-        """超過 max_pending_uploads 時自動 drop 最舊。"""
+        """超過 max_pending_uploads 時仍保留所有未上傳項目（D-31-32，不自動 drop）。"""
         from client.lan_client import LANClient
 
         # 把上限設低
@@ -982,10 +982,10 @@ class TestLANClientHealthExtra:
         for i in range(3):
             client._queue_for_retry(str(audio), str(shot), f"P{i}", "D")
 
-        assert len(client.pending_uploads) == 2
-        # 最舊的 P0 應被 drop
+        # D-31-32: 佇列超限不丟棄，保留所有未上傳項目
+        assert len(client.pending_uploads) == 3
         names = [p.patient_name for p in client.pending_uploads]
-        assert "P0" not in names
+        assert "P0" in names
         assert "P1" in names
         assert "P2" in names
 
@@ -1112,7 +1112,7 @@ class TestLocalStorageManager:
         assert len(data) == 2
 
     def test_local_storage_queue_overflow(self, tmp_path):
-        """新增超過上限時，最舊項目自動刪除並記 warning。"""
+        """新增超過上限時，仍保留所有未上傳項目（D-31-32，不自動丟棄最舊項目）。"""
         from client.local_storage import LocalStorageManager
 
         mgr = LocalStorageManager(str(tmp_path / "cache"), max_pending=3)
@@ -1122,11 +1122,11 @@ class TestLocalStorageManager:
             shot = self._mk_shot(tmp_path, f"s{i}.jpg")
             mgr.add_pending(f"sess{i}", audio, shot, f"P{i}", "D")
 
-        # 上限 3：最舊兩個（sess0/sess1）應被刪除
-        assert mgr.get_queue_size() == 3
+        # D-31-32: 不丟棄未上傳項目，隊列累積全部 5 項
+        assert mgr.get_queue_size() == 5
         names = [p.session_id for p in mgr.get_all_pending()]
-        assert "sess0" not in names
-        assert "sess1" not in names
+        assert "sess0" in names
+        assert "sess1" in names
         assert "sess2" in names
         assert "sess3" in names
         assert "sess4" in names
