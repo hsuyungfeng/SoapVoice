@@ -5,7 +5,8 @@ import pytest
 
 from client.local_storage import LocalStorageManager
 from client.segment_store import SegmentStore
-from client.temp_cleanup import enforce_cap
+from client.temp_cleanup import enforce_cap, enforce_retention
+from datetime import datetime, timezone
 
 
 def _setup_cycle(store: SegmentStore, cycle_id: str, chunk_sizes: list[int], acked_map: dict[int, bool], archived: bool, archived_at: str | None = None):
@@ -121,3 +122,94 @@ def test_local_storage_no_drop_on_max_pending(tmp_path):
     assert mgr.get_queue_size() == 3
     all_sess = [p.session_id for p in mgr.get_all_pending()]
     assert all_sess == ["sess_0", "sess_1", "sess_2"]
+
+
+def test_retention_deletes_expired_acked_cycles(tmp_path):
+    """Test 7: 超過 retention_days 且已 acked 封存循環被刪除 (reason='age')，即使未達容量上限 (D-32-20)。"""
+    store = SegmentStore(tmp_path)
+    now = datetime(2026, 6, 1, 12, 0, tzinfo=timezone.utc)
+    # 100 天前已封存
+    c1_dir = _setup_cycle(
+        store, "c_expired", [500, 500], {0: True, 1: True},
+        archived=True, archived_at="2026-02-01T00:00:00Z"
+    )
+    # 10 天前已封存
+    c2_dir = _setup_cycle(
+        store, "c_fresh", [500, 500], {0: True, 1: True},
+        archived=True, archived_at="2026-05-20T00:00:00Z"
+    )
+
+    res = enforce_retention(store, max_bytes=100000, retention_days=90, now=now)
+
+    assert not (c1_dir / "chunk_000000.wav").exists()
+    assert not (c1_dir / "chunk_000001.wav").exists()
+    assert str(c1_dir / "chunk_000000.wav") in res["reasons"]
+    assert res["reasons"][str(c1_dir / "chunk_000000.wav")] == "age"
+
+    # 新循環未過期，未超量，保留
+    assert (c2_dir / "chunk_000000.wav").exists()
+    assert (c2_dir / "chunk_000001.wav").exists()
+
+
+def test_retention_preserves_expired_unacked_chunks(tmp_path):
+    """Test 8: 超過 retention_days 但未 acked 的檔案，無論多舊絕對不刪除 (D-32-20)。"""
+    store = SegmentStore(tmp_path)
+    now = datetime(2026, 6, 1, 12, 0, tzinfo=timezone.utc)
+    c_dir = _setup_cycle(
+        store, "c_expired_unacked", [600, 600], {0: True, 1: False},
+        archived=True, archived_at="2026-01-01T00:00:00Z"
+    )
+
+    res = enforce_retention(store, max_bytes=100000, retention_days=90, now=now)
+
+    # chunk 0 已 acked 依 age 刪除
+    assert not (c_dir / "chunk_000000.wav").exists()
+    assert res["reasons"][str(c_dir / "chunk_000000.wav")] == "age"
+
+    # chunk 1 未 acked 嚴禁刪除
+    assert (c_dir / "chunk_000001.wav").exists()
+    assert str(c_dir / "chunk_000001.wav") not in res["reasons"]
+    assert res["unuploaded_bytes"] >= 600
+
+
+def test_retention_unarchived_never_deleted(tmp_path):
+    """Test 9: 未封存循環即使過期永不刪除 (D-31-33, D-32-20)。"""
+    store = SegmentStore(tmp_path)
+    now = datetime(2026, 6, 1, 12, 0, tzinfo=timezone.utc)
+    c_dir = _setup_cycle(
+        store, "c_unarchived_old", [500], {0: True},
+        archived=False
+    )
+    # 修改 manifest 加上很早的 created_at
+    m = store.load("c_unarchived_old")
+    m.created_at = "2026-01-01T00:00:00Z"
+    store._save_manifest_unlocked(m)
+
+    res = enforce_retention(store, max_bytes=100, retention_days=90, now=now)
+
+    assert (c_dir / "chunk_000000.wav").exists()
+    assert len(res["deleted_files"]) == 0
+
+
+def test_retention_cap_fallback(tmp_path):
+    """Test 10: 時間清理後若仍超過容量上限，依容量規則接續清理未過期已 acked 檔案 (reason='cap')。"""
+    store = SegmentStore(tmp_path)
+    now = datetime(2026, 6, 1, 12, 0, tzinfo=timezone.utc)
+    # 舊的過期循環
+    c1 = _setup_cycle(store, "c_exp", [1000], {0: True}, archived=True, archived_at="2026-01-01T00:00:00Z")
+    # 未過期但較早封存
+    c2 = _setup_cycle(store, "c_cap_target", [1000], {0: True}, archived=True, archived_at="2026-05-10T00:00:00Z")
+    # 未過期且最新封存
+    c3 = _setup_cycle(store, "c_kept", [1000], {0: True}, archived=True, archived_at="2026-05-25T00:00:00Z")
+
+    # 設 max_bytes=3200。c_exp 被 age 刪除後剩 ~4042，仍 > 3200，c_cap_target 應被 cap 刪除後剩 ~3042 <= 3200
+    res = enforce_retention(store, max_bytes=3200, retention_days=90, now=now)
+
+    assert not (c1 / "chunk_000000.wav").exists()
+    assert res["reasons"][str(c1 / "chunk_000000.wav")] == "age"
+
+    assert not (c2 / "chunk_000000.wav").exists()
+    assert res["reasons"][str(c2 / "chunk_000000.wav")] == "cap"
+
+    assert (c3 / "chunk_000000.wav").exists()
+

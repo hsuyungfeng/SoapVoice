@@ -81,6 +81,9 @@ class LANConfig:
     temp_cache_max_mb: int = field(
         default_factory=lambda: int(os.getenv("SOAPVOICE_TEMP_CACHE_MAX_MB", "2048"))
     )
+    temp_retention_days: int = field(
+        default_factory=lambda: int(os.getenv("SOAPVOICE_TEMP_RETENTION_DAYS", "90"))
+    )
     chunk_seconds: int = 20
 
     # 本機控制通道 (Phase 31)

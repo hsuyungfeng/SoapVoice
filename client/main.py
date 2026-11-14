@@ -44,7 +44,7 @@ from client.local_storage import LocalStorageManager  # noqa: F401 — 供 main 
 from client.retry_manager import RetryManager  # noqa: F401 — 供 main 入口顯式宣告依賴（11-03 key_link）
 from client.screenshot_capture import ScreenshotCapture
 from client.segment_store import SegmentStore
-from client.temp_cleanup import enforce_cap
+from client.temp_cleanup import enforce_cap, enforce_retention
 
 logger = logging.getLogger(__name__)
 
@@ -277,7 +277,19 @@ class App:
 
         def cleanup_fn() -> None:
             max_bytes = int(getattr(self.config, "temp_cache_max_mb", 2048)) * 1024 * 1024
-            enforce_cap(self.store, max_bytes=max_bytes)
+            retention_days = int(getattr(self.config, "temp_retention_days", 90))
+            result = enforce_retention(
+                self.store,
+                max_bytes=max_bytes,
+                retention_days=retention_days,
+            )
+            unuploaded = result.get("unuploaded_bytes", 0)
+            if unuploaded > int(max_bytes * 0.8):
+                logger.warning(
+                    "SoapVoice unuploaded cache is high: %d bytes (> 80%% of %d max_bytes)",
+                    unuploaded,
+                    max_bytes,
+                )
 
         def server_check_fn(cycle_id: str) -> Optional[str]:
             url = f"{base_url.rstrip('/')}/api/cycles/{cycle_id}"
