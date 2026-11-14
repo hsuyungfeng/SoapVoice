@@ -23,11 +23,12 @@ Faster-Whisper medium    Tesseract OCR / Ollama Vision (備援)
 
 ```bash
 # 安裝依賴（使用 uv，非 pip）
-uv sync                        # 生產依賴
-uv sync --group dev            # 含開發工具（pytest, ruff, black, locust）
+uv sync --no-config                              # 診間客戶端依賴（不含 ASR／LLM，約 100 MB）
+uv sync --extra server --no-config              # 伺服器端（torch、faster-whisper 等，數 GB）
+uv sync --extra server --group dev --no-config  # 伺服器＋開發工具（pytest, ruff, black, locust）
 
 # 啟動 API 伺服器（須先確認 Ollama 運行中：ollama serve）
-uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+uv run --extra server --no-config uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## 測試指令
